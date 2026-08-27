@@ -1,6 +1,6 @@
 /* src/css/homepage.css */
 
-/* Force the home page to take up the entire width of the viewport/page */
+/* Force the home page to take up the entire width of the viewport/page and flush to top */
 .homepage,
 .home-page {
   width: 100vw !important;
@@ -10,10 +10,16 @@
   right: 50%;
   margin-left: -50vw !important;
   margin-right: -50vw !important;
-  margin-top: 0;
+  margin-top: -85px !important;
   padding: 0;
-  overflow-x: hidden;
   box-sizing: border-box;
+}
+
+@media (max-width: 991px) {
+  .homepage,
+  .home-page {
+    margin-top: -70px !important;
+  }
 }
 
 /* Statement / Philosophy Section */
