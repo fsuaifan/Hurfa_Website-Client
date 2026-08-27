@@ -20,11 +20,11 @@ function NavigationBar() {
     >
       <Container>
         {/* logo */}
-        <Navbar.Brand as={Link} to="/" className="fw-bold fs-4">
+        <Navbar.Brand as={Link} to="/" className="py-0 d-flex align-items-center">
           <img
             src="https://ik.imagekit.io/6dghafkgmq/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204"
             alt="HurfaLogo"
-            height="34"
+            height="44"
           />
         </Navbar.Brand>
 
@@ -32,12 +32,13 @@ function NavigationBar() {
         <Navbar.Toggle aria-controls="mobile-nav-dropdown" />
 
         <Navbar.Collapse id="mobile-nav-dropdown">
-          <Nav className="ms-auto align-items-lg-center text-center text-lg-start pt-3 pt-lg-0 border-top border-lg-0 mt-2 mt-lg-0">
+          <Nav className="ms-auto align-items-lg-center text-center text-lg-start pt-3 pt-lg-0 border-top border-lg-0 mt-2 mt-lg-0 gap-lg-1">
             <Nav.Link
               as={NavLink}
               to="/kitchens"
               onClick={closeDropdown}
-              className="py-2 px-3 fw-semibold text-uppercase"
+              className="py-2 px-3 fw-semibold text-uppercase small"
+              style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
               Kitchens
             </Nav.Link>
@@ -45,7 +46,8 @@ function NavigationBar() {
               as={NavLink}
               to="/bedrooms"
               onClick={closeDropdown}
-              className="py-2 px-3 fw-semibold text-uppercase"
+              className="py-2 px-3 fw-semibold text-uppercase small"
+              style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
               Bedrooms
             </Nav.Link>
@@ -53,7 +55,8 @@ function NavigationBar() {
               as={NavLink}
               to="/products"
               onClick={closeDropdown}
-              className="py-2 px-3 fw-semibold text-uppercase"
+              className="py-2 px-3 fw-semibold text-uppercase small"
+              style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
               Products
             </Nav.Link>
@@ -61,7 +64,8 @@ function NavigationBar() {
               as={NavLink}
               to="/about"
               onClick={closeDropdown}
-              className="py-2 px-3 fw-semibold text-uppercase"
+              className="py-2 px-3 fw-semibold text-uppercase small"
+              style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
               About
             </Nav.Link>
@@ -69,7 +73,8 @@ function NavigationBar() {
               as={NavLink}
               to="/admin"
               onClick={closeDropdown}
-              className="py-2 px-3 text-secondary"
+              className="py-2 px-3 text-secondary text-uppercase small"
+              style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
               Admin
             </Nav.Link>
@@ -78,6 +83,7 @@ function NavigationBar() {
               <button
                 type="button"
                 className="btn btn-outline-dark btn-sm px-3"
+                style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}
                 onClick={closeDropdown}
               >
                 العربية
