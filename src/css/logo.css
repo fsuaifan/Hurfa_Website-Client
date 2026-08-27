@@ -1,13 +1,16 @@
 .nav-logo {
-  height: 52px !important;
+  height: 40vh !important;
+  max-height: 7vw !important;
+  min-height: 48px;
   width: auto !important;
-  max-height: none !important;
   object-fit: contain;
   display: block;
 }
 
 @media (max-width: 991px) {
   .nav-logo {
-    height: 42px !important;
+    height: 6vh !important;
+    max-width: 14vw !important;
+    min-height: 40px;
   }
 }

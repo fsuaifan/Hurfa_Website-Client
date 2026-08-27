@@ -1,0 +1,60 @@
+/* src/css/Navbar.css */
+
+.hurfa-navbar {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+/* Desktop sizing */
+@media (min-width: 992px) {
+  .hurfa-navbar {
+    height: 70px;
+    max-height: 70px;
+  }
+
+  .hurfa-navbar .container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Prevent the large logo from expanding the navbar height */
+  .hurfa-navbar .navbar-brand {
+    position: relative;
+    height: 100%;
+    min-width: 75px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hurfa-navbar .navbar-brand .nav-logo {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+}
+
+/* Mobile sizing */
+@media (max-width: 991px) {
+  .hurfa-navbar {
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+  }
+
+  .hurfa-navbar .navbar-brand {
+    position: relative;
+    height: 46px;
+    min-width: 55px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hurfa-navbar .navbar-brand .nav-logo {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+}
