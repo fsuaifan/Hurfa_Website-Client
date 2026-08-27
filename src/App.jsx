@@ -7,7 +7,7 @@ function App() {
   return (
     <BrowserRouter>
       <NavigationBar />
-      <div className="main-content" style={{ paddingTop: '80px' }}>
+      <div className="main-content">
         <Routes>
           <Route path="/" element={<div className="container py-5"><h1>Home</h1></div>} />
           <Route path="/kitchens" element={<div className="container py-5"><h1>Kitchens</h1></div>} />
@@ -15,7 +15,7 @@ function App() {
           <Route path="/products" element={<div className="container py-5"><h1>Products</h1></div>} />
           <Route path="/about" element={<div className="container py-5"><h1>About Us</h1></div>} />
           <Route path="/admin" element={<div className="container py-5"><h1>Admin</h1></div>} />
-1        </Routes>
+        </Routes>
       </div>
     </BrowserRouter>
   );

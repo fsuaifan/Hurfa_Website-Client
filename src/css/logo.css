@@ -1,5 +1,5 @@
 .nav-logo {
-  height: 60px !important;
+  height: 52px !important;
   width: auto !important;
   max-height: none !important;
   object-fit: contain;
@@ -8,6 +8,6 @@
 
 @media (max-width: 991px) {
   .nav-logo {
-    height: 48px !important;
+    height: 42px !important;
   }
 }

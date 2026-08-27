@@ -1,3 +1,13 @@
+.main-content {
+  padding-top: 85px;
+}
+
+@media (max-width: 991px) {
+  .main-content {
+    padding-top: 75px;
+  }
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
