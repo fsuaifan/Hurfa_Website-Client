@@ -3,6 +3,39 @@
 .hurfa-navbar {
   padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
+  transition: background-color 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+/* Solid Navbar (default & on scroll) */
+.hurfa-navbar.is-solid {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Transparent Navbar (Homepage at top) */
+.hurfa-navbar.is-transparent {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid transparent;
+}
+
+/* Invert logo to white when transparent over dark video */
+.hurfa-navbar.is-transparent .nav-logo {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Nav links in transparent mode */
+.hurfa-navbar.is-transparent .nav-link {
+  color: #ffffff !important;
+}
+
+.hurfa-navbar.is-transparent .nav-link:hover {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Hamburger toggler in transparent mode */
+.hurfa-navbar.is-transparent .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* Desktop sizing */
