@@ -88,4 +88,6 @@ function NavigationBar() {
       </Container>
     </Navbar>
   );
-}  
+}
+
+export default NavigationBar;
