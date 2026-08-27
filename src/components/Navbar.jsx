@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, NavLink } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import '../css/logo.css';
+import '../css/Navbar.css';
 
 const LOGO_URL = "https://ik.imagekit.io/6dghafkgmq/tr:x-1648,y-950,w-677,h-753/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204";
 
@@ -19,7 +20,7 @@ function NavigationBar() {
       bg="white"
       expanded={expanded}
       onToggle={setExpanded}
-      className="shadow-sm py-2"
+      className="hurfa-navbar shadow-sm"
     >
       <Container className="d-flex align-items-center">
         {/* logo */}
