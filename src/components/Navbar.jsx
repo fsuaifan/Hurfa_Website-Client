@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, NavLink } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
+import hurfaLogo from '../assets/hurfa-logo.png';
+import '../css/logo.css';
 
 function NavigationBar() {
   // this checks if the dropdown menu is expanded or not
@@ -16,20 +18,20 @@ function NavigationBar() {
       bg="white"
       expanded={expanded}
       onToggle={setExpanded}
-      className="shadow-sm py-2 py-lg-3"
+      className="shadow-sm py-2"
     >
-      <Container>
+      <Container className="d-flex align-items-center">
         {/* logo */}
-        <Navbar.Brand as={Link} to="/" className="py-0 d-flex align-items-center">
+        <Navbar.Brand as={Link} to="/" className="py-0 my-0 d-flex align-items-center">
           <img
-            src="https://ik.imagekit.io/6dghafkgmq/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204"
-            alt="HurfaLogo"
-            height="44"
+            src={hurfaLogo}
+            alt="Hurfa"
+            className="nav-logo"
           />
         </Navbar.Brand>
 
         {/* dropdown menu toggle */}
-        <Navbar.Toggle aria-controls="mobile-nav-dropdown" />
+        <Navbar.Toggle aria-controls="mobile-nav-dropdown" className="my-auto" />
 
         <Navbar.Collapse id="mobile-nav-dropdown">
           <Nav className="ms-auto align-items-lg-center text-center text-lg-start pt-3 pt-lg-0 border-top border-lg-0 mt-2 mt-lg-0 gap-lg-1">
