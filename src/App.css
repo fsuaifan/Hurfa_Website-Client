@@ -1,10 +1,10 @@
 .main-content {
-  padding-top: 85px;
+  padding-top: 96px;
 }
 
 @media (max-width: 991px) {
   .main-content {
-    padding-top: 75px;
+    padding-top: 80px;
   }
 }
 
