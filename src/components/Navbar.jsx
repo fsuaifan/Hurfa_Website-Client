@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import '../css/logo.css';
 import '../css/Navbar.css';
@@ -8,19 +8,37 @@ import '../css/Navbar.css';
 const LOGO_URL = "https://ik.imagekit.io/6dghafkgmq/tr:x-1648,y-950,w-677,h-753/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204";
 
 function NavigationBar() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   // this checks if the dropdown menu is expanded or not
   const [expanded, setExpanded] = useState(false);
+  // track scroll position to switch between transparent and solid
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 40);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // this function closes the dropdown menu when a link is clicked
   const closeDropdown = () => setExpanded(false);
+
+  // Transparent only on the homepage when at the top and mobile menu is closed
+  const isTransparent = isHomePage && !isScrolled && !expanded;
 
   return (
     <Navbar
       expand="lg"
       fixed="top"
-      bg="white"
+      variant={isTransparent ? "dark" : "light"}
       expanded={expanded}
       onToggle={setExpanded}
-      className="hurfa-navbar shadow-sm"
+      className={`hurfa-navbar ${isTransparent ? 'is-transparent' : 'is-solid shadow-sm'}`}
     >
       <Container className="d-flex align-items-center">
         {/* logo */}
@@ -86,7 +104,7 @@ function NavigationBar() {
             <div className="py-2 py-lg-0 ps-lg-2">
               <button
                 type="button"
-                className="btn btn-outline-dark btn-sm px-3"
+                className={`btn btn-sm px-3 ${isTransparent ? 'btn-outline-light' : 'btn-outline-dark'}`}
                 style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}
                 onClick={closeDropdown}
               >
