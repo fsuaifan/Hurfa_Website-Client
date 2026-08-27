@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, NavLink } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
+import '../css/logo.css';
 
 function NavigationBar() {
   // this checks if the dropdown menu is expanded or not
@@ -24,7 +25,7 @@ function NavigationBar() {
           <img
             src="https://ik.imagekit.io/6dghafkgmq/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204"
             alt="HurfaLogo"
-            height="44"
+            className="nav-logo"
           />
         </Navbar.Brand>
 
