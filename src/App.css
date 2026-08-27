@@ -1,10 +1,10 @@
 .main-content {
-  padding-top: 96px;
+  padding-top: calc(7vh + 2rem);
 }
 
 @media (max-width: 991px) {
   .main-content {
-    padding-top: 80px;
+    padding-top: calc(6vh + 1.75rem);
   }
 }
 
