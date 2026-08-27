@@ -1,11 +1,12 @@
 import React from "react";
 import { Container, Row, Col, Nav } from "react-bootstrap";
+import "../css/footer.css";
 
 const LOGO_URL = "https://ik.imagekit.io/6dghafkgmq/tr:x-1648,y-950,w-677,h-753/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204";
 
 function Footer() {
   return (
-    <footer className="bg-dark text-light pt-5 pb-4 mt-auto">
+    <footer className="hurfa-footer bg-dark text-light pt-5 pb-4 mt-auto">
       <Container>
         {/* Top section: logo and media links */}
         <Row className="align-items-center justify-content-between pb-4 gy-3">
