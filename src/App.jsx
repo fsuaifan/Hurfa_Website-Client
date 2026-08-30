@@ -9,6 +9,7 @@ import KitchenModelDetail from './pages/KitchenModelDetail';
 import Bedrooms from './pages/bedrooms';
 import Products from './pages/products';
 import AboutUs from './pages/aboutUs';
+import Cart from './pages/cart';
 import './App.css';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Route path="/bedrooms" element={<Bedrooms />} />
             <Route path="/products" element={<Products />} />
             <Route path="/about" element={<AboutUs />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/admin" element={<div className="container py-5"><h1>Admin</h1></div>} />
           </Routes>
         </div>
