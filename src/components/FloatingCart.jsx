@@ -1,14 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../css/floating-cart.css';
 
 function FloatingCart({ count = 0, onClick, ariaLabel }) {
+  const navigate = useNavigate();
   const label = ariaLabel || `Shopping cart with ${count} ${count === 1 ? 'item' : 'items'}`;
+  const handleClick = onClick || (() => navigate('/cart'));
 
   return (
     <button
       type="button"
       className="floating-cart-btn"
-      onClick={onClick}
+      onClick={handleClick}
       aria-label={label}
     >
       {/* Shopping Bag SVG Icon */}
