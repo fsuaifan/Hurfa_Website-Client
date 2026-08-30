@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import '../css/login.css';
 
 function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || '/';
+  const isAdminLogin = redirectTarget.includes('/admin');
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -38,6 +42,9 @@ function Login() {
     // Mock authentication process
     setTimeout(() => {
       setLoading(false);
+      // Persist session authentication for admin access
+      sessionStorage.setItem('hurfa_admin_authenticated', 'true');
+
       setStatusMessage({
         type: 'success',
         text: 'Sign in successful! Redirecting...',
@@ -45,9 +52,9 @@ function Login() {
 
       // Redirect after short delay
       setTimeout(() => {
-        navigate('/');
-      }, 1000);
-    }, 600);
+        navigate(redirectTarget, { replace: true });
+      }, 700);
+    }, 500);
   };
 
   return (
@@ -55,9 +62,15 @@ function Login() {
       <div className="login-card">
         {/* Header */}
         <header className="login-header">
-          <span className="login-eyebrow">Hurfa Studio</span>
-          <h1>Welcome Back</h1>
-          <p>Sign in to access your curated collections and account.</p>
+          <span className="login-eyebrow">
+            {isAdminLogin ? 'Admin Portal' : 'Hurfa Studio'}
+          </span>
+          <h1>{isAdminLogin ? 'Admin Sign In' : 'Welcome Back'}</h1>
+          <p>
+            {isAdminLogin
+              ? 'Sign in to access the Hurfa administration dashboard.'
+              : 'Sign in to access your curated collections and account.'}
+          </p>
         </header>
 
         {/* Status Message */}
