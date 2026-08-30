@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CATALOG_PRODUCTS, PREMIUM_COLLECTIONS } from '../data/productsData';
+import ProductModal from '../components/ProductModal';
 import '../css/products.css';
 
 const CATEGORIES = ['All', 'Kitchens', 'Bedrooms', 'Living Room'];
@@ -7,6 +8,17 @@ const CATEGORIES = ['All', 'Kitchens', 'Bedrooms', 'Living Room'];
 function Products() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenProduct = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -70,7 +82,19 @@ function Products() {
       <section className="products-grid-section" aria-label="Products Catalog">
         <div className="products-grid">
           {filteredProducts.map((product) => (
-            <article key={product.id} className="product-item-card">
+            <article
+              key={product.id}
+              className="product-item-card"
+              onClick={() => handleOpenProduct(product)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View details for ${product.name}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleOpenProduct(product);
+                }
+              }}
+            >
               <div className="product-item-media">
                 <img
                   src={product.images[0]}
@@ -98,7 +122,19 @@ function Products() {
 
         <div className="products-collections-grid">
           {PREMIUM_COLLECTIONS.map((col) => (
-            <article key={col.id} className="collection-item-card">
+            <article
+              key={col.id}
+              className="collection-item-card"
+              onClick={() => handleOpenProduct(col)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View details for ${col.name}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleOpenProduct(col);
+                }
+              }}
+            >
               <div className="collection-item-media">
                 <img
                   src={col.image}
@@ -116,6 +152,17 @@ function Products() {
           ))}
         </div>
       </section>
+
+      {/* Quick-View Product Modal */}
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        product={selectedProduct}
+        onAddToCart={(prod, qty) => {
+          console.log('Added to cart:', prod?.name, 'Qty:', qty);
+          handleCloseModal();
+        }}
+      />
     </div>
   );
 }
