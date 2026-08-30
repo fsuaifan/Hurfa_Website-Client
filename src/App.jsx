@@ -10,6 +10,7 @@ import Bedrooms from './pages/bedrooms';
 import Products from './pages/products';
 import AboutUs from './pages/aboutUs';
 import Cart from './pages/cart';
+import Login from './pages/login';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<div className="container py-5"><h1>Admin</h1></div>} />
           </Routes>
         </div>
