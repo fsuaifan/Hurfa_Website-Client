@@ -1,15 +1,9 @@
 /* src/css/footer.css */
 
-/* Make footer span the full 100% width of the viewport/page */
+/* Make footer span the full 100% width of the page */
 .hurfa-footer,
 footer {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw !important;
-  margin-right: -50vw !important;
+  width: 100%;
   box-sizing: border-box;
 }
 

@@ -1,19 +1,12 @@
 /* src/css/Kitchens.css */
     
-    /* Full-bleed page wrapper */
-    .kitchens-page,
-    .kitchen-detail-page {
-      width: 100vw !important;
-      max-width: 100vw !important;
-      position: relative;
-      left: 50%;
-      right: 50%;
-      margin-left: -50vw !important;
-      margin-right: -50vw !important;
-      padding: 0;
-      overflow-x: hidden;
-      box-sizing: border-box;
-    }
+    /* Full-width page wrapper */
+.kitchens-page,
+.kitchen-detail-page {
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+}
     
     /* Page Header */
     .kitchens-header {
