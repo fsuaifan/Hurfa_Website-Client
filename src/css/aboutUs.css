@@ -1,0 +1,378 @@
+/* src/css/aboutUs.css */
+
+.about-page {
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #FAF8F5;
+  color: #254844;
+}
+
+/* Hero Section */
+.about-hero {
+  padding: 60px 5% 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-eyebrow {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #78716c;
+  margin-bottom: 12px;
+}
+
+.about-hero h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400;
+  color: #1f1d1b;
+  margin: 0 0 18px;
+}
+
+.about-hero p {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #57534e;
+  margin: 0 auto;
+  max-width: 780px;
+}
+
+/* Tagline Quote Section */
+.about-tagline-section {
+  padding: 40px 5% 50px;
+  text-align: center;
+}
+
+.about-tagline {
+  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: #254844;
+  margin: 0;
+  font-family: serif, 'Cairo', sans-serif;
+  font-style: italic;
+}
+
+/* Info Cards (Mission, Goal, Philosophy) */
+.about-cards-section {
+  padding: 20px 5% 80px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.about-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.about-card {
+  background-color: #ffffff;
+  border: 1px solid #e7e5e4;
+  border-radius: 8px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.about-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #254844;
+  margin: 0 0 14px;
+}
+
+.about-card p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #57534e;
+  margin: 0;
+}
+
+/* Process Section */
+.about-process-section {
+  padding: 60px 5% 90px;
+  max-width: 1240px;
+  margin: 0 auto;
+  border-top: 1px solid #e7e5e4;
+}
+
+.about-section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.about-section-header h2 {
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  font-weight: 400;
+  color: #1f1d1b;
+  margin: 0;
+}
+
+.about-process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.about-process-step {
+  position: relative;
+  padding-top: 32px;
+  text-align: left;
+}
+
+.about-process-step .dot {
+  width: 14px;
+  height: 14px;
+  background-color: #e67e22;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.about-process-step::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 24px;
+  width: calc(100% - 24px);
+  height: 2px;
+  border-top: 2px dashed #d6d3d1;
+}
+
+.about-process-step:last-child::after {
+  display: none;
+}
+
+.about-process-step h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: #e67e22;
+}
+
+.about-process-step p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #57534e;
+  margin: 0;
+}
+
+/* Organization Structure Section */
+.about-org-section {
+  padding: 70px 5% 80px;
+  background-color: #254844;
+  color: #ffffff;
+  text-align: center;
+  overflow-x: auto;
+}
+
+.about-org-section h2 {
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 500;
+  margin: 0 0 14px;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+}
+
+.about-underline {
+  width: 60px;
+  height: 3px;
+  background-color: #e67e22;
+  margin: 0 auto 50px;
+}
+
+.org-tree {
+  display: flex;
+  justify-content: center;
+  min-width: max-content;
+  margin: 0 auto;
+}
+
+.org-tree ul {
+  padding-top: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-left: 0;
+  margin: 0;
+}
+
+.org-tree li {
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 8px 0;
+}
+
+.org-tree li::before,
+.org-tree li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  border-top: 1px solid #e67e22;
+  width: 50%;
+  height: 20px;
+}
+
+.org-tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 1px solid #e67e22;
+}
+
+.org-tree li:only-child::after,
+.org-tree li:only-child::before {
+  display: none;
+}
+
+.org-tree li:only-child {
+  padding-top: 0;
+}
+
+.org-tree li:first-child::before,
+.org-tree li:last-child::after {
+  border: 0 none;
+}
+
+.org-tree li:last-child::before {
+  border-right: 1px solid #e67e22;
+  border-radius: 0 5px 0 0;
+}
+
+.org-tree li:first-child::after {
+  border-radius: 5px 0 0 0;
+}
+
+.org-tree ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 1px solid #e67e22;
+  width: 0;
+  height: 20px;
+}
+
+.org-node {
+  background: #ffffff;
+  color: #254844;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+  border: 2px solid #e67e22;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+.org-node:hover {
+  background-color: #e67e22;
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.org-node strong {
+  font-size: 0.74rem;
+  font-weight: 700;
+  display: block;
+  line-height: 1.1;
+  color: inherit;
+}
+
+.org-node span {
+  font-size: 0.6rem;
+  display: block;
+  margin-top: 2px;
+  color: #78716c;
+  line-height: 1.1;
+}
+
+.org-node:hover span {
+  color: #ffffff;
+}
+
+/* Team Section */
+.about-team-section {
+  padding: 80px 5% 120px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.about-team-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px 32px;
+}
+
+.about-team-member {
+  width: 190px;
+  text-align: center;
+}
+
+.about-team-avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background-color: #e6e2da;
+  border: 3px solid #e67e22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #254844;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.about-team-member h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1f1d1b;
+  margin: 0 0 4px;
+}
+
+.about-team-member p {
+  font-size: 0.88rem;
+  color: #78716c;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .about-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .about-process-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .about-process-step::after {
+    display: none;
+  }
+
+  .about-org-section {
+    padding: 50px 4% 60px;
+  }
+}
