@@ -11,6 +11,7 @@ import Products from './pages/products';
 import AboutUs from './pages/aboutUs';
 import Cart from './pages/cart';
 import Login from './pages/login';
+import Admin from './pages/admin';
 import AdminProtectedWrapper from './components/AdminProtectedWrapper';
 import './App.css';
 
@@ -33,27 +34,7 @@ function App() {
               path="/admin"
               element={
                 <AdminProtectedWrapper>
-                  <div
-                    className="container py-5 text-start"
-                    style={{ maxWidth: '900px' }}
-                  >
-                    <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                      <h1 className="m-0">Admin Dashboard</h1>
-                      <button
-                        type="button"
-                        className="btn btn-outline-dark btn-sm"
-                        onClick={() => {
-                          sessionStorage.removeItem('hurfa_admin_authenticated');
-                          window.location.href = '/login?redirect=/admin';
-                        }}
-                      >
-                        Log Out (End Session)
-                      </button>
-                    </div>
-                    <p className="text-muted">
-                      Authenticated session active. The login page will prompt once per browser session.
-                    </p>
-                  </div>
+                  <Admin />
                 </AdminProtectedWrapper>
               }
             />
