@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NavigationBar from './components/Navbar';
 import Footer from './components/Footer';
+import FloatingCart from './components/FloatingCart';
 import HomePage from './pages/homepage';
 import Kitchens from './pages/Kitchens';
 import KitchenModelDetail from './pages/KitchenModelDetail';
@@ -24,6 +25,7 @@ function App() {
           </Routes>
         </div>
         <Footer />
+        <FloatingCart />
       </div>
     </BrowserRouter>
   );
