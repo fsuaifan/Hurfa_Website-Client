@@ -93,12 +93,12 @@ function NavigationBar() {
             </Nav.Link>
             <Nav.Link
               as={NavLink}
-              to="/admin"
+              to="/login"
               onClick={closeDropdown}
-              className="py-2 px-3 text-secondary text-uppercase small"
+              className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
-              Admin
+              Account
             </Nav.Link>
 
             <div className="py-2 py-lg-0 ps-lg-2">
