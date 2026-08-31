@@ -96,12 +96,12 @@ function Login() {
 
         setStatusMessage({
           type: 'success',
-          text: 'Welcome back! Redirecting to Hurfa Collections...',
+          text: 'Welcome back! Redirecting to your account...',
         });
 
         setTimeout(() => {
-          // If redirected from a non-admin protected page or cart, honor it; otherwise go to products/home
-          const destination = redirectTarget && !redirectTarget.includes('/admin') ? redirectTarget : '/products';
+          // If customer, go to /account (or explicit redirectTarget if not admin)
+          const destination = redirectTarget && !redirectTarget.includes('/admin') ? redirectTarget : '/account';
           navigate(destination, { replace: true });
         }, 700);
       }

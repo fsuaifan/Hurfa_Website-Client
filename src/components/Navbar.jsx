@@ -93,7 +93,13 @@ function NavigationBar() {
             </Nav.Link>
             <Nav.Link
               as={NavLink}
-              to="/login"
+              to={
+                sessionStorage.getItem('hurfa_admin_authenticated') === 'true'
+                  ? '/admin'
+                  : sessionStorage.getItem('hurfa_customer_authenticated') === 'true'
+                  ? '/account'
+                  : '/login'
+              }
               onClick={closeDropdown}
               className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
