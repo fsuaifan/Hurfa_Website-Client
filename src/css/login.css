@@ -17,9 +17,52 @@
   background-color: #ffffff;
   border: 1px solid #e7e5e4;
   border-radius: 12px;
-  padding: 44px 36px;
+  padding: 40px 36px;
   box-shadow: 0 10px 30px rgba(31, 29, 27, 0.05);
   box-sizing: border-box;
+}
+
+/* Role Selector Tabs */
+.login-role-tabs {
+  display: flex;
+  background-color: #FAF8F5;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #e7e5e4;
+  margin-bottom: 28px;
+  gap: 4px;
+}
+
+.login-role-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: #78716c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-role-tab svg {
+  transition: stroke 0.2s ease;
+}
+
+.login-role-tab:hover {
+  color: #1f1d1b;
+}
+
+.login-role-tab.active {
+  background-color: #ffffff;
+  color: #1f1d1b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .login-header {
@@ -211,6 +254,25 @@
 }
 
 .login-footer a:hover {
+  color: #e67e22;
+}
+
+.login-switch-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #1f1d1b;
+  font-weight: 600;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.login-switch-link:hover {
   color: #e67e22;
 }
 
