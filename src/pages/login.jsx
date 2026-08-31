@@ -283,7 +283,9 @@ function Login() {
           ) : (
             <p>
               Don't have an account?{' '}
-              <Link to="/products">Explore Collections</Link>
+              <Link to="/signup" className="login-signup-link">
+                Sign Up
+              </Link>
             </p>
           )}
         </footer>
