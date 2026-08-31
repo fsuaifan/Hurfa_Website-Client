@@ -11,6 +11,7 @@ import Products from './pages/products';
 import AboutUs from './pages/aboutUs';
 import Cart from './pages/cart';
 import Login from './pages/login';
+import SignUp from './pages/signUp';
 import Admin from './pages/admin';
 import AdminProtectedWrapper from './components/AdminProtectedWrapper';
 import './App.css';
@@ -30,6 +31,7 @@ function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route
               path="/admin"
               element={
