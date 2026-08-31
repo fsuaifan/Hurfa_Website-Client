@@ -87,7 +87,7 @@ function SignUp() {
       });
 
       setTimeout(() => {
-        navigate('/products', { replace: true });
+        navigate('/account', { replace: true });
       }, 750);
     }, 600);
   };
