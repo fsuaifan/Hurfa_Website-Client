@@ -14,6 +14,7 @@ import Login from './pages/login';
 import SignUp from './pages/signUp';
 import Account from './pages/account';
 import Admin from './pages/admin';
+import Editor from './pages/editor';
 import AdminProtectedWrapper from './components/AdminProtectedWrapper';
 import './App.css';
 
@@ -39,6 +40,14 @@ function App() {
               element={
                 <AdminProtectedWrapper>
                   <Admin />
+                </AdminProtectedWrapper>
+              }
+            />
+            <Route
+              path="/editor"
+              element={
+                <AdminProtectedWrapper>
+                  <Editor />
                 </AdminProtectedWrapper>
               }
             />
