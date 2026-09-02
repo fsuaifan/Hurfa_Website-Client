@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { INITIAL_RECORDS } from '../data/adminCatalogData';
+import ImgkitApi from '../components/imgkitApi';
 import '../css/admin.css';
 
 const DEFAULT_IMAGE =
@@ -70,6 +71,7 @@ function Editor() {
 
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showImgKitModal, setShowImgKitModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -288,9 +290,24 @@ function Editor() {
 
             {/* Row 3: Image URL & Presets */}
             <div className="login-form-group">
-              <label htmlFor="editor-image" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                Image CDN URL
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                <label htmlFor="editor-image" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', margin: 0 }}>
+                  Image CDN URL
+                </label>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-outline"
+                  style={{ padding: '4px 10px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  onClick={() => setShowImgKitModal(true)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                  </svg>
+                  ImageKit Studio & Transform
+                </button>
+              </div>
               <input
                 id="editor-image"
                 type="url"
@@ -465,6 +482,38 @@ function Editor() {
             </div>
           </form>
         </div>
+
+        {/* ImageKit Modal Studio */}
+        {showImgKitModal && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.65)',
+              backdropFilter: 'blur(3px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1050,
+              padding: '20px',
+            }}
+            onClick={() => setShowImgKitModal(false)}
+          >
+            <div
+              style={{ maxWidth: '640px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ImgkitApi
+                initialUrl={formData.image}
+                onSelect={(url) => {
+                  setFormData((prev) => ({ ...prev, image: url }));
+                  setShowImgKitModal(false);
+                }}
+                onClose={() => setShowImgKitModal(false)}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
