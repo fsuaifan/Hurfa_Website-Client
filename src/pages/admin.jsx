@@ -1,192 +1,27 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { INITIAL_RECORDS, INITIAL_ORDERS, INITIAL_CLIENTS } from '../data/adminCatalogData';
 import '../css/admin.css';
-
-const INITIAL_RECORDS = [
-  {
-    id: 1,
-    name: 'Tayf Kitchen Set',
-    category: 'Kitchens',
-    price: 'JOD 1,450',
-    stockStatus: 'Active',
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Tayf_4iPZv6iGf.png?updatedAt=1782466205843',
-  },
-  {
-    id: 2,
-    name: 'Oud Collection Sofa',
-    category: 'Living Room',
-    price: 'JOD 680',
-    stockStatus: 'Active',
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Oud-Collection_u9dsnBlwn.jpg?updatedAt=1787138978278',
-  },
-  {
-    id: 3,
-    name: 'Wesal Bed Frame',
-    category: 'Bedrooms',
-    price: 'JOD 310',
-    stockStatus: 'Active',
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg?updatedAt=1787138960280',
-  },
-  {
-    id: 4,
-    name: 'Kitchen Island V4',
-    category: 'Kitchens',
-    price: 'JOD 1,980',
-    stockStatus: 'Low Stock',
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/Kitchens/Kit3V4.jpg?updatedAt=1779196664060',
-  },
-  {
-    id: 5,
-    name: 'Wardrobe — Oak',
-    category: 'Bedrooms',
-    price: 'JOD 420',
-    stockStatus: 'Active',
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Tayf_4iPZv6iGf.png?updatedAt=1782466205843',
-  },
-  {
-    id: 6,
-    name: 'Dresser — Six Drawer',
-    category: 'Bedrooms',
-    price: 'JOD 265',
-    stockStatus: 'Active',
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Oud-Collection_u9dsnBlwn.jpg?updatedAt=1787138978278',
-  },
-];
-
-const INITIAL_ORDERS = [
-  {
-    id: 'ORD-2026-101',
-    clientName: 'Nour Al-Husseini',
-    clientEmail: 'nour.h@example.com',
-    items: 'Tayf Kitchen Set, Kitchen Island V4',
-    total: 'JOD 3,430',
-    date: 'Aug 29, 2026',
-    status: 'In Production',
-    deliveryAddress: 'Abdoun, Amman',
-  },
-  {
-    id: 'ORD-2026-102',
-    clientName: 'Tariq Haddad',
-    clientEmail: 'tariq.haddad@example.com',
-    items: 'Wesal Bed Frame, Wardrobe — Oak',
-    total: 'JOD 730',
-    date: 'Aug 27, 2026',
-    status: 'Ready for Delivery',
-    deliveryAddress: 'Dabouq, Amman',
-  },
-  {
-    id: 'ORD-2026-103',
-    clientName: 'Lina Kassem',
-    clientEmail: 'lina.k@example.com',
-    items: 'Oud Collection Sofa',
-    total: 'JOD 680',
-    date: 'Aug 24, 2026',
-    status: 'Delivered',
-    deliveryAddress: 'Sweifieh, Amman',
-  },
-  {
-    id: 'ORD-2026-104',
-    clientName: 'Yazeed Bakhit',
-    clientEmail: 'yazeed.b@example.com',
-    items: 'Dresser — Six Drawer',
-    total: 'JOD 265',
-    date: 'Aug 21, 2026',
-    status: 'Delivered',
-    deliveryAddress: 'Um Uthaina, Amman',
-  },
-  {
-    id: 'ORD-2026-105',
-    clientName: 'Rania Kawar',
-    clientEmail: 'rania.kawar@example.com',
-    items: 'Custom Architectural Kitchen Consultation',
-    total: 'JOD 1,850',
-    date: 'Aug 19, 2026',
-    status: 'Consultation Scheduled',
-    deliveryAddress: 'Deir Ghbar, Amman',
-  },
-];
-
-const INITIAL_CLIENTS = [
-  {
-    id: 1,
-    name: 'Nour Al-Husseini',
-    email: 'nour.h@example.com',
-    phone: '+962 7 9811 2233',
-    city: 'Amman (Abdoun)',
-    totalOrders: 2,
-    totalSpent: 'JOD 4,280',
-    status: 'Active VIP',
-    lastActive: 'Today',
-  },
-  {
-    id: 2,
-    name: 'Tariq Haddad',
-    email: 'tariq.haddad@example.com',
-    phone: '+962 7 9554 4321',
-    city: 'Amman (Dabouq)',
-    totalOrders: 1,
-    totalSpent: 'JOD 730',
-    status: 'Active',
-    lastActive: '2 days ago',
-  },
-  {
-    id: 3,
-    name: 'Lina Kassem',
-    email: 'lina.k@example.com',
-    phone: '+962 7 8665 1199',
-    city: 'Amman (Sweifieh)',
-    totalOrders: 3,
-    totalSpent: 'JOD 2,150',
-    status: 'Active VIP',
-    lastActive: '5 days ago',
-  },
-  {
-    id: 4,
-    name: 'Yazeed Bakhit',
-    email: 'yazeed.b@example.com',
-    phone: '+962 7 9123 4567',
-    city: 'Amman (Um Uthaina)',
-    totalOrders: 1,
-    totalSpent: 'JOD 265',
-    status: 'Active',
-    lastActive: '1 week ago',
-  },
-  {
-    id: 5,
-    name: 'Rania Kawar',
-    email: 'rania.kawar@example.com',
-    phone: '+962 7 9778 8990',
-    city: 'Amman (Deir Ghbar)',
-    totalOrders: 2,
-    totalSpent: 'JOD 3,600',
-    status: 'Active VIP',
-    lastActive: '3 days ago',
-  },
-  {
-    id: 6,
-    name: 'Omar Majali',
-    email: 'omar.majali@example.com',
-    phone: '+962 7 9443 2211',
-    city: 'Amman (Shmeisani)',
-    totalOrders: 0,
-    totalSpent: 'JOD 0',
-    status: 'Prospect',
-    lastActive: '2 weeks ago',
-  },
-];
 
 function Admin() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('catalog'); // 'catalog' | 'orders' | 'clients'
 
   // Catalog State
-  const [records, setRecords] = useState(INITIAL_RECORDS);
+  const [records, setRecords] = useState(() => {
+    try {
+      const stored = localStorage.getItem('hurfa_catalog_records');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    return INITIAL_RECORDS;
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -206,28 +41,16 @@ function Admin() {
 
   const handleDeleteRecord = (id, name) => {
     if (window.confirm(`Are you sure you want to remove "${name}" from the catalog?`)) {
-      setRecords((prev) => prev.filter((r) => r.id !== id));
+      setRecords((prev) => {
+        const updated = prev.filter((r) => r.id !== id);
+        try {
+          localStorage.setItem('hurfa_catalog_records', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+        return updated;
+      });
     }
-  };
-
-  const handleAddProduct = () => {
-    const title = window.prompt('Enter product name:');
-    if (!title || !title.trim()) return;
-
-    const category = window.prompt('Enter category (Kitchens, Bedrooms, Living Room):', 'Bedrooms') || 'Bedrooms';
-    const price = window.prompt('Enter price (e.g. JOD 450):', 'JOD 450') || 'JOD 450';
-
-    const newRecord = {
-      id: Date.now(),
-      name: title.trim(),
-      category: category.trim(),
-      price: price.trim(),
-      stockStatus: 'Active',
-      image:
-        'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg?updatedAt=1787138960280',
-    };
-
-    setRecords((prev) => [newRecord, ...prev]);
   };
 
   const handleUpdateOrderStatus = (orderId, currentStatus) => {
@@ -318,13 +141,9 @@ function Admin() {
               View Storefront
             </Link>
             {activeSection === 'catalog' && (
-              <button
-                type="button"
-                className="admin-btn admin-btn-primary"
-                onClick={handleAddProduct}
-              >
+              <Link to="/editor" className="admin-btn admin-btn-primary">
                 + Add Product
-              </button>
+              </Link>
             )}
             {activeSection === 'clients' && (
               <button
@@ -543,27 +362,13 @@ function Admin() {
                           </td>
                           <td>
                             <div className="admin-actions-cell">
-                              <button
-                                type="button"
+                              <Link
+                                to={`/editor?id=${item.id}`}
                                 className="admin-action-btn admin-action-edit"
-                                onClick={() => {
-                                  const newPrice = window.prompt(
-                                    `Update price for ${item.name}:`,
-                                    item.price
-                                  );
-                                  if (newPrice && newPrice.trim()) {
-                                    setRecords((prev) =>
-                                      prev.map((r) =>
-                                        r.id === item.id
-                                          ? { ...r, price: newPrice.trim() }
-                                          : r
-                                      )
-                                    );
-                                  }
-                                }}
+                                style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
                               >
                                 Edit
-                              </button>
+                              </Link>
                               <button
                                 type="button"
                                 className="admin-action-btn admin-action-delete"
