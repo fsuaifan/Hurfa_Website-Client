@@ -1,35 +1,71 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 import '../css/cart.css';
 
-// Initial sample items matching Hurfa collections
-const INITIAL_CART_ITEMS = [
-  {
-    id: 'wardrobe-oak',
-    name: 'Wardrobe — Oak',
-    category: 'Bedrooms',
-    unitPrice: 420,
-    quantity: 1,
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Tayf_4iPZv6iGf.png?updatedAt=1782466205843',
-  },
-  {
-    id: 'wesal-bed-frame',
-    name: 'Bed Frame — Wesal',
-    category: 'Bedrooms',
-    unitPrice: 310,
-    quantity: 1,
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg?updatedAt=1787138960280',
-  },
-];
-
 function Cart() {
-  const [items, setItems] = useState(INITIAL_CART_ITEMS);
+  const navigate = useNavigate();
+  const [items, setItems] = useState(() => {
+    try {
+      const stored = localStorage.getItem('hurfa_cart');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return [];
+  });
+
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(null);
 
-  // Handlers for cart actions
+  // Sync to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('hurfa_cart', JSON.stringify(items));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [items]);
+
+  // Load from backend if user is logged in
+  useEffect(() => {
+    let isMounted = true;
+    async function syncBackendCart() {
+      try {
+        const userStr = sessionStorage.getItem('hurfa_user') || localStorage.getItem('hurfa_user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          if (user?.email) {
+            const dbCart = await api.cart.get(user.email);
+            if (isMounted && Array.isArray(dbCart) && dbCart.length > 0) {
+              const formatted = dbCart.map((row) => ({
+                id: row.id || row.product_id,
+                name: row.name,
+                category: row.category || 'Furniture',
+                unitPrice: parseFloat(row.price) || 0,
+                quantity: row.quantity || 1,
+                image: row.img || row.image || 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg',
+              }));
+              setItems(formatted);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Using local cart state:', err.message);
+      }
+    }
+    syncBackendCart();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Handlers
   const handleQuantityChange = (id, delta) => {
     setItems((prevItems) =>
       prevItems.map((item) => {
@@ -59,14 +95,47 @@ function Cart() {
     }
   };
 
-  // Calculations
   const totalItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = items.reduce(
-    (acc, item) => acc + item.unitPrice * item.quantity,
-    0
-  );
+  const subtotal = items.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
   const discount = promoApplied ? subtotal * 0.1 : 0;
   const grandTotal = Math.max(0, subtotal - discount);
+
+  const handleCheckout = async () => {
+    const userStr = sessionStorage.getItem('hurfa_user') || localStorage.getItem('hurfa_user');
+    let user = { name: 'Valued Patron', email: 'guest@hurfa.com', phone: '+962 7 9000 0000' };
+
+    if (userStr) {
+      try {
+        user = JSON.parse(userStr);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    const itemsSummary = items.map((i) => `${i.name} (x${i.quantity})`).join(', ');
+
+    setCheckingOut(true);
+    try {
+      const order = await api.orders.create({
+        clientName: user.name || 'Valued Patron',
+        clientEmail: user.email || 'patron@example.com',
+        clientPhone: user.phone || '+962 7 9000 0000',
+        items: itemsSummary,
+        total: grandTotal,
+        deliveryAddress: 'Amman, Jordan',
+        status: 'In Production',
+      });
+
+      setOrderSuccess(order);
+      setItems([]);
+      localStorage.removeItem('hurfa_cart');
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert(`Checkout could not be completed: ${err.message || 'Please check your connection and try again.'}`);
+    } finally {
+      setCheckingOut(false);
+    }
+  };
 
   return (
     <div className="cart-page">
@@ -79,7 +148,42 @@ function Cart() {
         </p>
       </header>
 
-      {items.length === 0 ? (
+      {/* Order Success Confirmation Banner */}
+      {orderSuccess ? (
+        <div className="cart-empty-state text-center py-5">
+          <div className="cart-empty-icon mb-3" style={{ color: '#27ae60' }}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <h2>Thank you for your order!</h2>
+          <p className="mb-2">
+            Order Reference: <strong>{orderSuccess.id}</strong>
+          </p>
+          <p className="text-secondary mb-4">
+            Your bespoke architectural order has been received and scheduled for production.
+          </p>
+          <div className="d-flex gap-3 justify-content-center">
+            <Link to="/products" className="cart-empty-btn">
+              Explore More Pieces
+            </Link>
+            <Link to="/account" className="btn btn-outline-dark px-4 py-2">
+              View My Orders
+            </Link>
+          </div>
+        </div>
+      ) : items.length === 0 ? (
         /* Empty Cart State */
         <div className="cart-empty-state">
           <div className="cart-empty-icon" aria-hidden="true">
@@ -149,17 +253,16 @@ function Cart() {
                         type="button"
                         className="cart-qty-btn"
                         onClick={() => handleQuantityChange(item.id, -1)}
-                        disabled={item.quantity <= 1}
-                        aria-label="Decrease quantity"
+                        aria-label={`Decrease quantity for ${item.name}`}
                       >
-                        −
+                        -
                       </button>
                       <span className="cart-qty-value">{item.quantity}</span>
                       <button
                         type="button"
                         className="cart-qty-btn"
                         onClick={() => handleQuantityChange(item.id, 1)}
-                        aria-label="Increase quantity"
+                        aria-label={`Increase quantity for ${item.name}`}
                       >
                         +
                       </button>
@@ -169,60 +272,44 @@ function Cart() {
                       type="button"
                       className="cart-item-remove-btn"
                       onClick={() => handleRemoveItem(item.id)}
-                      aria-label={`Remove ${item.name} from cart`}
                     >
                       Remove
                     </button>
                   </div>
                 </div>
 
-                <div className="cart-item-total-col">
-                  <span className="cart-item-total-price">
-                    JOD {(item.unitPrice * item.quantity).toLocaleString()}
-                  </span>
+                <div className="cart-item-total">
+                  <span>JOD {(item.unitPrice * item.quantity).toLocaleString()}</span>
                 </div>
               </article>
             ))}
-
-            <div className="cart-footer-links">
-              <Link to="/products" className="cart-continue-link">
-                ← Continue Shopping
-              </Link>
-            </div>
           </section>
 
-          {/* Right Column: Order Summary */}
+          {/* Right Column: Summary Card */}
           <aside className="cart-summary-column" aria-label="Order Summary">
-            <div className="cart-summary-box">
-              <h2 className="cart-summary-title">Order Summary</h2>
+            <div className="cart-summary-card">
+              <h2>Order Summary</h2>
 
               <div className="cart-summary-rows">
                 <div className="cart-summary-row">
-                  <span>Subtotal</span>
+                  <span>Items Subtotal</span>
                   <span>JOD {subtotal.toLocaleString()}</span>
                 </div>
 
                 {promoApplied && (
-                  <div className="cart-summary-row free-highlight">
-                    <span>Promo Discount (10%)</span>
-                    <span>- JOD {discount.toLocaleString()}</span>
+                  <div className="cart-summary-row discount">
+                    <span>Architectural Discount (10%)</span>
+                    <span>-JOD {discount.toLocaleString()}</span>
                   </div>
                 )}
 
-                <div className="cart-summary-row free-highlight">
+                <div className="cart-summary-row">
                   <span>White-Glove Delivery</span>
-                  <span>Complimentary</span>
+                  <span className="cart-free-tag">Complimentary</span>
                 </div>
 
-                <div className="cart-summary-row free-highlight">
-                  <span>Installation & Assembly</span>
-                  <span>Included</span>
-                </div>
-
-                <div className="cart-summary-divider" />
-
-                <div className="cart-summary-row total-row">
-                  <span>Total</span>
+                <div className="cart-summary-row total">
+                  <span>Estimated Total</span>
                   <span>JOD {grandTotal.toLocaleString()}</span>
                 </div>
               </div>
@@ -232,29 +319,23 @@ function Cart() {
                 <input
                   type="text"
                   className="cart-promo-input"
-                  placeholder="Promo code (e.g. HURFA10)"
+                  placeholder="Promo Code (HURFA10)"
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value)}
-                  disabled={promoApplied}
                 />
-                <button
-                  type="submit"
-                  className="cart-promo-btn"
-                  disabled={promoApplied || !promoCode.trim()}
-                >
-                  {promoApplied ? 'Applied' : 'Apply'}
+                <button type="submit" className="cart-promo-btn">
+                  Apply
                 </button>
               </form>
 
-              {/* Checkout CTA */}
+              {/* Checkout Button */}
               <button
                 type="button"
                 className="cart-checkout-btn"
-                onClick={() =>
-                  alert('Proceeding to Hurfa secure architectural checkout...')
-                }
+                disabled={checkingOut}
+                onClick={handleCheckout}
               >
-                Proceed to Checkout
+                {checkingOut ? 'Placing Order...' : 'Proceed to Checkout'}
               </button>
 
               {/* Trust Badges */}
@@ -294,23 +375,6 @@ function Cart() {
                     <circle cx="7" cy="18" r="2" />
                   </svg>
                   <span>White-Glove Delivery & Installation in Jordan</span>
-                </div>
-                <div className="cart-trust-item">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="m9 12 2 2 4-4" />
-                  </svg>
-                  <span>Bespoke Design House Standards</span>
                 </div>
               </div>
             </div>

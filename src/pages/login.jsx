@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { api } from '../services/api';
 import '../css/login.css';
 
 function Login() {
@@ -22,7 +23,6 @@ function Login() {
   const handleRoleChange = (role) => {
     setSelectedRole(role);
     setStatusMessage({ type: '', text: '' });
-    // Update the URL query params without full page reload
     const newParams = new URLSearchParams(searchParams);
     if (role === 'admin') {
       newParams.set('mode', 'admin');
@@ -43,7 +43,7 @@ function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
 
@@ -57,21 +57,26 @@ function Login() {
 
     setLoading(true);
 
-    // Mock authentication process
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await api.auth.login({
+        email: formData.email.trim(),
+        password: formData.password,
+        role: loginRole,
+      });
 
-      if (loginRole === 'admin') {
-        // Persist admin session
+      const user = res.user || {
+        role: loginRole,
+        email: formData.email,
+        name: formData.email.split('@')[0] || 'Valued User',
+      };
+
+      const storage = formData.rememberMe ? localStorage : sessionStorage;
+
+      if (user.role === 'admin' || loginRole === 'admin') {
         sessionStorage.setItem('hurfa_admin_authenticated', 'true');
-        sessionStorage.setItem(
-          'hurfa_user',
-          JSON.stringify({
-            role: 'admin',
-            email: formData.email,
-            name: 'Studio Administrator',
-          })
-        );
+        sessionStorage.setItem('hurfa_user', JSON.stringify({ ...user, role: 'admin' }));
+        storage.setItem('hurfa_admin_authenticated', 'true');
+        storage.setItem('hurfa_user', JSON.stringify({ ...user, role: 'admin' }));
 
         setStatusMessage({
           type: 'success',
@@ -81,18 +86,12 @@ function Login() {
         setTimeout(() => {
           const destination = redirectTarget.includes('/admin') ? redirectTarget : '/admin';
           navigate(destination, { replace: true });
-        }, 700);
+        }, 600);
       } else {
-        // Customer session authentication
         sessionStorage.setItem('hurfa_customer_authenticated', 'true');
-        sessionStorage.setItem(
-          'hurfa_user',
-          JSON.stringify({
-            role: 'customer',
-            email: formData.email,
-            name: formData.email.split('@')[0] || 'Valued Client',
-          })
-        );
+        sessionStorage.setItem('hurfa_user', JSON.stringify({ ...user, role: 'customer' }));
+        storage.setItem('hurfa_customer_authenticated', 'true');
+        storage.setItem('hurfa_user', JSON.stringify({ ...user, role: 'customer' }));
 
         setStatusMessage({
           type: 'success',
@@ -100,12 +99,19 @@ function Login() {
         });
 
         setTimeout(() => {
-          // If customer, go to /account (or explicit redirectTarget if not admin)
           const destination = redirectTarget && !redirectTarget.includes('/admin') ? redirectTarget : '/account';
           navigate(destination, { replace: true });
-        }, 700);
+        }, 600);
       }
-    }, 500);
+    } catch (err) {
+      console.error('Login error:', err);
+      setStatusMessage({
+        type: 'error',
+        text: err.message || 'Invalid credentials. Please verify and try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isAdmin = loginRole === 'admin';
@@ -136,7 +142,7 @@ function Login() {
               <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            Customer
+            <span>Customer Portal</span>
           </button>
           <button
             type="button"
@@ -156,64 +162,115 @@ function Login() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M3 9h18" />
+              <path d="M9 21V9" />
             </svg>
-            Admin Portal
+            <span>Studio Admin</span>
           </button>
         </div>
 
         {/* Header */}
         <header className="login-header">
           <span className="login-eyebrow">
-            {isAdmin ? 'Management Portal' : 'Hurfa Client Space'}
+            {isAdmin ? 'Management Console' : 'Hurfa Client Access'}
           </span>
-          <h1>{isAdmin ? 'Admin Sign In' : 'Client Sign In'}</h1>
-          <p>
+          <h1>{isAdmin ? 'Studio Portal' : 'Welcome Back'}</h1>
+          <p className="login-subtitle">
             {isAdmin
-              ? 'Sign in to access Hurfa studio dashboard, inventory, and catalog.'
-              : 'Sign in to access your curated collections, orders, and inquiries.'}
+              ? 'Sign in with studio credentials to manage furniture catalog, customer orders, and client inquiries.'
+              : 'Sign in to access your bespoke orders, saved palettes, and consultation requests.'}
           </p>
         </header>
 
-        {/* Status Alert */}
+        {/* Status Message */}
         {statusMessage.text && (
-          <div className={`login-alert ${statusMessage.type}`} role="alert">
-            {statusMessage.text}
+          <div
+            className={`login-status-message ${statusMessage.type}`}
+            role="alert"
+          >
+            {statusMessage.type === 'error' ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            )}
+            <span>{statusMessage.text}</span>
           </div>
         )}
 
-        {/* Login Form */}
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="login-form-group">
-            <label htmlFor="login-email">
-              {isAdmin ? 'Admin Email / Username' : 'Email Address'}
+        {/* Form */}
+        <form className="login-form" onSubmit={handleSubmit} noValidate>
+          <div className="login-input-group">
+            <label htmlFor="email">
+              {isAdmin ? 'Admin Username or Email' : 'Email Address'}
             </label>
-            <div className="login-input-wrap">
-              <input
-                id="login-email"
-                type={isAdmin ? 'text' : 'email'}
-                name="email"
-                className="login-input"
-                placeholder={isAdmin ? 'admin@hurfa.com' : 'name@example.com'}
-                value={formData.email}
-                onChange={handleChange}
-                autoComplete={isAdmin ? 'username' : 'email'}
-                required
-              />
-            </div>
+            <input
+              type={isAdmin ? 'text' : 'email'}
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder={
+                isAdmin
+                  ? 'admin or admin@hurfa.com'
+                  : 'sarah@example.com'
+              }
+              autoComplete={isAdmin ? 'username' : 'email'}
+              required
+            />
           </div>
 
-          <div className="login-form-group">
-            <label htmlFor="login-password">Password</label>
-            <div className="login-input-wrap">
+          <div className="login-input-group">
+            <div className="login-password-label-row">
+              <label htmlFor="password">Password</label>
+              {!isAdmin && (
+                <a
+                  href="#forgot"
+                  className="login-forgot-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert('Password reset link sent to your registered email.');
+                  }}
+                >
+                  Forgot?
+                </a>
+              )}
+            </div>
+            <div className="login-password-wrapper">
               <input
-                id="login-password"
                 type={showPassword ? 'text' : 'password'}
+                id="password"
                 name="password"
-                className="login-input"
-                placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
+                placeholder="••••••••"
                 autoComplete="current-password"
                 required
               />
@@ -223,36 +280,53 @@ function Login() {
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                {showPassword ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                    <line x1="2" y1="2" x2="22" y2="22" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>
 
           <div className="login-options-row">
-            <label className="login-remember-wrap">
+            <label className="login-checkbox-label">
               <input
                 type="checkbox"
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleChange}
               />
-              <span>Remember me</span>
+              <span>Remember session on this device</span>
             </label>
-
-            <a
-              href="#forgot-password"
-              className="login-forgot-link"
-              onClick={(e) => {
-                e.preventDefault();
-                alert(
-                  isAdmin
-                    ? 'Please contact Hurfa IT administration to reset administrative credentials.'
-                    : 'Password reset instructions will be sent to your email.'
-                );
-              }}
-            >
-              Forgot password?
-            </a>
           </div>
 
           <button
@@ -260,31 +334,25 @@ function Login() {
             className="login-submit-btn"
             disabled={loading}
           >
-            {loading
-              ? 'Verifying...'
-              : isAdmin
-              ? 'Enter Studio Dashboard'
-              : 'Sign In to Account'}
+            {loading ? (
+              <span className="login-spinner">Authenticating...</span>
+            ) : (
+              <span>{isAdmin ? 'Sign In to Studio Console' : 'Sign In'}</span>
+            )}
           </button>
         </form>
 
+        {/* Footer info */}
         <footer className="login-footer">
           {isAdmin ? (
             <p>
-              Looking for client shopping?{' '}
-              <button
-                type="button"
-                className="login-switch-link"
-                onClick={() => handleRoleChange('customer')}
-              >
-                Switch to Customer Login
-              </button>
+              Restricted management console. Authorized Hurfa studio staff only.
             </p>
           ) : (
             <p>
-              Don't have an account?{' '}
-              <Link to="/signup" className="login-signup-link">
-                Sign Up
+              New to Hurfa Studio?{' '}
+              <Link to="/signup" className="login-link">
+                Create an account
               </Link>
             </p>
           )}

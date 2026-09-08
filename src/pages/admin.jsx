@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { INITIAL_RECORDS, INITIAL_ORDERS, INITIAL_CLIENTS } from '../data/adminCatalogData';
+import { api } from '../services/api';
 import '../css/admin.css';
 
 function Admin() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('catalog'); // 'catalog' | 'orders' | 'clients'
+  const [loading, setLoading] = useState(true);
 
   // Catalog State
   const [records, setRecords] = useState(() => {
@@ -20,27 +21,73 @@ function Admin() {
     } catch (err) {
       console.error(err);
     }
-    return INITIAL_RECORDS;
+    return [];
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Orders State
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
+  const [orders, setOrders] = useState([]);
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('All');
 
   // Clients State
-  const [clients, setClients] = useState(INITIAL_CLIENTS);
+  const [clients, setClients] = useState([]);
   const [clientSearchQuery, setClientSearchQuery] = useState('');
+
+  // Fetch live records from backend on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      setLoading(true);
+      try {
+        const data = await api.catalog.getAll();
+        if (isMounted && Array.isArray(data)) {
+          setRecords(data);
+        }
+      } catch (e) {
+        console.warn('Catalog API warning:', e.message);
+      }
+
+      try {
+        const ordersData = await api.orders.getAll();
+        if (isMounted && Array.isArray(ordersData)) {
+          setOrders(ordersData);
+        }
+      } catch (e) {
+        console.warn('Orders API warning:', e.message);
+      }
+
+      try {
+        const clientsData = await api.clients.getAll();
+        if (isMounted && Array.isArray(clientsData)) {
+          setClients(clientsData);
+        }
+      } catch (e) {
+        console.warn('Clients API warning:', e.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem('hurfa_admin_authenticated');
+    sessionStorage.removeItem('hurfa_user');
     navigate('/login?redirect=/admin', { replace: true });
   };
 
-  const handleDeleteRecord = (id, name) => {
+  const handleDeleteRecord = async (id, name) => {
     if (window.confirm(`Are you sure you want to remove "${name}" from the catalog?`)) {
+      try {
+        await api.catalog.delete(id);
+      } catch (e) {
+        console.warn('Delete API fallback:', e.message);
+      }
       setRecords((prev) => {
         const updated = prev.filter((r) => r.id !== id);
         try {
@@ -53,19 +100,24 @@ function Admin() {
     }
   };
 
-  const handleUpdateOrderStatus = (orderId, currentStatus) => {
+  const handleUpdateOrderStatus = async (orderId, currentStatus) => {
     const newStatus = window.prompt(
       `Update status for ${orderId} (Current: ${currentStatus}):\nOptions: In Production, Ready for Delivery, Delivered, Consultation Scheduled`,
       currentStatus
     );
     if (newStatus && newStatus.trim()) {
+      try {
+        await api.orders.updateStatus(orderId, newStatus.trim());
+      } catch (e) {
+        console.warn('Order status API fallback:', e.message);
+      }
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, status: newStatus.trim() } : o))
       );
     }
   };
 
-  const handleAddClient = () => {
+  const handleAddClient = async () => {
     const name = window.prompt('Enter client full name:');
     if (!name || !name.trim()) return;
     const email = window.prompt('Enter client email address:', 'client@example.com') || 'client@example.com';
@@ -84,6 +136,18 @@ function Admin() {
       lastActive: 'Just now',
     };
 
+    try {
+      await api.clients.create({
+        name: newClient.name,
+        email: newClient.email,
+        phone: newClient.phone,
+        city: newClient.city,
+        status: 'Prospect',
+      });
+    } catch (e) {
+      console.warn('Client create API fallback:', e.message);
+    }
+
     setClients((prev) => [newClient, ...prev]);
   };
 
@@ -91,10 +155,10 @@ function Admin() {
   const filteredRecords = useMemo(() => {
     return records.filter((r) => {
       const matchesCategory =
-        selectedCategory === 'All' || r.category === selectedCategory;
+        selectedCategory === 'All' || r.category === selectedCategory || (r.category && r.category.includes(selectedCategory));
       const matchesSearch =
-        r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.category.toLowerCase().includes(searchQuery.toLowerCase());
+        (r.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.category || '').toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   }, [records, searchQuery, selectedCategory]);
@@ -105,9 +169,9 @@ function Admin() {
       const matchesStatus =
         orderStatusFilter === 'All' || o.status === orderStatusFilter;
       const matchesSearch =
-        o.id.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
-        o.clientName.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
-        o.items.toLowerCase().includes(orderSearchQuery.toLowerCase());
+        (o.id || '').toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+        (o.clientName || '').toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+        (o.items || '').toLowerCase().includes(orderSearchQuery.toLowerCase());
       return matchesStatus && matchesSearch;
     });
   }, [orders, orderSearchQuery, orderStatusFilter]);
@@ -117,10 +181,10 @@ function Admin() {
     return clients.filter((c) => {
       const query = clientSearchQuery.toLowerCase();
       return (
-        c.name.toLowerCase().includes(query) ||
-        c.email.toLowerCase().includes(query) ||
-        c.phone.toLowerCase().includes(query) ||
-        c.city.toLowerCase().includes(query)
+        (c.name || '').toLowerCase().includes(query) ||
+        (c.email || '').toLowerCase().includes(query) ||
+        (c.city || '').toLowerCase().includes(query) ||
+        (c.phone || '').toLowerCase().includes(query)
       );
     });
   }, [clients, clientSearchQuery]);
@@ -128,32 +192,25 @@ function Admin() {
   return (
     <div className="admin-page">
       <div className="admin-container">
-        {/* Top Header */}
+        {/* Header Bar */}
         <header className="admin-header">
           <div>
-            <span className="admin-eyebrow">Studio Management</span>
-            <h1>Admin Dashboard</h1>
-            <p>Monitor collection records, customer orders, and client relationships.</p>
+            <span className="admin-eyebrow">Studio Portal</span>
+            <h1>Management Console</h1>
+            <p>Hurfa Architectural Studio • Catalog, Order & Client Directory</p>
           </div>
 
           <div className="admin-header-actions">
-            <Link to="/" className="admin-btn admin-btn-outline">
-              View Storefront
+            <Link to="/editor" className="admin-btn admin-btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add New Piece
             </Link>
-            {activeSection === 'catalog' && (
-              <Link to="/editor" className="admin-btn admin-btn-primary">
-                + Add Product
-              </Link>
-            )}
-            {activeSection === 'clients' && (
-              <button
-                type="button"
-                className="admin-btn admin-btn-primary"
-                onClick={handleAddClient}
-              >
-                + Add Client
-              </button>
-            )}
+            <Link to="/products" className="admin-btn admin-btn-outline" target="_blank" rel="noreferrer">
+              Live Website ↗
+            </Link>
             <button
               type="button"
               className="admin-btn admin-btn-logout"
@@ -164,8 +221,8 @@ function Admin() {
           </div>
         </header>
 
-        {/* Section Navigation Tabs */}
-        <div className="admin-nav-tabs" role="tablist" aria-label="Admin Sections">
+        {/* Top-Level Section Switcher Tabs */}
+        <div className="admin-nav-tabs" role="tablist">
           <button
             type="button"
             role="tab"
@@ -174,11 +231,12 @@ function Admin() {
             onClick={() => setActiveSection('catalog')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-              <path d="M3 9h18" />
-              <path d="M9 21V9" />
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
             </svg>
-            Catalog & Inventory ({records.length})
+            Furniture Catalog ({records.length})
           </button>
           <button
             type="button"
@@ -247,7 +305,7 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">
-                  {records.filter((r) => r.category === 'Bedrooms').length}
+                  {records.filter((r) => r.category === 'Bedrooms' || (r.category && r.category.includes('Bedroom'))).length}
                 </h2>
                 <span className="admin-stat-trend">Frames, wardrobes & nightstands</span>
               </div>
@@ -264,7 +322,7 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">
-                  {records.filter((r) => r.category === 'Kitchens').length}
+                  {records.filter((r) => r.category === 'Kitchens' || (r.category && r.category.includes('Kitchen'))).length}
                 </h2>
                 <span className="admin-stat-trend">Chic, Organic & Contemporary</span>
               </div>
@@ -302,6 +360,7 @@ function Admin() {
                 <option value="Kitchens">Kitchens</option>
                 <option value="Bedrooms">Bedrooms</option>
                 <option value="Living Room">Living Room</option>
+                <option value="Living Room Tables">Living Room Tables</option>
               </select>
             </div>
 
@@ -335,7 +394,7 @@ function Admin() {
                           <td>
                             <div className="admin-prod-cell">
                               <img
-                                src={item.image}
+                                src={item.image || item.images?.[0]}
                                 alt={item.name}
                                 className="admin-prod-thumb"
                                 loading="lazy"
@@ -351,28 +410,27 @@ function Admin() {
                           </td>
                           <td>
                             <span
-                              className={`admin-badge ${
-                                item.stockStatus === 'Active'
-                                  ? 'admin-badge-active'
-                                  : 'admin-badge-low'
+                              className={`admin-badge-stock ${
+                                item.stockStatus === 'Active' ? 'active' : 'low'
                               }`}
                             >
-                              {item.stockStatus}
+                              {item.stockStatus || 'Active'}
                             </span>
                           </td>
                           <td>
                             <div className="admin-actions-cell">
                               <Link
                                 to={`/editor?id=${item.id}`}
-                                className="admin-action-btn admin-action-edit"
-                                style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                                className="admin-action-btn edit"
+                                title="Edit piece specifications"
                               >
                                 Edit
                               </Link>
                               <button
                                 type="button"
-                                className="admin-action-btn admin-action-delete"
+                                className="admin-action-btn delete"
                                 onClick={() => handleDeleteRecord(item.id, item.name)}
+                                title="Remove piece from catalog"
                               >
                                 Delete
                               </button>
@@ -389,24 +447,24 @@ function Admin() {
         )}
 
         {/* ========================================================================= */}
-        {/* SECTION 2: ORDERS */}
+        {/* SECTION 2: ORDERS & INQUIRIES */}
         {/* ========================================================================= */}
         {activeSection === 'orders' && (
           <>
             {/* Orders KPIs */}
-            <section className="admin-stats-grid" aria-label="Orders KPIs">
+            <section className="admin-stats-grid" aria-label="Order Performance Indicators">
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Total Orders</span>
+                  <span className="admin-stat-label">Total Inquiries / Orders</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                      <path d="M3 6h18" />
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
                     </svg>
                   </div>
                 </div>
                 <h2 className="admin-stat-value">{orders.length}</h2>
-                <span className="admin-stat-trend">Current cycle</span>
+                <span className="admin-stat-trend">Lifetime Studio Requests</span>
               </div>
 
               <div className="admin-stat-card">
@@ -422,48 +480,47 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {orders.filter((o) => o.status === 'In Production').length}
                 </h2>
-                <span className="admin-stat-trend">Crafting in workshop</span>
+                <span className="admin-stat-trend">Workshop Jordan Active</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Ready & Out</span>
+                  <span className="admin-stat-label">Ready for Delivery</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-                      <path d="M15 18H9" />
-                      <circle cx="17" cy="18" r="2" />
-                      <circle cx="7" cy="18" r="2" />
+                      <rect width="18" height="18" x="3" y="3" rx="2" />
+                      <path d="m9 12 2 2 4-4" />
                     </svg>
                   </div>
                 </div>
                 <h2 className="admin-stat-value">
                   {orders.filter((o) => o.status === 'Ready for Delivery').length}
                 </h2>
-                <span className="admin-stat-trend">White-glove dispatched</span>
+                <span className="admin-stat-trend">Quality Inspected & Packed</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Order Volume</span>
+                  <span className="admin-stat-label">Consultations Scheduled</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="12" y1="1" x2="12" y2="23" />
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                   </div>
                 </div>
-                <h2 className="admin-stat-value">JOD 6,955</h2>
-                <span className="admin-stat-trend">+14% vs last month</span>
+                <h2 className="admin-stat-value">
+                  {orders.filter((o) => o.status === 'Consultation Scheduled').length}
+                </h2>
+                <span className="admin-stat-trend">Architectural On-Site Visits</span>
               </div>
             </section>
 
-            {/* Orders Controls */}
+            {/* Controls */}
             <div className="admin-table-controls">
               <input
                 type="text"
                 className="admin-search-input"
-                placeholder="Search by Order ID, client, or item..."
+                placeholder="Search order ID, client name, or piece..."
                 value={orderSearchQuery}
                 onChange={(e) => setOrderSearchQuery(e.target.value)}
               />
@@ -481,20 +538,20 @@ function Admin() {
               </select>
             </div>
 
-            {/* Orders Table Card */}
+            {/* Orders Table */}
             <div className="admin-card">
               <div className="admin-card-header">
-                <h2>Customer Orders & Architecture Requests ({filteredOrders.length})</h2>
+                <h2>Bespoke Orders & Inquiries ({filteredOrders.length})</h2>
               </div>
 
               <div className="admin-table-responsive">
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Order ID</th>
-                      <th>Client</th>
-                      <th>Ordered Items</th>
-                      <th>Total</th>
+                      <th>Order Code</th>
+                      <th>Client Name</th>
+                      <th>Items & Details</th>
+                      <th>Total Value</th>
                       <th>Date</th>
                       <th>Status</th>
                       <th>Action</th>
@@ -508,43 +565,41 @@ function Admin() {
                         </td>
                       </tr>
                     ) : (
-                      filteredOrders.map((ord) => (
-                        <tr key={ord.id}>
+                      filteredOrders.map((order) => (
+                        <tr key={order.id}>
                           <td>
-                            <strong>{ord.id}</strong>
-                            <div style={{ fontSize: '0.78rem', color: '#78716c' }}>{ord.deliveryAddress}</div>
-                          </td>
-                          <td>
-                            <div style={{ fontWeight: 600, color: '#1f1d1b' }}>{ord.clientName}</div>
-                            <div style={{ fontSize: '0.8rem', color: '#78716c' }}>{ord.clientEmail}</div>
-                          </td>
-                          <td style={{ maxWidth: '280px' }}>
-                            <span style={{ fontSize: '0.88rem' }}>{ord.items}</span>
+                            <strong className="admin-order-id">{order.id}</strong>
                           </td>
                           <td>
-                            <span className="admin-price">{ord.total}</span>
+                            <strong>{order.clientName}</strong>
+                            <br />
+                            <small style={{ color: '#6b7280' }}>
+                              {order.clientEmail || order.clientPhone}
+                            </small>
                           </td>
-                          <td>{ord.date}</td>
+                          <td>{order.items}</td>
+                          <td>
+                            <span className="admin-price">{order.total}</span>
+                          </td>
+                          <td>{order.date || 'Recent'}</td>
                           <td>
                             <span
-                              className={`admin-badge ${
-                                ord.status === 'Delivered'
-                                  ? 'admin-badge-active'
-                                  : ord.status === 'In Production'
-                                  ? 'admin-badge-low'
-                                  : 'admin-badge-neutral'
-                              }`}
+                              className={`admin-status-badge ${order.status
+                                .toLowerCase()
+                                .replace(/\s+/g, '-')}`}
                             >
-                              {ord.status}
+                              {order.status}
                             </span>
                           </td>
                           <td>
                             <button
                               type="button"
-                              className="admin-action-btn admin-action-edit"
-                              onClick={() => handleUpdateOrderStatus(ord.id, ord.status)}
+                              className="admin-action-btn edit"
+                              onClick={() =>
+                                handleUpdateOrderStatus(order.id, order.status)
+                              }
                             >
-                              Update Status
+                              Update
                             </button>
                           </td>
                         </tr>
@@ -558,31 +613,15 @@ function Admin() {
         )}
 
         {/* ========================================================================= */}
-        {/* SECTION 3: CLIENTS */}
+        {/* SECTION 3: CLIENTS & PATRONS */}
         {/* ========================================================================= */}
         {activeSection === 'clients' && (
           <>
             {/* Clients KPIs */}
-            <section className="admin-stats-grid" aria-label="Clients KPIs">
+            <section className="admin-stats-grid" aria-label="Client Directory Indicators">
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Total Clients</span>
-                  <div className="admin-stat-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                  </div>
-                </div>
-                <h2 className="admin-stat-value">{clients.length}</h2>
-                <span className="admin-stat-trend">Patrons & registered accounts</span>
-              </div>
-
-              <div className="admin-stat-card">
-                <div className="admin-stat-top">
-                  <span className="admin-stat-label">VIP Studio Members</span>
+                  <span className="admin-stat-label">VIP Studio Patrons</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -590,55 +629,81 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">
-                  {clients.filter((c) => c.status === 'Active VIP').length}
+                  {clients.filter((c) => c.status === 'VIP').length}
                 </h2>
-                <span className="admin-stat-trend">High architectural volume</span>
+                <span className="admin-stat-trend">High-value residential architects</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Primary Region</span>
+                  <span className="admin-stat-label">Active Clients</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                      <circle cx="12" cy="10" r="3" />
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
                     </svg>
                   </div>
                 </div>
-                <h2 className="admin-stat-value">Amman</h2>
-                <span className="admin-stat-trend">Abdoun, Dabouq, Sweifieh</span>
+                <h2 className="admin-stat-value">
+                  {clients.filter((c) => c.status === 'Active').length}
+                </h2>
+                <span className="admin-stat-trend">Recent inquiries & projects</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Client Retention</span>
+                  <span className="admin-stat-label">Total Patrons</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                      <polyline points="22 4 12 14.01 9 11.01" />
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
                   </div>
                 </div>
-                <h2 className="admin-stat-value">92%</h2>
-                <span className="admin-stat-trend">Returning for secondary spaces</span>
+                <h2 className="admin-stat-value">{clients.length}</h2>
+                <span className="admin-stat-trend">Jordan & GCC Directory</span>
+              </div>
+
+              <div className="admin-stat-card">
+                <div className="admin-stat-top">
+                  <span className="admin-stat-label">Average Project Value</span>
+                  <div className="admin-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="1" x2="12" y2="23" />
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                  </div>
+                </div>
+                <h2 className="admin-stat-value">JOD 2,450</h2>
+                <span className="admin-stat-trend">Across bespoke suites</span>
               </div>
             </section>
 
-            {/* Clients Search Bar */}
+            {/* Search & Actions Bar */}
             <div className="admin-table-controls">
               <input
                 type="text"
                 className="admin-search-input"
-                placeholder="Search by client name, email, phone, or neighborhood..."
+                placeholder="Search patrons by name, email, city, or phone..."
                 value={clientSearchQuery}
                 onChange={(e) => setClientSearchQuery(e.target.value)}
               />
+
+              <button
+                type="button"
+                className="admin-btn admin-btn-primary"
+                onClick={handleAddClient}
+              >
+                + Register Client
+              </button>
             </div>
 
-            {/* Clients Table Card */}
+            {/* Clients Table */}
             <div className="admin-card">
               <div className="admin-card-header">
-                <h2>Client Roster & Accounts ({filteredClients.length})</h2>
+                <h2>Registered Clients & Patrons ({filteredClients.length})</h2>
               </div>
 
               <div className="admin-table-responsive">
@@ -646,11 +711,11 @@ function Admin() {
                   <thead>
                     <tr>
                       <th>Client Name</th>
-                      <th>Contact Details</th>
+                      <th>Contact Info</th>
                       <th>Location</th>
-                      <th>Total Orders</th>
-                      <th>Lifetime Spent</th>
-                      <th>Tier</th>
+                      <th>Orders Completed</th>
+                      <th>Total Value</th>
+                      <th>Status</th>
                       <th>Last Active</th>
                     </tr>
                   </thead>
@@ -665,52 +730,35 @@ function Admin() {
                       filteredClients.map((client) => (
                         <tr key={client.id}>
                           <td>
-                            <div className="admin-prod-cell">
-                              <div
-                                style={{
-                                  width: '38px',
-                                  height: '38px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#FAF8F5',
-                                  border: '1px solid #e7e5e4',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 600,
-                                  fontSize: '0.85rem',
-                                  color: '#1f1d1b',
-                                }}
-                              >
-                                {client.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                              </div>
-                              <div>
-                                <p className="admin-prod-title">{client.name}</p>
-                              </div>
-                            </div>
+                            <strong>{client.name}</strong>
                           </td>
                           <td>
-                            <div style={{ fontSize: '0.88rem', color: '#1f1d1b' }}>{client.email}</div>
-                            <div style={{ fontSize: '0.8rem', color: '#78716c' }}>{client.phone}</div>
+                            <div>{client.email}</div>
+                            <small style={{ color: '#6b7280' }}>{client.phone}</small>
                           </td>
                           <td>{client.city}</td>
+                          <td>{client.orders || client.totalOrders || 0} Projects</td>
                           <td>
-                            <strong>{client.totalOrders}</strong>
-                          </td>
-                          <td>
-                            <span className="admin-price">{client.totalSpent}</span>
+                            <span className="admin-price">{client.spent || client.totalSpent || 'JOD 0'}</span>
                           </td>
                           <td>
                             <span
-                              className={`admin-badge ${
-                                client.status === 'Active VIP'
-                                  ? 'admin-badge-active'
-                                  : 'admin-badge-neutral'
+                              className={`admin-status-badge ${
+                                client.status === 'VIP'
+                                  ? 'delivered'
+                                  : client.status === 'Active'
+                                  ? 'in-production'
+                                  : 'ready-for-delivery'
                               }`}
                             >
                               {client.status}
                             </span>
                           </td>
-                          <td style={{ fontSize: '0.84rem', color: '#78716c' }}>{client.lastActive}</td>
+                          <td>
+                            <small style={{ color: '#6b7280' }}>
+                              {client.lastActive}
+                            </small>
+                          </td>
                         </tr>
                       ))
                     )}

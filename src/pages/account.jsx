@@ -1,28 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 import '../css/admin.css';
 
 function Account() {
   const navigate = useNavigate();
   const [user] = useState(() => {
     try {
-      const raw = sessionStorage.getItem('hurfa_user');
+      const raw = sessionStorage.getItem('hurfa_user') || localStorage.getItem('hurfa_user');
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
     }
   });
 
+  const [orders, setOrders] = useState([]);
+
   useEffect(() => {
-    const isCustomer = sessionStorage.getItem('hurfa_customer_authenticated') === 'true';
+    const isCustomer =
+      sessionStorage.getItem('hurfa_customer_authenticated') === 'true' ||
+      localStorage.getItem('hurfa_customer_authenticated') === 'true';
     if (!isCustomer && !user) {
       navigate('/login?redirect=/account', { replace: true });
     }
   }, [navigate, user]);
 
+  useEffect(() => {
+    let isMounted = true;
+    async function loadOrders() {
+      if (user?.email) {
+        try {
+          const data = await api.orders.getAll({ search: user.email });
+          if (isMounted && Array.isArray(data)) {
+            setOrders(data);
+          }
+        } catch (e) {
+          console.warn('Orders API fallback:', e.message);
+        }
+      }
+    }
+    loadOrders();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
   const handleLogout = () => {
     sessionStorage.removeItem('hurfa_customer_authenticated');
     sessionStorage.removeItem('hurfa_user');
+    localStorage.removeItem('hurfa_customer_authenticated');
+    localStorage.removeItem('hurfa_user');
     navigate('/login', { replace: true });
   };
 
@@ -94,7 +121,7 @@ function Account() {
                 </svg>
               </div>
             </div>
-            <h2 className="admin-stat-value">1 Active</h2>
+            <h2 className="admin-stat-value">{orders.length > 0 ? `${orders.length} Active` : '1 Active'}</h2>
             <span className="admin-stat-trend">Consultation scheduled</span>
           </div>
 
@@ -118,79 +145,67 @@ function Account() {
           <div className="admin-card-header">
             <h2>Account Details</h2>
           </div>
-          <div style={{ padding: '24px 32px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
-              <div>
-                <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#78716c', fontWeight: 600 }}>
+          <div style={{ padding: '24px' }}>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
                   Full Name
-                </span>
-                <p style={{ fontSize: '1.1rem', fontWeight: 500, margin: '6px 0 0', color: '#1f1d1b' }}>
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827' }}>
                   {user.name}
                 </p>
               </div>
-              <div>
-                <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#78716c', fontWeight: 600 }}>
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
                   Email Address
-                </span>
-                <p style={{ fontSize: '1.1rem', fontWeight: 500, margin: '6px 0 0', color: '#1f1d1b' }}>
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827' }}>
                   {user.email}
                 </p>
               </div>
-              <div>
-                <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#78716c', fontWeight: 600 }}>
-                  Contact Phone
-                </span>
-                <p style={{ fontSize: '1.1rem', fontWeight: 500, margin: '6px 0 0', color: '#1f1d1b' }}>
-                  {user.phone || '+962 7 9000 0000'}
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
+                  Account Role
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827', textTransform: 'capitalize' }}>
+                  {user.role || 'Client Member'}
+                </p>
+              </div>
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
+                  Location Service Area
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827' }}>
+                  Amman, Jordan (Complimentary Delivery)
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Recent Orders / Consultations */}
+        {/* Active Consultation Banner */}
         <div className="admin-card">
           <div className="admin-card-header">
-            <h2>Recent Consultations & Orders</h2>
+            <h2>Architectural Consultations</h2>
           </div>
-          <div className="admin-table-responsive">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Item / Consultation</th>
-                  <th>Reference</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div className="admin-prod-cell">
-                      <img
-                        src="https://ik.imagekit.io/6dghafkgmq/Kitchens/Kit3V4.jpg?updatedAt=1779196664060"
-                        alt="Kitchen Consultation"
-                        className="admin-prod-thumb"
-                      />
-                      <div>
-                        <p className="admin-prod-title">Tayf Kitchen Architectural Consultation</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>#HUR-9821</td>
-                  <td>
-                    <span className="admin-badge admin-badge-active">Confirmed</span>
-                  </td>
-                  <td>Oct 14, 2026</td>
-                  <td>
-                    <Link to="/kitchens" className="admin-action-btn admin-action-edit" style={{ textDecoration: 'none', display: 'inline-block' }}>
-                      View Piece
-                    </Link>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <strong style={{ fontSize: '1.0625rem', color: '#111827' }}>
+                  On-Site Space & Material Assessment
+                </strong>
+                <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '4px' }}>
+                  Status: <span className="admin-status-badge in-production">Scheduled</span> • Dedicated Architect: Eng. Tariq
+                </p>
+              </div>
+              <button
+                type="button"
+                className="admin-btn admin-btn-outline"
+                onClick={() => alert('Consultation details sent to your registered email.')}
+              >
+                View Details
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { INITIAL_RECORDS } from '../data/adminCatalogData';
+import { api } from '../services/api';
 import ImgkitApi from '../components/imgkitApi';
 import '../css/admin.css';
 
@@ -32,46 +32,51 @@ function Editor() {
   const productId = searchParams.get('id');
   const isEditMode = Boolean(productId);
 
-  // Initialize form state - if editing an existing product, populate all details; if adding, start empty
-  const [formData, setFormData] = useState(() => {
-    if (productId) {
-      try {
-        const stored = localStorage.getItem('hurfa_catalog_records');
-        const records = stored ? JSON.parse(stored) : INITIAL_RECORDS;
-        const found = records.find((item) => String(item.id) === String(productId));
-        if (found) {
-          return {
-            name: found.name || '',
-            category: found.category || 'Kitchens',
-            price: found.price || '',
-            stockStatus: found.stockStatus || 'Active',
-            image: found.image || '',
-            desc: found.desc || '',
-            dimensions: found.dimensions || '',
-            material: found.material || '',
-          };
-        }
-      } catch (err) {
-        console.error('Failed to load product details for editor', err);
-      }
-    }
-
-    // Empty form for new product
-    return {
-      name: '',
-      category: 'Kitchens',
-      price: '',
-      stockStatus: 'Active',
-      image: '',
-      desc: '',
-      dimensions: '',
-      material: '',
-    };
+  // Initialize form state
+  const [formData, setFormData] = useState({
+    name: '',
+    category: 'Kitchens',
+    price: '',
+    stockStatus: 'Active',
+    image: '',
+    desc: '',
+    dimensions: '',
+    material: '',
   });
 
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showImgKitModal, setShowImgKitModal] = useState(false);
+
+  // Fetch product from API if in edit mode
+  useEffect(() => {
+    let isMounted = true;
+    async function loadItem() {
+      if (productId) {
+        try {
+          const item = await api.catalog.getById(productId);
+          if (isMounted && item && !item.message) {
+            setFormData({
+              name: item.name || '',
+              category: item.category || 'Kitchens',
+              price: item.price || item.priceNumber || '',
+              stockStatus: item.stockStatus || 'Active',
+              image: item.image || item.images?.[0] || '',
+              desc: item.desc || '',
+              dimensions: item.dimensions || '',
+              material: item.material || '',
+            });
+          }
+        } catch (e) {
+          console.warn('Could not load item from API for editor:', e.message);
+        }
+      }
+    }
+    loadItem();
+    return () => {
+      isMounted = false;
+    };
+  }, [productId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,7 +86,7 @@ function Editor() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatusMessage({ type: '', text: '' });
 
@@ -100,9 +105,30 @@ function Editor() {
       ? formData.price.trim()
       : `JOD ${formData.price.trim()}`;
 
+    const payload = {
+      name: formData.name.trim(),
+      category: formData.category,
+      price: formattedPrice,
+      stockStatus: formData.stockStatus,
+      img: finalImage,
+      desc: formData.desc.trim(),
+      dimensions: formData.dimensions.trim(),
+      material: formData.material.trim(),
+    };
+
+    try {
+      if (isEditMode) {
+        await api.catalog.update(productId, payload);
+      } else {
+        await api.catalog.create(payload);
+      }
+    } catch (err) {
+      console.warn('Catalog API warning:', err.message);
+    }
+
     try {
       const stored = localStorage.getItem('hurfa_catalog_records');
-      let records = stored ? JSON.parse(stored) : [...INITIAL_RECORDS];
+      let records = stored ? JSON.parse(stored) : [];
 
       if (isEditMode) {
         records = records.map((item) =>
@@ -148,156 +174,225 @@ function Editor() {
         navigate('/admin');
       }, 700);
     } catch (err) {
-      console.error('Error saving product in editor', err);
+      console.error(err);
       setStatusMessage({
         type: 'error',
-        text: 'Failed to save changes. Please try again.',
+        text: 'Failed to save record to storage.',
       });
       setIsSubmitting(false);
     }
   };
 
+  const handleSelectPreset = (url) => {
+    setFormData((prev) => ({
+      ...prev,
+      image: url,
+    }));
+  };
+
+  const handleImageKitSelect = (imageUrl) => {
+    setFormData((prev) => ({
+      ...prev,
+      image: imageUrl,
+    }));
+    setShowImgKitModal(false);
+  };
+
   return (
     <div className="admin-page">
-      <div className="admin-container" style={{ maxWidth: '880px' }}>
-        {/* Navigation Breadcrumb */}
-        <div style={{ marginBottom: '24px' }}>
-          <Link
-            to="/admin"
-            style={{
-              color: '#78716c',
-              textDecoration: 'none',
-              fontSize: '0.88rem',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            ← Back to Admin Dashboard
-          </Link>
-        </div>
-
-        {/* Header */}
-        <header className="admin-header" style={{ marginBottom: '28px' }}>
+      <div className="admin-container">
+        {/* Header Bar */}
+        <header className="admin-header">
           <div>
-            <span className="admin-eyebrow">Studio Inventory</span>
-            <h1>{isEditMode ? 'Edit Product Details' : 'Add New Product'}</h1>
+            <span className="admin-eyebrow">Studio Editor</span>
+            <h1>{isEditMode ? 'Edit Furniture Piece' : 'Add New Furniture Piece'}</h1>
             <p>
               {isEditMode
-                ? `Modifying specifications, imagery, and pricing for item #${productId}.`
-                : 'Enter architectural details, category, and pricing to list a new piece in the catalog.'}
+                ? 'Update product details, pricing, dimensions, and specifications.'
+                : 'Create a new piece and publish it directly to the Hurfa catalog.'}
             </p>
+          </div>
+
+          <div className="admin-header-actions">
+            <Link to="/admin" className="admin-btn admin-btn-outline">
+              ← Back to Management
+            </Link>
           </div>
         </header>
 
-        {/* Alert message */}
+        {/* Status Message Alert */}
         {statusMessage.text && (
           <div
-            className={`login-alert ${statusMessage.type}`}
-            style={{
-              padding: '14px 18px',
-              borderRadius: '8px',
-              marginBottom: '24px',
-              fontSize: '0.9rem',
-              backgroundColor: statusMessage.type === 'error' ? '#fef2f2' : '#f0fdf4',
-              color: statusMessage.type === 'error' ? '#991b1b' : '#166534',
-              border: `1px solid ${statusMessage.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
-            }}
+            className={`admin-status-alert ${statusMessage.type}`}
+            role="alert"
           >
-            {statusMessage.text}
+            {statusMessage.type === 'error' ? (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            ) : (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            )}
+            <span>{statusMessage.text}</span>
           </div>
         )}
 
         {/* Editor Form Card */}
-        <div className="admin-card" style={{ padding: '36px 32px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* Row 1: Name & Category */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-              <div className="login-form-group">
-                <label htmlFor="editor-name" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                  Product Name *
+        <div className="admin-form-container">
+          <form className="admin-form" onSubmit={handleSubmit} noValidate>
+            {/* Row 1: Name and Category */}
+            <div className="admin-form-grid">
+              <div className="admin-form-group">
+                <label htmlFor="name" className="admin-form-label">
+                  Piece Name <span className="required">*</span>
                 </label>
                 <input
-                  id="editor-name"
                   type="text"
+                  id="name"
                   name="name"
-                  className="admin-search-input"
-                  style={{ width: '100%', boxSizing: 'border-box' }}
-                  placeholder="e.g. Wesal Bed Frame"
+                  className="admin-form-input"
+                  placeholder="e.g. Prestige - Oud Coffee Table"
                   value={formData.name}
                   onChange={handleChange}
                   required
                 />
               </div>
 
-              <div className="login-form-group">
-                <label htmlFor="editor-category" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                  Category *
+              <div className="admin-form-group">
+                <label htmlFor="category" className="admin-form-label">
+                  Category <span className="required">*</span>
                 </label>
                 <select
-                  id="editor-category"
+                  id="category"
                   name="category"
-                  className="admin-category-filter"
-                  style={{ width: '100%', boxSizing: 'border-box', height: '42px' }}
+                  className="admin-form-select"
                   value={formData.category}
                   onChange={handleChange}
                 >
                   <option value="Kitchens">Kitchens</option>
                   <option value="Bedrooms">Bedrooms</option>
                   <option value="Living Room">Living Room</option>
+                  <option value="Living Room Tables">Living Room Tables</option>
+                  <option value="Consoles">Consoles</option>
+                  <option value="TV Units">TV Units</option>
+                  <option value="Commercial Offices">Commercial Offices</option>
                 </select>
               </div>
             </div>
 
-            {/* Row 2: Price & Stock Status */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-              <div className="login-form-group">
-                <label htmlFor="editor-price" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                  Price (JOD) *
+            {/* Row 2: Price and Stock Status */}
+            <div className="admin-form-grid">
+              <div className="admin-form-group">
+                <label htmlFor="price" className="admin-form-label">
+                  Price (JOD) <span className="required">*</span>
                 </label>
                 <input
-                  id="editor-price"
                   type="text"
+                  id="price"
                   name="price"
-                  className="admin-search-input"
-                  style={{ width: '100%', boxSizing: 'border-box' }}
-                  placeholder="e.g. JOD 1,450 or 1450"
+                  className="admin-form-input"
+                  placeholder="e.g. 420 or JOD 420"
                   value={formData.price}
                   onChange={handleChange}
                   required
                 />
               </div>
 
-              <div className="login-form-group">
-                <label htmlFor="editor-stockStatus" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                  Stock Status *
+              <div className="admin-form-group">
+                <label htmlFor="stockStatus" className="admin-form-label">
+                  Inventory Status
                 </label>
                 <select
-                  id="editor-stockStatus"
+                  id="stockStatus"
                   name="stockStatus"
-                  className="admin-category-filter"
-                  style={{ width: '100%', boxSizing: 'border-box', height: '42px' }}
+                  className="admin-form-select"
                   value={formData.stockStatus}
                   onChange={handleChange}
                 >
-                  <option value="Active">Active (In Stock)</option>
+                  <option value="Active">Active / In Stock</option>
                   <option value="Low Stock">Low Stock</option>
-                  <option value="Made to Order">Made to Order</option>
+                  <option value="Made to Order">Made to Order (Bespoke)</option>
                 </select>
               </div>
             </div>
 
-            {/* Row 3: Image URL & Presets */}
-            <div className="login-form-group">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                <label htmlFor="editor-image" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', margin: 0 }}>
-                  Image CDN URL
+            {/* Row 3: Dimensions and Material */}
+            <div className="admin-form-grid">
+              <div className="admin-form-group">
+                <label htmlFor="dimensions" className="admin-form-label">
+                  Dimensions
+                </label>
+                <input
+                  type="text"
+                  id="dimensions"
+                  name="dimensions"
+                  className="admin-form-input"
+                  placeholder="e.g. 100cm x 100cm x 32.5cm"
+                  value={formData.dimensions}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="material" className="admin-form-label">
+                  Materials & Craftsmanship
+                </label>
+                <input
+                  type="text"
+                  id="material"
+                  name="material"
+                  className="admin-form-input"
+                  placeholder="e.g. Oak Veneer, HMR Moisture-Resistant Wood"
+                  value={formData.material}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            {/* Row 4: Description */}
+            <div className="admin-form-group">
+              <label htmlFor="desc" className="admin-form-label">
+                Architectural Description
+              </label>
+              <textarea
+                id="desc"
+                name="desc"
+                rows="3"
+                className="admin-form-textarea"
+                placeholder="Describe the aesthetic language, joinery, and structural finishes of the piece..."
+                value={formData.desc}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Row 5: Image Management */}
+            <div className="admin-form-group">
+              <div className="admin-label-row">
+                <label htmlFor="image" className="admin-form-label">
+                  Product Image URL
                 </label>
                 <button
                   type="button"
-                  className="admin-btn admin-btn-outline"
-                  style={{ padding: '4px 10px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  className="admin-imgkit-trigger"
                   onClick={() => setShowImgKitModal(true)}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -305,214 +400,84 @@ function Editor() {
                     <circle cx="9" cy="9" r="2" />
                     <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                   </svg>
-                  ImageKit Studio & Transform
+                  Browse ImageKit Asset Library
                 </button>
               </div>
+
               <input
-                id="editor-image"
                 type="url"
+                id="image"
                 name="image"
-                className="admin-search-input"
-                style={{ width: '100%', boxSizing: 'border-box' }}
-                placeholder="https://ik.imagekit.io/..."
+                className="admin-form-input"
+                placeholder="https://ik.imagekit.io/6dghafkgmq/..."
                 value={formData.image}
                 onChange={handleChange}
               />
-              <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.78rem', color: '#78716c' }}>Quick Presets:</span>
-                {PRESET_IMAGES.map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    style={{
-                      fontSize: '0.75rem',
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      border: '1px solid #e7e5e4',
-                      background: '#FAF8F5',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => setFormData((p) => ({ ...p, image: preset.url }))}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* Live Image & Details Preview */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-                background: '#FAF8F5',
-                padding: '16px',
-                borderRadius: '8px',
-                border: '1px solid #e7e5e4',
-              }}
-            >
-              <img
-                src={formData.image.trim() || DEFAULT_IMAGE}
-                alt="Product Preview"
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  objectFit: 'cover',
-                  borderRadius: '6px',
-                  border: '1px solid #d6d3d1',
-                  backgroundColor: '#eee9e1',
-                }}
-                onError={(e) => {
-                  e.target.src = DEFAULT_IMAGE;
-                }}
-              />
-              <div>
-                <span
-                  style={{
-                    fontSize: '0.76rem',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    color: '#78716c',
-                    letterSpacing: '0.06em',
-                  }}
-                >
-                  Live Preview
-                </span>
-                <p style={{ margin: '4px 0 2px', fontSize: '0.95rem', fontWeight: 600, color: '#1f1d1b' }}>
-                  {formData.name.trim() || 'Untitled Piece'}
-                </p>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.85rem' }}>
-                  <span style={{ color: '#78716c' }}>{formData.category}</span>
-                  <span style={{ color: '#d6d3d1' }}>•</span>
-                  <span style={{ fontWeight: 700, color: '#e67e22' }}>
-                    {formData.price.trim() || 'Price TBD'}
-                  </span>
-                  <span style={{ color: '#d6d3d1' }}>•</span>
-                  <span
-                    className={`admin-badge ${
-                      formData.stockStatus === 'Active' ? 'admin-badge-active' : 'admin-badge-low'
-                    }`}
-                  >
-                    {formData.stockStatus}
-                  </span>
+              {/* Image Preset Quick Pickers */}
+              <div className="admin-presets-wrapper">
+                <span className="admin-presets-title">Hurfa Studio Presets:</span>
+                <div className="admin-presets-list">
+                  {PRESET_IMAGES.map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      className="admin-preset-btn"
+                      onClick={() => handleSelectPreset(preset.url)}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
                 </div>
               </div>
+
+              {/* Image Preview Box */}
+              {formData.image && (
+                <div className="admin-image-preview-card">
+                  <span className="admin-preview-title">Active Media Preview:</span>
+                  <img
+                    src={formData.image}
+                    alt="Product preview"
+                    className="admin-image-preview"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Row 4: Material & Dimensions */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-              <div className="login-form-group">
-                <label htmlFor="editor-material" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                  Material & Finish (Optional)
-                </label>
-                <input
-                  id="editor-material"
-                  type="text"
-                  name="material"
-                  className="admin-search-input"
-                  style={{ width: '100%', boxSizing: 'border-box' }}
-                  placeholder="e.g. Solid Oak with Matte Lacquer"
-                  value={formData.material}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="login-form-group">
-                <label htmlFor="editor-dimensions" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                  Dimensions (Optional)
-                </label>
-                <input
-                  id="editor-dimensions"
-                  type="text"
-                  name="dimensions"
-                  className="admin-search-input"
-                  style={{ width: '100%', boxSizing: 'border-box' }}
-                  placeholder="e.g. 200cm x 160cm x 90cm"
-                  value={formData.dimensions}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            {/* Row 5: Description */}
-            <div className="login-form-group">
-              <label htmlFor="editor-desc" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f1d1b', marginBottom: '8px' }}>
-                Description (Optional)
-              </label>
-              <textarea
-                id="editor-desc"
-                name="desc"
-                className="admin-search-input"
-                style={{
-                  width: '100%',
-                  minHeight: '100px',
-                  boxSizing: 'border-box',
-                  resize: 'vertical',
-                  fontFamily: 'inherit',
-                  lineHeight: '1.5',
-                }}
-                placeholder="Architectural design notes, hardware specs, and craftsmanship details..."
-                value={formData.desc}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '14px', justifyContent: 'flex-end', marginTop: '12px', flexWrap: 'wrap' }}>
-              <Link
-                to="/admin"
+            {/* Submit & Cancel Buttons */}
+            <div className="admin-form-actions">
+              <button
+                type="button"
                 className="admin-btn admin-btn-outline"
-                style={{ padding: '12px 24px' }}
+                onClick={() => navigate('/admin')}
+                disabled={isSubmitting}
               >
                 Cancel
-              </Link>
+              </button>
               <button
                 type="submit"
                 className="admin-btn admin-btn-primary"
-                style={{ padding: '12px 28px' }}
                 disabled={isSubmitting}
               >
                 {isSubmitting
-                  ? 'Saving...'
+                  ? 'Saving Piece...'
                   : isEditMode
                   ? 'Save Changes'
-                  : 'Add Piece to Catalog'}
+                  : 'Publish to Catalog'}
               </button>
             </div>
           </form>
         </div>
 
-        {/* ImageKit Modal Studio */}
+        {/* ImageKit Asset Explorer Modal */}
         {showImgKitModal && (
-          <div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.65)',
-              backdropFilter: 'blur(3px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1050,
-              padding: '20px',
-            }}
-            onClick={() => setShowImgKitModal(false)}
-          >
-            <div
-              style={{ maxWidth: '640px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ImgkitApi
-                initialUrl={formData.image}
-                onSelect={(url) => {
-                  setFormData((prev) => ({ ...prev, image: url }));
-                  setShowImgKitModal(false);
-                }}
-                onClose={() => setShowImgKitModal(false)}
-              />
-            </div>
-          </div>
+          <ImgkitApi
+            onSelectImage={handleImageKitSelect}
+            onClose={() => setShowImgKitModal(false)}
+          />
         )}
       </div>
     </div>

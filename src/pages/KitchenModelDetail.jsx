@@ -1,18 +1,51 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { KITCHEN_MODELS_DATA } from '../data/kitchensData';
+import { api } from '../services/api';
 import ModelHero from '../components/ModelHero';
 import ModelDetailRows from '../components/ModelDetailRows';
 import '../css/Kitchens.css';
 
 function KitchenModelDetail() {
   const { modelId } = useParams();
-  const model = KITCHEN_MODELS_DATA[modelId?.toLowerCase()];
+  const [model, setModel] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Scroll to top when entering a model detail page
   useEffect(() => {
     window.scrollTo(0, 0);
+    let isMounted = true;
+
+    async function loadModel() {
+      try {
+        setLoading(true);
+        const data = await api.kitchens.getById(modelId);
+        if (isMounted && data && !data.message) {
+          setModel(data);
+        }
+      } catch (err) {
+        console.warn('Kitchen model API warning:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    if (modelId) {
+      loadModel();
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [modelId]);
+
+  if (loading && !model) {
+    return (
+      <div className="kitchen-detail-page text-center py-5">
+        <div className="container py-5">
+          <p className="text-secondary">Loading kitchen specifications...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!model) {
     return (
@@ -43,7 +76,7 @@ function KitchenModelDetail() {
       <ModelHero model={model} />
 
       {/* Craftsmanship & Feature Breakdown */}
-      <ModelDetailRows details={model.details} />
+      <ModelDetailRows details={model.details || []} />
     </div>
   );
 }

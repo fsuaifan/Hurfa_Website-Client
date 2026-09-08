@@ -1,15 +1,57 @@
-import React, { useState, useMemo } from 'react';
-import { CATALOG_PRODUCTS, PREMIUM_COLLECTIONS } from '../data/productsData';
+import React, { useState, useEffect, useMemo } from 'react';
+import { api } from '../services/api';
 import ProductModal from '../components/ProductModal';
 import '../css/products.css';
 
 const CATEGORIES = ['All', 'Kitchens', 'Bedrooms', 'Living Room'];
 
+const SIGNATURE_SUITES = [
+  {
+    id: 'the-oud-collection',
+    title: 'The Oud Collection',
+    tagline: 'Solid Oak & Bouclé',
+    description: 'A signature living-room collection built around solid oak framing, subtle warm curves, and boucle upholstery.',
+    priceRange: 'JOD 2,400',
+    image: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Oud-Collection_u9dsnBlwn.jpg?updatedAt=1787138978278',
+  },
+  {
+    id: 'the-wesal-collection',
+    title: 'The Wesal Collection',
+    tagline: 'Walnut & Architectural Linen',
+    description: 'A bedroom collection defined by low-profile walnut woodwork, soft textiles, and serene minimalist balance.',
+    priceRange: 'JOD 1,980',
+    image: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg?updatedAt=1787138960280',
+  },
+];
+
 function Products() {
+  const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadProducts() {
+      try {
+        setLoading(true);
+        const data = await api.products.getAll();
+        if (isMounted && Array.isArray(data)) {
+          setProducts(data);
+        }
+      } catch (err) {
+        console.warn('Products API warning:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadProducts();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleOpenProduct = (product) => {
     setSelectedProduct(product);
@@ -22,20 +64,24 @@ function Products() {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let result = [...CATALOG_PRODUCTS];
+    let result = [...products];
 
     if (activeCategory !== 'All') {
-      result = result.filter((p) => p.category === activeCategory);
+      result = result.filter((p) => {
+        const cat = (p.category || '').toLowerCase();
+        const active = activeCategory.toLowerCase();
+        return cat.includes(active) || (active === 'living room' && cat.includes('living'));
+      });
     }
 
     if (sortBy === 'price-low') {
-      result.sort((a, b) => a.priceNumber - b.priceNumber);
+      result.sort((a, b) => (a.priceNumber || 0) - (b.priceNumber || 0));
     } else if (sortBy === 'price-high') {
-      result.sort((a, b) => b.priceNumber - a.priceNumber);
+      result.sort((a, b) => (b.priceNumber || 0) - (a.priceNumber || 0));
     }
 
     return result;
-  }, [activeCategory, sortBy]);
+  }, [products, activeCategory, sortBy]);
 
   return (
     <div className="products-page">
@@ -61,16 +107,19 @@ function Products() {
             ))}
           </div>
 
-          {/* Sort Selector */}
-          <div className="products-sort-wrap">
-            <label htmlFor="products-sort-select">Sort By</label>
+          {/* Sort Dropdown */}
+          <div className="products-sort-wrapper">
+            <label htmlFor="products-sort-select" className="visually-hidden">
+              Sort Products
+            </label>
             <select
               id="products-sort-select"
               className="products-sort-select"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Sort products by price"
             >
-              <option value="default">Featured</option>
+              <option value="default">Featured / Default</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
             </select>
@@ -78,91 +127,98 @@ function Products() {
         </div>
       </header>
 
-      {/* Main 3-Column Products Grid */}
-      <section className="products-grid-section" aria-label="Products Catalog">
-        <div className="products-grid">
-          {filteredProducts.map((product) => (
-            <article
-              key={product.id}
-              className="product-item-card"
-              onClick={() => handleOpenProduct(product)}
-              role="button"
-              tabIndex={0}
-              aria-label={`View details for ${product.name}`}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleOpenProduct(product);
-                }
-              }}
+      {/* Catalog Grid */}
+      <section className="products-grid-section" aria-label="Furniture Products Grid">
+        {loading && products.length === 0 ? (
+          <div className="products-loading-state py-5 text-center">
+            <p>Loading Hurfa collection...</p>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="products-empty-state">
+            <p>No furniture pieces found for the selected filter.</p>
+            <button
+              type="button"
+              className="btn btn-outline-dark mt-3"
+              onClick={() => setActiveCategory('All')}
             >
-              <div className="product-item-media">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  loading="lazy"
-                />
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          <div className="products-grid">
+            {filteredProducts.map((product) => (
+              <article
+                key={product.id}
+                className="product-card"
+                onClick={() => handleOpenProduct(product)}
+                role="button"
+                tabIndex={0}
+                aria-label={`View details for ${product.name}`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleOpenProduct(product);
+                  }
+                }}
+              >
+                <div className="product-card-image-wrap">
+                  <img
+                    src={product.images ? product.images[0] : product.image}
+                    alt={product.name}
+                    loading="lazy"
+                  />
+                  {product.salePrice && (
+                    <span className="product-card-badge">Bespoke Offer</span>
+                  )}
+                </div>
+                <div className="product-card-body">
+                  <span className="product-card-category">{product.category}</span>
+                  <h3 className="product-card-title">{product.name}</h3>
+                  <div className="product-card-price-row">
+                    <span className="product-card-price">{product.price}</span>
+                    <span className="product-card-action">View Piece →</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Signature & Premium Collections Section */}
+      <section className="products-premium-section" aria-label="Signature Collections">
+        <div className="products-premium-header">
+          <span className="products-eyebrow">Exclusives</span>
+          <h2>Signature Suites</h2>
+          <p>
+            Explore our architectural whole-room conceptual collections, engineered with unified tone and materiality.
+          </p>
+        </div>
+
+        <div className="products-premium-grid">
+          {SIGNATURE_SUITES.map((suite) => (
+            <article key={suite.id} className="products-premium-card">
+              <div className="products-premium-media">
+                <img src={suite.image} alt={suite.title} loading="lazy" />
               </div>
-              <div className="product-item-body">
-                <span className="product-item-tag">{product.category}</span>
-                <h3>{product.name}</h3>
-                <p className="product-item-price">{product.price}</p>
-                <p className="product-item-desc">{product.desc}</p>
+              <div className="products-premium-info">
+                <span className="products-premium-tag">{suite.tagline}</span>
+                <h3>{suite.title}</h3>
+                <p>{suite.description}</p>
+                <span className="products-premium-price">{suite.priceRange}</span>
               </div>
             </article>
           ))}
         </div>
       </section>
 
-      {/* Premium Collections Section */}
-      <section className="products-collections-section" aria-label="Premium Collections">
-        <div className="products-collections-header">
-          <span className="products-eyebrow">Signature</span>
-          <h2>Premium Collection</h2>
-        </div>
-
-        <div className="products-collections-grid">
-          {PREMIUM_COLLECTIONS.map((col) => (
-            <article
-              key={col.id}
-              className="collection-item-card"
-              onClick={() => handleOpenProduct(col)}
-              role="button"
-              tabIndex={0}
-              aria-label={`View details for ${col.name}`}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleOpenProduct(col);
-                }
-              }}
-            >
-              <div className="collection-item-media">
-                <img
-                  src={col.image}
-                  alt={col.name}
-                  loading="lazy"
-                />
-              </div>
-              <div className="collection-item-body">
-                <span className="product-item-tag">{col.category}</span>
-                <h3>{col.name}</h3>
-                <p className="collection-item-price">{col.price}</p>
-                <p className="collection-item-desc">{col.desc}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Quick-View Product Modal */}
-      <ProductModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        product={selectedProduct}
-        onAddToCart={(prod, qty) => {
-          console.log('Added to cart:', prod?.name, 'Qty:', qty);
-          handleCloseModal();
-        }}
-      />
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <ProductModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          product={selectedProduct}
+        />
+      )}
     </div>
   );
 }

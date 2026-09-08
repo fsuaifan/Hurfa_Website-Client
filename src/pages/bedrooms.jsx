@@ -1,11 +1,34 @@
-import React, { useState } from 'react';
-import { BEDROOM_PRODUCTS } from '../data/bedroomsData';
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import ProductModal from '../components/ProductModal';
 import '../css/bedrooms.css';
 
 function Bedrooms() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadBedrooms() {
+      try {
+        setLoading(true);
+        const data = await api.bedrooms.getAll();
+        if (isMounted && Array.isArray(data)) {
+          setProducts(data);
+        }
+      } catch (err) {
+        console.warn('Bedrooms API warning:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadBedrooms();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleOpenProduct = (product) => {
     setSelectedProduct(product);
@@ -30,7 +53,7 @@ function Bedrooms() {
 
       {/* 2-Column Product Grid */}
       <section className="bedrooms-product-grid" aria-label="Bedroom Products">
-        {BEDROOM_PRODUCTS.map((product) => (
+        {products.map((product) => (
           <article
             key={product.id}
             className="bedroom-product-card"
@@ -46,7 +69,7 @@ function Bedrooms() {
           >
             <div className="bedroom-card-media">
               <img
-                src={product.images[0]}
+                src={product.images ? product.images[0] : product.image}
                 alt={product.name}
                 loading="lazy"
               />
@@ -60,16 +83,14 @@ function Bedrooms() {
         ))}
       </section>
 
-      {/* Quick-View Product Modal */}
-      <ProductModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        product={selectedProduct}
-        onAddToCart={(prod, qty) => {
-          console.log('Added to cart:', prod?.name, 'Qty:', qty);
-          handleCloseModal();
-        }}
-      />
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <ProductModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          product={selectedProduct}
+        />
+      )}
     </div>
   );
 }
