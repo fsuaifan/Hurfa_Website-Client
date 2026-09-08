@@ -13,6 +13,10 @@ function NavigationBar() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
+  // this checks if the dropdown menu is expanded or not
+  const [expanded, setExpanded] = useState(false);
+  // track scroll position to switch between transparent and solid
+  const [isScrolled, setIsScrolled] = useState(false);
   const [authDestination, setAuthDestination] = useState('/login');
 
   useEffect(() => {
