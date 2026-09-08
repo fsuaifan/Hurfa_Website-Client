@@ -12,6 +12,7 @@ const translations = {
     account: 'Account',
     login: 'Login',
     logout: 'Logout',
+    logOut: 'Log Out',
     langBtn: 'العربية',
 
     // --- Home Page ---
@@ -28,6 +29,7 @@ const translations = {
     wallClosetDesc: 'Introducing our wall closet design, a harmonious blend of style and functionality that transforms your space into an organized haven. This sophisticated design seamlessly integrates into your room, offering a tailored storage solution maximizes both space and aesthetics.',
 
     // --- Kitchens & Kitchen Models ---
+    collections: 'Collections',
     kitchensHeroDesc: 'Every kitchen we build is designed around how you actually cook and live — from minimalist layouts to warm, traditional finishes.',
     backToKitchens: 'Back to Collections',
     backToKitchensArrow: '← Back to Collections',
@@ -35,12 +37,35 @@ const translations = {
     modelNotFound: 'Kitchen Model Not Found',
     modelNotFoundDesc: "We couldn't find the kitchen model you were looking for.",
     loadingSpecs: 'Loading kitchen specifications...',
+    model: 'Model',
+    finishVariation: 'Finish variation',
     contemporary: 'Contemporary',
+    Contemporary: 'Contemporary',
     contemporaryDesc: 'Experience the perfect blend of style and functionality with our premium contemporary kitchen designs.',
+    'ContemporaryDesc': 'Experience the perfect blend of style and functionality with our premium contemporary kitchen designs.',
     'Modern chic': 'Modern Chic',
     'Modern chicDesc': 'A sophisticated take on modern living, featuring clean lines and elegant finishes.',
+    chic: 'Modern Chic',
+    Chic: 'Modern Chic',
+    ChicDesc: 'A sophisticated take on modern living, featuring clean lines and elegant finishes.',
     'Organic Modern': 'Organic Modern',
     'Organic ModernDesc': 'Bringing natural elements into the heart of your home with sustainable materials and fluid design.',
+    organic: 'Organic Modern',
+    Organic: 'Organic Modern',
+    Cabinetry: 'Cabinetry',
+    Surfaces: 'Surfaces',
+    'Soft-close hinges and hand-finished panel work, built to hold up to daily use without losing its edge.':
+      'Soft-close hinges and hand-finished panel work, built to hold up to daily use without losing its edge.',
+    'Countertop and backsplash materials chosen to match the tone of the model, with finishes that resist heat and stains.':
+      'Countertop and backsplash materials chosen to match the tone of the model, with finishes that resist heat and stains.',
+    'Constructed with natural wood grain panels, moisture-resistant sealing, and integrated push-to-open latches.':
+      'Constructed with natural wood grain panels, moisture-resistant sealing, and integrated push-to-open latches.',
+    'Honed natural stone countertops with matching waterfall edges for an unbroken, organic kitchen flow.':
+      'Honed natural stone countertops with matching waterfall edges for an unbroken, organic kitchen flow.',
+    'Architectural matte lacquer surfaces with seamless laser edge-banding that repels fingerprints and spills.':
+      'Architectural matte lacquer surfaces with seamless laser edge-banding that repels fingerprints and spills.',
+    'Ultra-compact sintered porcelain counters engineered to withstand extreme heat, knife marks, and heavy daily cooking.':
+      'Ultra-compact sintered porcelain counters engineered to withstand extreme heat, knife marks, and heavy daily cooking.',
 
     // --- About Us ---
     aboutTitle: 'About Us',
@@ -123,7 +148,6 @@ const translations = {
 
     // --- Product / Bedroom UI (Static Controls & Labels) ---
     catalog: 'Catalog',
-    collections: 'Collections',
     homeFurniture: 'Home Furniture',
     bedroomsHeroDesc: 'Bed frames, wardrobes, and nightstands built to match — pick a piece to see finishes, pricing, and details.',
     leadTime: 'Lead time: 14-26 days',
@@ -133,6 +157,7 @@ const translations = {
     addedToCart: '✓ Added to Cart',
     premiumCol: 'Premium collection',
     all: 'All',
+    All: 'All',
     noItems: 'No items found.',
     noFurnitureFound: 'No furniture pieces found for the selected filter.',
     resetFilters: 'Reset Filters',
@@ -151,9 +176,33 @@ const translations = {
     configurationOption: 'Configuration Option',
     standardSuite: 'Standard Suite',
     expandedSuite: 'Expanded Suite',
+    suiteWithWardrobe: 'Suite with Wardrobe / Option B',
+    productDefaultDesc: 'Crafted with premium materials and signature Hurfa architectural detail.',
+    productView: 'Product view',
+    each: 'each',
     materials: 'Materials:',
     dimensions: 'Dimensions:',
     quantity: 'Quantity',
+
+    // Categories
+    'Living Room Tables': 'Living Room Tables',
+    'TV Units': 'TV Units',
+    'Consoles': 'Consoles',
+    'Commercial Offices': 'Commercial Offices',
+    'Wardrobe': 'Wardrobe',
+    'Additions': 'Additions',
+    'Essentials': 'Essentials',
+    'Signature': 'Signature',
+    'Prestige': 'Prestige',
+    'Kitchens': 'Kitchens',
+    'Bedrooms': 'Bedrooms',
+    'Living Room': 'Living Room',
+    'Coffee Tables': 'Coffee Tables',
+    'coffeeTables': 'Coffee Tables',
+    'tvUnits': 'TV Units',
+    'consols': 'Consols',
+    'Dining Sets': 'Dining Sets',
+    'Storage Units': 'Storage Units',
 
     // Sort Options
     sortFeatured: 'Featured / Default',
@@ -177,8 +226,10 @@ const translations = {
     estimatedTotal: 'Estimated Total',
     promoPlaceholder: 'Promo Code (HURFA10)',
     apply: 'Apply',
+    invalidPromo: 'Invalid promo code. Try "HURFA10" for 10% off.',
     proceedToCheckout: 'Proceed to Checkout',
     placingOrder: 'Placing Order...',
+    checkoutError: 'Checkout could not be completed. Please check your connection and try again.',
     clientInfo: 'Client Information',
     clientName: 'Client Name',
     email: 'Email',
@@ -225,6 +276,20 @@ const translations = {
     orderDate: 'Date',
     orderStatus: 'Status',
     noPastOrders: 'No past orders found. Explore the Catalog to commission your first piece.',
+    clientSince: 'Client since 2026',
+    kitchensAndBedroomsSets: 'Kitchens & Bedroom sets',
+    active: 'Active',
+    activeOrders: 'Active',
+    consultationScheduled: 'Consultation scheduled',
+    whiteGlove: 'White-Glove',
+    jordanInstallationIncluded: 'Jordan installation included',
+    clientMember: 'Client Member',
+    spaceAssessment: 'On-Site Space & Material Assessment',
+    statusLabel: 'Status:',
+    scheduled: 'Scheduled',
+    dedicatedArchitect: 'Dedicated Architect: Eng. Tariq',
+    viewDetails: 'View Details',
+    consultationDetailsAlert: 'Consultation details sent to your registered email.',
     customerPortal: 'Customer Portal',
     studioAdmin: 'Studio Admin',
     managementConsole: 'Management Console',
@@ -236,17 +301,166 @@ const translations = {
     adminUsernameOrEmail: 'Admin Username or Email',
     password: 'Password',
     confirmPassword: 'Confirm Password',
+    phoneNumber: 'Phone Number',
+    optional: '(Optional)',
+    min6Chars: '(min. 6 characters)',
     forgot: 'Forgot?',
     rememberSession: 'Remember session on this device',
     signIn: 'Sign In',
     signInToStudio: 'Sign In to Studio Console',
     createAccount: 'Create Account',
+    creatingAccount: 'Creating Account...',
+    authenticating: 'Authenticating...',
+    restrictedStaffOnly: 'Restricted management console. Authorized Hurfa studio staff only.',
+    forgotPasswordSent: 'Password reset link sent to your registered email.',
     newToHurfa: 'New to Hurfa Studio?',
     alreadyHaveAccount: 'Already have an account?',
     hurfaMembership: 'Hurfa Membership',
     createAccountTitle: 'Create Your Account',
     createAccountSubtitle: 'Join Hurfa Studio to save custom palettes, request architectural consultations, and track bespoke orders.',
     agreeTermsText: 'I agree to the Hurfa Terms of Service and Privacy Policy.',
+    fillAllRequired: 'Please fill in all required fields.',
+    passwordMin6: 'Password must be at least 6 characters.',
+    passwordsDoNotMatch: 'Passwords do not match.',
+    acceptTermsPrompt: 'Please accept the terms of service and privacy policy to continue.',
+    accountCreatedSuccess: 'Account created successfully! Welcome to Hurfa.',
+    invalidCredentials: 'Invalid credentials. Please verify and try again.',
+    adminRedirect: 'Admin authorization verified. Redirecting to Studio Dashboard...',
+    welcomeRedirect: 'Welcome back! Redirecting to your account...',
+    enterBothEmailPass: 'Please enter both your email/username and password.',
+
+    // --- Admin & Editor ---
+    admin: 'Admin',
+    studioEditor: 'Studio Editor',
+    editPieceSubtitle: 'Update product details, pricing, dimensions, and specifications.',
+    addNewPieceSubtitle: 'Create a new piece and publish it directly to the Hurfa catalog.',
+    backToManagement: '← Back to Management',
+    hurfaStudioPortalDesc: 'Hurfa Architectural Studio • Catalog, Orders & Client Directory',
+    totalCatalogItems: 'Total Catalog Items',
+    liveAcrossWeb: 'Live across web & boutique',
+    bedroomPieces: 'Bedroom Pieces',
+    framesWardrobesNightstands: 'Frames, wardrobes & nightstands',
+    kitchenSystems: 'Kitchen Systems',
+    chicOrganicContemporary: 'Chic, Organic & Contemporary',
+    signatureCollections: 'Signature Collections',
+    theOudAndTheWesalSuite: 'The Oud & The Wesal Suite',
+    searchPieceNameOrCat: 'Search piece name or category...',
+    catalogRecords: 'Catalog Records',
+    noMatchingRecordsFound: 'No matching records found.',
+    product: 'Product',
+    price: 'Price',
+    status: 'Status',
+    actions: 'Actions',
+    edit: 'Edit',
+    delete: 'Delete',
+    activeInStock: 'Active / In Stock',
+    madeToOrder: 'Made to Order (Bespoke)',
+    lowStock: 'Low Stock',
+    totalInquiriesOrders: 'Total Inquiries / Orders',
+    lifetimeStudioRequests: 'Lifetime Studio Requests',
+    inProduction: 'In Production',
+    workshopJordanActive: 'Workshop Jordan Active',
+    readyForDelivery: 'Ready for Delivery',
+    qualityInspectedPacked: 'Quality Inspected & Packed',
+    consultationsScheduled: 'Consultations Scheduled',
+    architecturalOnSiteVisits: 'Architectural On-Site Visits',
+    searchOrderIdClient: 'Search order ID, client name, or piece...',
+    bespokeOrdersInquiries: 'Bespoke Orders & Inquiries',
+    noMatchingOrdersFound: 'No matching orders found.',
+    itemsAndDetails: 'Items & Details',
+    totalValue: 'Total Value',
+    date: 'Date',
+    action: 'Action',
+    recent: 'Recent',
+    update: 'Update',
+    vipStudioPatrons: 'VIP Studio Patrons',
+    highValueArchitects: 'High-value residential architects',
+    activeClients: 'Active Clients',
+    recentInquiriesProjects: 'Recent inquiries & projects',
+    totalPatrons: 'Total Patrons',
+    jordanGccDirectory: 'Jordan & GCC Directory',
+    averageProjectValue: 'Average Project Value',
+    acrossBespokeSuites: 'Across bespoke suites',
+    searchPatronsPlaceholder: 'Search patrons by name, email, city, or phone...',
+    registerClient: '+ Register Client',
+    registeredClientsPatrons: 'Registered Clients & Patrons',
+    noMatchingClientsFound: 'No matching clients found.',
+    contactInfo: 'Contact Info',
+    location: 'Location',
+    ordersCompleted: 'Orders Completed',
+    projects: 'Projects',
+    justNow: 'Just now',
+    confirmDeleteRecord: 'Are you sure you want to remove',
+    fromTheCatalog: 'from the catalog?',
+    updateStatusFor: 'Update status for',
+    enterClientFullName: 'Enter client full name:',
+    enterClientEmail: 'Enter client email address:',
+    enterClientPhone: 'Enter client phone:',
+    enterDistrictCity: 'Enter district/city:',
+    furnitureCatalog: 'Furniture Catalog',
+    ordersAndRequests: 'Orders & Inquiries',
+    clientDirectory: 'Client Directory',
+    addNewPiece: 'Add New Piece',
+    liveWebsite: 'Live Website ↗',
+    searchCatalog: 'Search catalog by name, model or material...',
+    allCategories: 'All Categories',
+    priceRange: 'Price Range',
+    stockStatus: 'Stock Status',
+    editPiece: 'Edit Piece',
+    deletePiece: 'Delete Piece',
+    searchOrders: 'Search orders by ID, client or piece...',
+    allStatuses: 'All Statuses',
+    delivered: 'Delivered',
+    updateStatus: 'Update Status',
+    addClient: 'Add Client',
+    searchClients: 'Search clients by name, email or city...',
+    city: 'City',
+    totalOrders: 'Total Orders',
+    totalSpent: 'Total Spent',
+    lastActive: 'Last Active',
+    prospect: 'Prospect',
+    activeClient: 'Active Client',
+    vipClient: 'VIP Client',
+    VIP: 'VIP',
+    Active: 'Active',
+    Delivered: 'Delivered',
+    'In Production': 'In Production',
+    'Ready for Delivery': 'Ready for Delivery',
+    'Consultation Scheduled': 'Consultation Scheduled',
+    editorTitle: 'Furniture Piece Editor',
+    pieceName: 'Piece Name',
+    category: 'Category',
+    priceJod: 'Price (JOD)',
+    imageMedia: 'Image / Media',
+    description: 'Description',
+    dimensionsCm: 'Dimensions (e.g. 160x58x40 cm)',
+    materialsDesc: 'Materials (e.g. Oak Veneer, MDF)',
+    savePiece: 'Save Piece',
+    cancel: 'Cancel',
+    uploadViaImageKit: 'Upload via ImageKit',
+    selectPreset: 'Or choose from presets',
+    editorFillRequired: 'Please provide both a product name and price.',
+    editorChangesSaved: 'Product changes saved successfully!',
+    editorAddedSuccess: 'New product added to catalog!',
+    editorSaveFailed: 'Failed to save record to storage.',
+
+    // --- Signature & Premium Collections Fallbacks ---
+    'The Oud Collection': 'The Oud Collection',
+    'Oud Collection': 'Oud Collection',
+    'oudCol': 'Oud Collection',
+    'The Wesal Collection': 'The Wesal Collection',
+    'Wesal Collection': 'Wesal Collection',
+    'wesalCol': 'Wesal Collection',
+    'Cont-Siq Collection': 'Cont-Siq Collection',
+    'Siq Collection': 'Siq Collection',
+    'Solid Oak & Bouclé': 'Solid Oak & Bouclé',
+    'Walnut & Architectural Linen': 'Walnut & Architectural Linen',
+    'A signature living-room collection built around solid oak framing, subtle warm curves, and boucle upholstery.':
+      'A signature living-room collection built around solid oak framing, subtle warm curves, and boucle upholstery.',
+    'A bedroom collection defined by low-profile walnut woodwork, soft textiles, and serene minimalist balance.':
+      'A bedroom collection defined by low-profile walnut woodwork, soft textiles, and serene minimalist balance.',
+    'oudDesc': 'Oud is crafted from premium walnut veneer.',
+    'wesalDesc': 'Wesal is defined by multi-layered contrast.',
 
     // --- Footer ---
     contactVia: 'Contact Us Via',
@@ -266,6 +480,7 @@ const translations = {
     account: 'الحساب',
     login: 'تسجيل الدخول',
     logout: 'تسجيل الخروج',
+    logOut: 'تسجيل الخروج',
     langBtn: 'English',
 
     // --- Home Page ---
@@ -282,6 +497,7 @@ const translations = {
     wallClosetDesc: 'نقدم لكم تصميم خزائن الحائط، مزيج متناغم من الأناقة والوظيفة الذي يحول مساحتك إلى ملاذ منظم. يندمج هذا التصميم المتطور بسلاسة في غرفتك، مما يوفر حلاً مخصصاً للتخزين يزيد من المساحة والجماليات.',
 
     // --- Kitchens & Kitchen Models ---
+    collections: 'المجموعات',
     kitchensHeroDesc: 'كل مطبخ نبنيه مصمم وفقاً لكيفية طهيك وعيشك فعلياً — من التصاميم البسيطة إلى التشطيبات التقليدية الدافئة.',
     backToKitchens: 'العودة إلى المجموعات',
     backToKitchensArrow: '← العودة إلى المجموعات',
@@ -289,12 +505,35 @@ const translations = {
     modelNotFound: 'لم يتم العثور على نموذج المطبخ',
     modelNotFoundDesc: 'لم نتمكن من العثور على نموذج المطبخ الذي تبحث عنه.',
     loadingSpecs: 'جاري تحميل مواصفات المطبخ...',
+    model: 'نموذج',
+    finishVariation: 'خيار التشطيب',
     contemporary: 'عصري',
+    Contemporary: 'عصري',
     contemporaryDesc: 'جرب المزيج المثالي بين الأناقة والوظيفة مع تصاميم المطابخ العصرية المميزة لدينا.',
+    'ContemporaryDesc': 'جرب المزيج المثالي بين الأناقة والوظيفة مع تصاميم المطابخ العصرية المميزة لدينا.',
     'Modern chic': 'مودرن شيك',
     'Modern chicDesc': 'لمسة متطورة للحياة الحديثة، تتميز بخطوط نظيفة وتشطيبات أنيقة.',
+    chic: 'مودرن شيك',
+    Chic: 'مودرن شيك',
+    ChicDesc: 'لمسة متطورة للحياة الحديثة، تتميز بخطوط نظيفة وتشطيبات أنيقة.',
     'Organic Modern': 'أورجانيك مودرن',
     'Organic ModernDesc': 'جلب العناصر الطبيعية إلى قلب منزلك بمواد مستدامة وتصميم انسيابي.',
+    organic: 'أورجانيك مودرن',
+    Organic: 'أورجانيك مودرن',
+    Cabinetry: 'الخزائن',
+    Surfaces: 'الأسطح',
+    'Soft-close hinges and hand-finished panel work, built to hold up to daily use without losing its edge.':
+      'مفصلات ذات إغلاق ناعم وتشطيبات يدوية متقنة للألواح، مصممة لتحمل الاستخدام اليومي دون أن تفقد رونقها.',
+    'Countertop and backsplash materials chosen to match the tone of the model, with finishes that resist heat and stains.':
+      'مواد الأسطح والجدران الخلفية تم اختيارها لتلائم طابع النموذج، مع تشطيبات مقاومة للحرارة والبقع.',
+    'Constructed with natural wood grain panels, moisture-resistant sealing, and integrated push-to-open latches.':
+      'مصنوعة من ألواح خشبية طبيعية الملمس، مع عزل مقاوم للرطوبة ومقابض مدمجة بنظام الدفع للفتح.',
+    'Honed natural stone countertops with matching waterfall edges for an unbroken, organic kitchen flow.':
+      'أسطح من الحجر الطبيعي المعالج مع حواف شلالية متناسقة لتدفق مطبخي انسيابي وطبيعي متكامل.',
+    'Architectural matte lacquer surfaces with seamless laser edge-banding that repels fingerprints and spills.':
+      'أسطح لاكيه مطفية مع حواف ليزرية سلسة تقاوم بصمات الأصابع والانسكابات.',
+    'Ultra-compact sintered porcelain counters engineered to withstand extreme heat, knife marks, and heavy daily cooking.':
+      'أسطح بورسلين مدمجة فائقة التحمل هندسياً لمقاومة الحرارة الشديدة، آثار السكاكين والطهي اليومي المكثف.',
 
     // --- About Us ---
     aboutTitle: 'من نحن',
@@ -377,7 +616,6 @@ const translations = {
 
     // --- Product / Bedroom UI (Static Controls & Labels) ---
     catalog: 'الكتالوج',
-    collections: 'المجموعات',
     homeFurniture: 'أثاث منزلي',
     bedroomsHeroDesc: 'هياكل الأسرة والخزائن وطاولات السرير المصممة للتناسق — اختر قطعة لمعرفة التشطيبات والأسعار والتفاصيل.',
     leadTime: 'مدة التوريد: 14-26 يوم',
@@ -387,6 +625,7 @@ const translations = {
     addedToCart: '✓ تمت الإضافة إلى السلة',
     premiumCol: 'مجموعة متميزة',
     all: 'الكل',
+    All: 'الكل',
     noItems: 'لم يتم العثور على عناصر.',
     noFurnitureFound: 'لم يتم العثور على قطع أثاث للتصفية المحددة.',
     resetFilters: 'إعادة ضبط التصفية',
@@ -405,9 +644,33 @@ const translations = {
     configurationOption: 'خيار التكوين',
     standardSuite: 'المجموعة القياسية',
     expandedSuite: 'المجموعة الموسعة',
+    suiteWithWardrobe: 'طقم مع خزانة / خيار ب',
+    productDefaultDesc: 'مصنوعة من مواد فاخرة وتفاصيل معمارية مميزة خاصة بدار حرفة.',
+    productView: 'عرض المنتج',
+    each: 'لكل قطعة',
     materials: 'المواد:',
     dimensions: 'الأبعاد:',
     quantity: 'الكمية',
+
+    // Categories
+    'Living Room Tables': 'طاولات غرف معيشة',
+    'TV Units': 'طاولات تلفاز',
+    'Consoles': 'كونسول',
+    'Commercial Offices': 'مكاتب',
+    'Wardrobe': 'خزائن',
+    'Additions': 'الاضافات',
+    'Essentials': 'أساس',
+    'Signature': 'اختصاص',
+    'Prestige': 'سُموّ',
+    'Kitchens': 'المطابخ',
+    'Bedrooms': 'غرف النوم',
+    'Living Room': 'غرف معيشة',
+    'Coffee Tables': 'طاولات قهوة',
+    'coffeeTables': 'طاولات قهوة',
+    'tvUnits': 'طاولات تلفاز',
+    'consols': 'كونسول',
+    'Dining Sets': 'طاولات طعام',
+    'Storage Units': 'وحدات تخزين',
 
     // Sort Options
     sortFeatured: 'المميز / الافتراضي',
@@ -431,8 +694,10 @@ const translations = {
     estimatedTotal: 'المجموع التقديري',
     promoPlaceholder: 'رمز الخصم (HURFA10)',
     apply: 'تطبيق',
+    invalidPromo: 'رمز ترويجي غير صالح. جرب "HURFA10" للحصول على خصم 10%.',
     proceedToCheckout: 'إتمام الطلب',
     placingOrder: 'جاري تقديم الطلب...',
+    checkoutError: 'تعذر إتمام الطلب. يرجى التحقق من اتصالك والمحاولة مرة أخرى.',
     clientInfo: 'معلومات العميل',
     clientName: 'اسم العميل',
     email: 'البريد الإلكتروني',
@@ -479,6 +744,20 @@ const translations = {
     orderDate: 'التاريخ',
     orderStatus: 'الحالة',
     noPastOrders: 'لم يتم العثور على طلبات سابقة. استكشف الكتالوج لطلب أول قطعة.',
+    clientSince: 'عميل منذ 2026',
+    kitchensAndBedroomsSets: 'أطقم المطابخ وغرف النوم',
+    active: 'نشط',
+    activeOrders: 'نشط',
+    consultationScheduled: 'تمت جدولة الاستشارة',
+    whiteGlove: 'خدمة راقية متكاملة',
+    jordanInstallationIncluded: 'شامل التركيب في الأردن',
+    clientMember: 'عضو مميز',
+    spaceAssessment: 'معاينة الموقع والمواد ميدانياً',
+    statusLabel: 'الحالة:',
+    scheduled: 'مجدول',
+    dedicatedArchitect: 'المهندس المخصص: م. طارق',
+    viewDetails: 'عرض التفاصيل',
+    consultationDetailsAlert: 'تم إرسال تفاصيل الاستشارة إلى بريدك الإلكتروني المسجل.',
     customerPortal: 'بوابة العميل',
     studioAdmin: 'إدارة الاستوديو',
     managementConsole: 'لوحة الإدارة',
@@ -490,21 +769,209 @@ const translations = {
     adminUsernameOrEmail: 'اسم المستخدم أو البريد الإلكتروني للمسؤول',
     password: 'كلمة المرور',
     confirmPassword: 'تأكيد كلمة المرور',
+    phoneNumber: 'رقم الهاتف',
+    optional: '(اختياري)',
+    min6Chars: '(6 أحرف كحد أدنى)',
     forgot: 'نسيت؟',
     rememberSession: 'تذكر الجلسة على هذا الجهاز',
     signIn: 'تسجيل الدخول',
     signInToStudio: 'تسجيل الدخول إلى لوحة الاستوديو',
     createAccount: 'إنشاء حساب',
+    creatingAccount: 'جاري إنشاء الحساب...',
+    authenticating: 'جاري المصادقة...',
+    restrictedStaffOnly: 'لوحة إدارة مقيدة. للموظفين المصرح لهم فقط.',
+    forgotPasswordSent: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك المسجل.',
     newToHurfa: 'جديد في استوديو حرفة؟',
     alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
     hurfaMembership: 'عضوية حرفة',
     createAccountTitle: 'إنشاء حسابك',
-    createAccountSubtitle: 'انضم إلى استوديو حرفة لحفظ لوحات الألوان المخصصة وطلب استشارات معمارية وتتبع طلباتك.',
-    agreeTermsText: 'أوافق على شروط خدمة وسياسة خصوصية حرفة.',
+    createAccountSubtitle: 'انضم إلى استوديو حرفة لحفظ لوحات الألوان المخصصة وطلب الاستشارات ومتابعة طلباتك.',
+    agreeTermsText: 'أوافق على شروط الخدمة وسياسة الخصوصية الخاصة بحرفة.',
+    fillAllRequired: 'يرجى ملء جميع الحقول المطلوبة.',
+    passwordMin6: 'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.',
+    passwordsDoNotMatch: 'كلمات المرور غير متطابقة.',
+    acceptTermsPrompt: 'يرجى قبول شروط الخدمة وسياسة الخصوصية للمتابعة.',
+    accountCreatedSuccess: 'تم إنشاء الحساب بنجاح! مرحباً بك في حرفة.',
+    invalidCredentials: 'بيانات الاعتماد غير صالحة. يرجى التحقق والمحاولة مرة أخرى.',
+    adminRedirect: 'تم التحقق من إذن المسؤول. جاري التوجيه إلى لوحة التحكم...',
+    welcomeRedirect: 'مرحباً بعودتك! جاري التوجيه إلى حسابك...',
+    enterBothEmailPass: 'يرجى إدخال اسم المستخدم/البريد وكلمة المرور.',
+
+    // --- Admin & Editor ---
+    admin: 'الإدارة',
+    studioEditor: 'محرر الاستوديو',
+    editPieceSubtitle: 'تحديث تفاصيل المنتج والأسعار والأبعاد والمواصفات.',
+    addNewPieceSubtitle: 'إنشاء قطعة جديدة ونشرها مباشرة في كتالوج حرفة.',
+    backToManagement: '← العودة إلى لوحة الإدارة',
+    hurfaStudioPortalDesc: 'استوديو حرفة المعماري • الكتالوج، الطلبات ودليل العملاء',
+    totalCatalogItems: 'إجمالي قطع الكتالوج',
+    liveAcrossWeb: 'معروضة على الموقع والمعرض',
+    bedroomPieces: 'قطع غرف النوم',
+    framesWardrobesNightstands: 'هياكل، خزائن وطاولات سرير',
+    kitchenSystems: 'أنظمة المطابخ',
+    chicOrganicContemporary: 'مودرن شيك، أورجانيك ومعاصر',
+    signatureCollections: 'المجموعات المميزة',
+    theOudAndTheWesalSuite: 'مجموعة العود ومجموعة وصال',
+    searchPieceNameOrCat: 'البحث باسم القطعة أو الفئة...',
+    catalogRecords: 'سجلات الكتالوج',
+    noMatchingRecordsFound: 'لم يتم العثور على سجلات مطابقة.',
+    product: 'المنتج',
+    price: 'السعر',
+    status: 'الحالة',
+    actions: 'الإجراءات',
+    edit: 'تعديل',
+    delete: 'حذف',
+    activeInStock: 'نشط / متوفر بالمخزون',
+    madeToOrder: 'صناعة حسب الطلب (مخصص)',
+    lowStock: 'مخزون منخفض',
+    totalInquiriesOrders: 'إجمالي الاستفسارات والطلبات',
+    lifetimeStudioRequests: 'إجمالي طلبات الاستوديو',
+    inProduction: 'قيد الإنتاج',
+    workshopJordanActive: 'قيد التنفيذ في مشغل الأردن',
+    readyForDelivery: 'جاهز للتوصيل',
+    qualityInspectedPacked: 'تم فحص الجودة والتغليف',
+    consultationsScheduled: 'استشارات مجدولة',
+    architecturalOnSiteVisits: 'زيارات معمارية ميدانية',
+    searchOrderIdClient: 'البحث برقم الطلب أو اسم العميل أو القطعة...',
+    bespokeOrdersInquiries: 'الطلبات المخصصة والاستفسارات',
+    noMatchingOrdersFound: 'لم يتم العثور على طلبات مطابقة.',
+    itemsAndDetails: 'القطع والتفاصيل',
+    totalValue: 'القيمة الإجمالية',
+    date: 'التاريخ',
+    action: 'إجراء',
+    recent: 'حديثاً',
+    update: 'تحديث',
+    vipStudioPatrons: 'عملاء الاستوديو المميزون (VIP)',
+    highValueArchitects: 'مشاريع سكنية ومعمارية فاخرة',
+    activeClients: 'العملاء النشطون',
+    recentInquiriesProjects: 'استفسارات ومشاريع حديثة',
+    totalPatrons: 'إجمالي العملاء',
+    jordanGccDirectory: 'دليل الأردن والخليج',
+    averageProjectValue: 'متوسط قيمة المشروع',
+    acrossBespokeSuites: 'عبر الأطقم والمجموعات المخصصة',
+    searchPatronsPlaceholder: 'البحث في العملاء بالاسم أو البريد أو المدينة أو الهاتف...',
+    registerClient: '+ تسجيل عميل',
+    registeredClientsPatrons: 'العملاء المسجلون',
+    noMatchingClientsFound: 'لم يتم العثور على عملاء مطابقين.',
+    contactInfo: 'معلومات الاتصال',
+    location: 'الموقع',
+    ordersCompleted: 'الطلبات المكتملة',
+    projects: 'مشاريع',
+    justNow: 'الآن',
+    confirmDeleteRecord: 'هل أنت متأكد من حذف',
+    fromTheCatalog: 'من الكتالوج؟',
+    updateStatusFor: 'تحديث الحالة لـ',
+    enterClientFullName: 'أدخل الاسم الكامل للعميل:',
+    enterClientEmail: 'أدخل البريد الإلكتروني للعميل:',
+    enterClientPhone: 'أدخل رقم هاتف العميل:',
+    enterDistrictCity: 'أدخل المنطقة / المدينة:',
+    furnitureCatalog: 'كتالوج الأثاث',
+    ordersAndRequests: 'الطلبات والاستفسارات',
+    clientDirectory: 'دليل العملاء',
+    addNewPiece: 'إضافة قطعة جديدة',
+    liveWebsite: 'الموقع المباشر ↗',
+    searchCatalog: 'البحث في الكتالوج بالاسم أو النموذج أو المادة...',
+    allCategories: 'جميع الفئات',
+    priceRange: 'نطاق السعر',
+    stockStatus: 'حالة التوفر',
+    editPiece: 'تعديل القطعة',
+    deletePiece: 'حذف القطعة',
+    searchOrders: 'البحث في الطلبات بالرقم أو العميل أو القطعة...',
+    allStatuses: 'جميع الحالات',
+    delivered: 'تم التوصيل',
+    updateStatus: 'تحديث الحالة',
+    addClient: 'إضافة عميل',
+    searchClients: 'البحث في العملاء بالاسم أو البريد أو المدينة...',
+    city: 'المدينة',
+    totalOrders: 'إجمالي الطلبات',
+    totalSpent: 'إجمالي المشتريات',
+    lastActive: 'آخر نشاط',
+    prospect: 'عميل محتمل',
+    activeClient: 'عميل نشط',
+    vipClient: 'عميل مميز (VIP)',
+    VIP: 'عميل مميز (VIP)',
+    Active: 'نشط',
+    Delivered: 'تم التوصيل',
+    'In Production': 'قيد الإنتاج',
+    'Ready for Delivery': 'جاهز للتوصيل',
+    'Consultation Scheduled': 'تمت جدولة الاستشارة',
+    editorTitle: 'محرر قطع الأثاث',
+    pieceName: 'اسم القطعة',
+    category: 'الفئة',
+    priceJod: 'السعر (دينار أردني)',
+    imageMedia: 'الصورة / الوسائط',
+    description: 'الوصف',
+    dimensionsCm: 'الأبعاد (مثال: 160×58×40 سم)',
+    materialsDesc: 'المواد المستخدمة (مثال: قشرة بلوط، MDF)',
+    savePiece: 'حفظ القطعة',
+    cancel: 'إلغاء',
+    uploadViaImageKit: 'رفع عبر ImageKit',
+    selectPreset: 'أو اختر من المعرض الجاهز',
+    editorFillRequired: 'يرجى تقديم اسم القطعة وسعرها على الأقل.',
+    editorChangesSaved: 'تم حفظ تغييرات المنتج بنجاح!',
+    editorAddedSuccess: 'تمت إضافة القطعة الجديدة إلى الكتالوج!',
+    editorSaveFailed: 'فشل حفظ السجل في التخزين.',
+
+    // --- Signature & Premium Collections Fallbacks ---
+    'The Oud Collection': 'مجموعة العود',
+    'Oud Collection': 'مجموعة العود',
+    'oudCol': 'مجموعة العود',
+    'The Wesal Collection': 'مجموعة وصال',
+    'Wesal Collection': 'مجموعة وصال',
+    'wesalCol': 'مجموعة وصال',
+    'Cont-Siq Collection': 'مجموعة سيق المعاصرة',
+    'Siq Collection': 'مجموعة سيق',
+    'Solid Oak & Bouclé': 'خشب بلوط صلب وقماش بوكليه',
+    'Walnut & Architectural Linen': 'خشب جوز وكتان معماري',
+    'A signature living-room collection built around solid oak framing, subtle warm curves, and boucle upholstery.':
+      'مجموعة غرف معيشة مميزة مصممة حول إطار من خشب البلوط الصلب، ومنحنيات دافئة رقيقة، وتنجيد بوكليه فاخر.',
+    'A bedroom collection defined by low-profile walnut woodwork, soft textiles, and serene minimalist balance.':
+      'مجموعة غرف نوم تتميز بخشب الجوز المنخفض، وأقمشة ناعمة، وتوازن بسيط هادئ.',
+    'oudDesc': 'مجموعة العود مصنوعة من قشرة خشب الجوز الفاخرة.',
+    'wesalDesc': 'تتميز مجموعة وصال بالتباين المتعدد الطبقات.',
+
+    // --- Bedroom Direct Fallbacks ---
+    'Barah': 'براءة',
+    'Signature - Barah Bedroom': 'اختصاص - غرفة براح',
+    'Rawas': 'رواس',
+    'Signature - Rawas Bedroom': 'اختصاص - غرفة رواس',
+    'Rafif': 'رفيف',
+    'Prestige - Rafif Bedroom': 'سُموّ - غرفة رفيف',
+    'Tayf': 'طيف',
+    'Signature - Tayf Bedroom': 'اختصاص - غرفة طيف',
+    'Aram': 'أرام',
+    'Signature - Aram Bedroom': 'اختصاص - غرفة أرام',
+    'Aziz': 'عزيز',
+
+    // --- Product Direct Fallbacks ---
+    'Wesal TV Unit': 'طاولة تلفاز وصال',
+    'Wesal Side Table': 'طاولة جانبية وصال',
+    'Wesal Coffee Table': 'طاولة قهوة وصال',
+    'Siq TV Unit': 'طاولة تلفاز سيق',
+    'Siq TV Uint ': 'طاولة تلفاز سيق',
+    'Contemporary Wesal TV Unit': 'طاولة تلفاز وصال المعاصرة',
+    'contemporary Wesal TV Unit ': 'طاولة تلفاز وصال المعاصرة',
+    'Contemporary Siq TV Unit': 'طاولة تلفاز سيق المعاصرة',
+    'contemporary Siq TV Unit ': 'طاولة تلفاز سيق المعاصرة',
+    'Siq Coffee Table': 'طاولة قهوة سيق',
+    'OUD Coffee Table': 'طاولة قهوة العود',
+    'Oud Coffee Table': 'طاولة قهوة العود',
+    'OUD Console': 'كونسول العود',
+    'Oud Console': 'كونسول العود',
+    'Siq Console': 'كونسول سيق',
+    'boho Siq TV Unit': 'طاولة تلفاز سيق بوهو',
+    'organic Wesal TV Unit': 'طاولة تلفاز وصال العضوية',
+    'Wesal Console': 'كونسول وصال',
+    'Oud side tables': 'طاولات جانبية العود',
+    'Oud Side Table': 'طاولة جانبية العود',
+    'Oud Service Table': 'طاولة خدمة العود',
+    'Organic siq tv unit': 'طاولة تلفاز سيق العضوية',
+    'Cont-Siq Coffee Table': 'طاولة قهوة سيق المعاصرة',
+    'Cont-Siq Side Table': 'طاولة جانبية سيق المعاصرة',
 
     // --- Footer ---
     contactVia: 'اتصل بنا عبر',
-    allRightsReserved: '© 2026 حرفة ذ.م.م. جميع الحقوق محفوظة.',
+    allRightsReserved: '© 2026 شركة حرفة ذ.م.م. جميع الحقوق محفوظة.',
     ammanJordan: 'عمان، الأردن',
     learnMore: 'اعرف المزيد',
   },
@@ -515,27 +982,42 @@ const LanguageContext = createContext({
   isArabic: false,
   toggleLanguage: () => {},
   setLanguage: () => {},
-  t: (key, fallback) => fallback || key,
-  getLocalizedName: (item) => item?.name || item?.title || '',
-  getLocalizedDesc: (item) => item?.desc || item?.description || '',
-  getLocalizedCategory: (cat) => cat?.name || cat || '',
-  getLocalizedTagline: (item) => item?.tagline || '',
+  t: (key, fallback) => fallback || key || '',
+  tName: (item) => '',
+  tDesc: (item) => '',
+  getLocalizedName: (item) => '',
+  getLocalizedDesc: (item) => '',
+  getLocalizedCategory: (cat) => '',
+  getLocalizedTagline: (item) => '',
+  translations,
 });
 
 export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState(() => {
-    return localStorage.getItem('hurfa_lang') || 'en';
+    try {
+      return localStorage.getItem('hurfa_lang') || 'en';
+    } catch {
+      return 'en';
+    }
   });
 
   useEffect(() => {
     document.documentElement.lang = language;
-    localStorage.setItem('hurfa_lang', language);
+    try {
+      localStorage.setItem('hurfa_lang', language);
+    } catch (e) {
+      console.warn('Storage warning:', e);
+    }
   }, [language]);
 
   const toggleLanguage = useCallback(() => {
     setLanguageState((prev) => {
       const next = prev === 'en' ? 'ar' : 'en';
-      localStorage.setItem('hurfa_lang', next);
+      try {
+        localStorage.setItem('hurfa_lang', next);
+      } catch (e) {
+        console.warn('Storage warning:', e);
+      }
       document.documentElement.lang = next;
       return next;
     });
@@ -544,15 +1026,23 @@ export function LanguageProvider({ children }) {
   const setLanguage = useCallback((lang) => {
     if (lang === 'en' || lang === 'ar') {
       setLanguageState(lang);
-      localStorage.setItem('hurfa_lang', lang);
+      try {
+        localStorage.setItem('hurfa_lang', lang);
+      } catch (e) {
+        console.warn('Storage warning:', e);
+      }
       document.documentElement.lang = lang;
     }
   }, []);
 
   const t = useCallback(
     (key, fallback = '') => {
-      if (!key) return fallback || '';
+      if (!key && key !== 0) return fallback || '';
+      const strKey = String(key).trim();
       const dict = translations[language] || translations.en;
+      if (dict && dict[strKey] !== undefined) {
+        return dict[strKey];
+      }
       if (dict && dict[key] !== undefined) {
         return dict[key];
       }
@@ -563,13 +1053,18 @@ export function LanguageProvider({ children }) {
 
   const getLocalizedName = useCallback(
     (item) => {
-      if (!item) return '';
+      if (!item && item !== 0) return '';
       if (typeof item === 'string') {
         const tr = t(item);
         return tr !== item ? tr : item;
       }
-      if (language === 'ar' && item.arabicName) {
-        return item.arabicName;
+      if (language === 'ar') {
+        if (item.arabicName) return item.arabicName;
+        if (item.arabic_nam) return item.arabic_nam;
+        if (item.arabic_name) return item.arabic_name;
+        const fallbackName = item.name || item.title || '';
+        const tr = t(fallbackName);
+        if (tr && tr !== fallbackName) return tr;
       }
       return item.name || item.title || '';
     },
@@ -583,8 +1078,12 @@ export function LanguageProvider({ children }) {
         const tr = t(item);
         return tr !== item ? tr : item;
       }
-      if (language === 'ar' && item.arabicDesc) {
-        return item.arabicDesc;
+      if (language === 'ar') {
+        if (item.arabicDesc) return item.arabicDesc;
+        if (item.arabic_desc) return item.arabic_desc;
+        const fallbackDesc = item.desc || item.description || '';
+        const tr = t(fallbackDesc);
+        if (tr && tr !== fallbackDesc) return tr;
       }
       return item.desc || item.description || '';
     },
@@ -595,9 +1094,15 @@ export function LanguageProvider({ children }) {
     (cat) => {
       if (!cat) return '';
       if (typeof cat === 'object') {
-        return (language === 'ar' && (cat.arabic_name || cat.arabicName))
-          ? (cat.arabic_name || cat.arabicName)
-          : (cat.name || '');
+        if (language === 'ar') {
+          if (cat.arabic_name) return cat.arabic_name;
+          if (cat.arabicName) return cat.arabicName;
+          if (cat.arabicCategory) return cat.arabicCategory;
+          const fallbackCat = cat.name || cat.title || '';
+          const tr = t(fallbackCat);
+          if (tr && tr !== fallbackCat) return tr;
+        }
+        return cat.name || cat.title || '';
       }
       if (typeof cat === 'string') {
         const tr = t(cat);
@@ -615,8 +1120,12 @@ export function LanguageProvider({ children }) {
         const tr = t(item);
         return tr !== item ? tr : item;
       }
-      if (language === 'ar' && item.arabicTagline) {
-        return item.arabicTagline;
+      if (language === 'ar') {
+        if (item.arabicTagline) return item.arabicTagline;
+        if (item.arabic_tagline) return item.arabic_tagline;
+        const fallbackTag = item.tagline || '';
+        const tr = t(fallbackTag);
+        if (tr && tr !== fallbackTag) return tr;
       }
       return item.tagline || '';
     },

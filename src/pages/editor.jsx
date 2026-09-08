@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import ImgkitApi from '../components/imgkitApi';
 import '../css/admin.css';
 
@@ -27,6 +28,7 @@ const PRESET_IMAGES = [
 ];
 
 function Editor() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const productId = searchParams.get('id');
@@ -93,7 +95,7 @@ function Editor() {
     if (!formData.name.trim() || !formData.price.trim()) {
       setStatusMessage({
         type: 'error',
-        text: 'Please provide both a product name and price.',
+        text: t('editorFillRequired', 'Please provide both a product name and price.'),
       });
       return;
     }
@@ -166,8 +168,8 @@ function Editor() {
       setStatusMessage({
         type: 'success',
         text: isEditMode
-          ? 'Product changes saved successfully!'
-          : 'New product added to catalog!',
+          ? t('editorChangesSaved', 'Product changes saved successfully!')
+          : t('editorAddedSuccess', 'New product added to catalog!'),
       });
 
       setTimeout(() => {
@@ -177,7 +179,7 @@ function Editor() {
       console.error(err);
       setStatusMessage({
         type: 'error',
-        text: 'Failed to save record to storage.',
+        text: t('editorSaveFailed', 'Failed to save record to storage.'),
       });
       setIsSubmitting(false);
     }
@@ -204,18 +206,18 @@ function Editor() {
         {/* Header Bar */}
         <header className="admin-header">
           <div>
-            <span className="admin-eyebrow">Studio Editor</span>
-            <h1>{isEditMode ? 'Edit Furniture Piece' : 'Add New Furniture Piece'}</h1>
+            <span className="admin-eyebrow">{t('studioEditor', 'Studio Editor')}</span>
+            <h1>{isEditMode ? t('editPiece', 'Edit Furniture Piece') : t('addNewPiece', 'Add New Furniture Piece')}</h1>
             <p>
               {isEditMode
-                ? 'Update product details, pricing, dimensions, and specifications.'
-                : 'Create a new piece and publish it directly to the Hurfa catalog.'}
+                ? t('editPieceSubtitle', 'Update product details, pricing, dimensions, and specifications.')
+                : t('addNewPieceSubtitle', 'Create a new piece and publish it directly to the Hurfa catalog.')}
             </p>
           </div>
 
           <div className="admin-header-actions">
             <Link to="/admin" className="admin-btn admin-btn-outline">
-              ← Back to Management
+              {t('backToManagement', '← Back to Management')}
             </Link>
           </div>
         </header>
@@ -263,7 +265,7 @@ function Editor() {
             <div className="admin-form-grid">
               <div className="admin-form-group">
                 <label htmlFor="name" className="admin-form-label">
-                  Piece Name <span className="required">*</span>
+                  {t('pieceName', 'Piece Name')} <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -279,7 +281,7 @@ function Editor() {
 
               <div className="admin-form-group">
                 <label htmlFor="category" className="admin-form-label">
-                  Category <span className="required">*</span>
+                  {t('category', 'Category')} <span className="required">*</span>
                 </label>
                 <select
                   id="category"
@@ -288,13 +290,13 @@ function Editor() {
                   value={formData.category}
                   onChange={handleChange}
                 >
-                  <option value="Kitchens">Kitchens</option>
-                  <option value="Bedrooms">Bedrooms</option>
-                  <option value="Living Room">Living Room</option>
-                  <option value="Living Room Tables">Living Room Tables</option>
-                  <option value="Consoles">Consoles</option>
-                  <option value="TV Units">TV Units</option>
-                  <option value="Commercial Offices">Commercial Offices</option>
+                  <option value="Kitchens">{t('Kitchens', 'Kitchens')}</option>
+                  <option value="Bedrooms">{t('Bedrooms', 'Bedrooms')}</option>
+                  <option value="Living Room">{t('Living Room', 'Living Room')}</option>
+                  <option value="Living Room Tables">{t('Living Room Tables', 'Living Room Tables')}</option>
+                  <option value="Consoles">{t('Consoles', 'Consoles')}</option>
+                  <option value="TV Units">{t('TV Units', 'TV Units')}</option>
+                  <option value="Commercial Offices">{t('Commercial Offices', 'Commercial Offices')}</option>
                 </select>
               </div>
             </div>
@@ -303,7 +305,7 @@ function Editor() {
             <div className="admin-form-grid">
               <div className="admin-form-group">
                 <label htmlFor="price" className="admin-form-label">
-                  Price (JOD) <span className="required">*</span>
+                  {t('priceJod', 'Price (JOD)')} <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -319,7 +321,7 @@ function Editor() {
 
               <div className="admin-form-group">
                 <label htmlFor="stockStatus" className="admin-form-label">
-                  Inventory Status
+                  {t('stockStatus', 'Stock Status')}
                 </label>
                 <select
                   id="stockStatus"
@@ -328,9 +330,9 @@ function Editor() {
                   value={formData.stockStatus}
                   onChange={handleChange}
                 >
-                  <option value="Active">Active / In Stock</option>
-                  <option value="Low Stock">Low Stock</option>
-                  <option value="Made to Order">Made to Order (Bespoke)</option>
+                  <option value="Active">{t('activeInStock', 'Active / In Stock')}</option>
+                  <option value="Low Stock">{t('lowStock', 'Low Stock')}</option>
+                  <option value="Made to Order">{t('madeToOrder', 'Made to Order (Bespoke)')}</option>
                 </select>
               </div>
             </div>
@@ -339,7 +341,7 @@ function Editor() {
             <div className="admin-form-grid">
               <div className="admin-form-group">
                 <label htmlFor="dimensions" className="admin-form-label">
-                  Dimensions
+                  {t('dimensions', 'Dimensions')}
                 </label>
                 <input
                   type="text"
@@ -354,7 +356,7 @@ function Editor() {
 
               <div className="admin-form-group">
                 <label htmlFor="material" className="admin-form-label">
-                  Materials & Craftsmanship
+                  {t('materialsDesc', 'Materials & Craftsmanship')}
                 </label>
                 <input
                   type="text"
@@ -371,7 +373,7 @@ function Editor() {
             {/* Row 4: Description */}
             <div className="admin-form-group">
               <label htmlFor="desc" className="admin-form-label">
-                Architectural Description
+                {t('description', 'Description')}
               </label>
               <textarea
                 id="desc"
@@ -388,7 +390,7 @@ function Editor() {
             <div className="admin-form-group">
               <div className="admin-label-row">
                 <label htmlFor="image" className="admin-form-label">
-                  Product Image URL
+                  {t('imageMedia', 'Product Image URL')}
                 </label>
                 <button
                   type="button"
@@ -400,7 +402,7 @@ function Editor() {
                     <circle cx="9" cy="9" r="2" />
                     <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                   </svg>
-                  Browse ImageKit Asset Library
+                  {t('uploadViaImageKit', 'Browse ImageKit Asset Library')}
                 </button>
               </div>
 
@@ -416,7 +418,7 @@ function Editor() {
 
               {/* Image Preset Quick Pickers */}
               <div className="admin-presets-wrapper">
-                <span className="admin-presets-title">Hurfa Studio Presets:</span>
+                <span className="admin-presets-title">{t('selectPreset', 'Hurfa Studio Presets:')}</span>
                 <div className="admin-presets-list">
                   {PRESET_IMAGES.map((preset) => (
                     <button
@@ -434,7 +436,7 @@ function Editor() {
               {/* Image Preview Box */}
               {formData.image && (
                 <div className="admin-image-preview-card">
-                  <span className="admin-preview-title">Active Media Preview:</span>
+                  <span className="admin-preview-title">{t('imageMedia', 'Active Media Preview:')}</span>
                   <img
                     src={formData.image}
                     alt="Product preview"
@@ -455,7 +457,7 @@ function Editor() {
                 onClick={() => navigate('/admin')}
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
@@ -463,10 +465,10 @@ function Editor() {
                 disabled={isSubmitting}
               >
                 {isSubmitting
-                  ? 'Saving Piece...'
+                  ? t('savePiece', 'Saving Piece...')
                   : isEditMode
-                  ? 'Save Changes'
-                  : 'Publish to Catalog'}
+                  ? t('savePiece', 'Save Changes')
+                  : t('savePiece', 'Publish to Catalog')}
               </button>
             </div>
           </form>

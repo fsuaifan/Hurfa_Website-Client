@@ -39,7 +39,7 @@ function SignUp() {
     ) {
       setStatusMessage({
         type: 'error',
-        text: 'Please fill in all required fields.',
+        text: t('fillAllRequired', 'Please fill in all required fields.'),
       });
       return;
     }
@@ -47,7 +47,7 @@ function SignUp() {
     if (formData.password.length < 6) {
       setStatusMessage({
         type: 'error',
-        text: 'Password must be at least 6 characters.',
+        text: t('passwordMin6', 'Password must be at least 6 characters.'),
       });
       return;
     }
@@ -55,7 +55,7 @@ function SignUp() {
     if (formData.password !== formData.confirmPassword) {
       setStatusMessage({
         type: 'error',
-        text: 'Passwords do not match.',
+        text: t('passwordsDoNotMatch', 'Passwords do not match.'),
       });
       return;
     }
@@ -63,7 +63,7 @@ function SignUp() {
     if (!formData.agreeTerms) {
       setStatusMessage({
         type: 'error',
-        text: 'Please accept the terms of service and privacy policy to continue.',
+        text: t('acceptTermsPrompt', 'Please accept the terms of service and privacy policy to continue.'),
       });
       return;
     }
@@ -93,7 +93,7 @@ function SignUp() {
 
       setStatusMessage({
         type: 'success',
-        text: 'Account created successfully! Welcome to Hurfa.',
+        text: t('accountCreatedSuccess', 'Account created successfully! Welcome to Hurfa.'),
       });
 
       setTimeout(() => {
@@ -103,7 +103,7 @@ function SignUp() {
       console.error('Signup error:', err);
       setStatusMessage({
         type: 'error',
-        text: err.message || 'Could not create account. Please try again.',
+        text: err.message || t('invalidCredentials', 'Could not create account. Please try again.'),
       });
     } finally {
       setLoading(false);
@@ -198,7 +198,7 @@ function SignUp() {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="phone">{t('phoneNumber', 'Phone Number')} (Optional)</label>
+            <label htmlFor="phone">{t('phoneNumber', 'Phone Number')} {t('optional', '(Optional)')}</label>
             <input
               type="tel"
               id="phone"
@@ -211,7 +211,7 @@ function SignUp() {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="password">{t('password', 'Password')} (min. 6 characters)</label>
+            <label htmlFor="password">{t('password', 'Password')} {t('min6Chars', '(min. 6 characters)')}</label>
             <div className="login-password-wrapper">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -299,7 +299,7 @@ function SignUp() {
             disabled={loading}
           >
             {loading ? (
-              <span className="login-spinner">Creating Account...</span>
+              <span className="login-spinner">{t('creatingAccount', 'Creating Account...')}</span>
             ) : (
               <span>{t('createAccount', 'Create Account')}</span>
             )}

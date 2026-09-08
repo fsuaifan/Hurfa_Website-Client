@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/admin.css';
 
 function Admin() {
+  const { t, getLocalizedName, getLocalizedCategory } = useLanguage();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('catalog'); // 'catalog' | 'orders' | 'clients'
   const [loading, setLoading] = useState(true);
@@ -82,7 +84,7 @@ function Admin() {
   };
 
   const handleDeleteRecord = async (id, name) => {
-    if (window.confirm(`Are you sure you want to remove "${name}" from the catalog?`)) {
+    if (window.confirm(`${t('confirmDeleteRecord', 'Are you sure you want to remove')} "${name}" ${t('fromTheCatalog', 'from the catalog?')}`)) {
       try {
         await api.catalog.delete(id);
       } catch (e) {
@@ -102,7 +104,7 @@ function Admin() {
 
   const handleUpdateOrderStatus = async (orderId, currentStatus) => {
     const newStatus = window.prompt(
-      `Update status for ${orderId} (Current: ${currentStatus}):\nOptions: In Production, Ready for Delivery, Delivered, Consultation Scheduled`,
+      `${t('updateStatusFor', 'Update status for')} ${orderId} (${t('status', 'Status')}: ${currentStatus}):\nOptions: In Production, Ready for Delivery, Delivered, Consultation Scheduled`,
       currentStatus
     );
     if (newStatus && newStatus.trim()) {
@@ -118,11 +120,11 @@ function Admin() {
   };
 
   const handleAddClient = async () => {
-    const name = window.prompt('Enter client full name:');
+    const name = window.prompt(t('enterClientFullName', 'Enter client full name:'));
     if (!name || !name.trim()) return;
-    const email = window.prompt('Enter client email address:', 'client@example.com') || 'client@example.com';
-    const phone = window.prompt('Enter client phone:', '+962 7 9000 0000') || '+962 7 9000 0000';
-    const city = window.prompt('Enter district/city:', 'Amman (Abdoun)') || 'Amman';
+    const email = window.prompt(t('enterClientEmail', 'Enter client email address:'), 'client@example.com') || 'client@example.com';
+    const phone = window.prompt(t('enterClientPhone', 'Enter client phone:'), '+962 7 9000 0000') || '+962 7 9000 0000';
+    const city = window.prompt(t('enterDistrictCity', 'Enter district/city:'), 'Amman (Abdoun)') || 'Amman';
 
     const newClient = {
       id: Date.now(),
@@ -195,9 +197,9 @@ function Admin() {
         {/* Header Bar */}
         <header className="admin-header">
           <div>
-            <span className="admin-eyebrow">Studio Portal</span>
-            <h1>Management Console</h1>
-            <p>Hurfa Architectural Studio • Catalog, Order & Client Directory</p>
+            <span className="admin-eyebrow">{t('studioPortal', 'Studio Portal')}</span>
+            <h1>{t('managementConsole', 'Management Console')}</h1>
+            <p>{t('hurfaStudioPortalDesc', 'Hurfa Architectural Studio • Catalog, Orders & Client Directory')}</p>
           </div>
 
           <div className="admin-header-actions">
@@ -206,17 +208,17 @@ function Admin() {
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Add New Piece
+              {t('addNewPiece', 'Add New Piece')}
             </Link>
             <Link to="/products" className="admin-btn admin-btn-outline" target="_blank" rel="noreferrer">
-              Live Website ↗
+              {t('liveWebsite', 'Live Website ↗')}
             </Link>
             <button
               type="button"
               className="admin-btn admin-btn-logout"
               onClick={handleLogout}
             >
-              Log Out
+              {t('logOut', 'Log Out')}
             </button>
           </div>
         </header>
@@ -236,7 +238,7 @@ function Admin() {
               <rect width="7" height="9" x="14" y="12" rx="1" />
               <rect width="7" height="5" x="3" y="16" rx="1" />
             </svg>
-            Furniture Catalog ({records.length})
+            {t('furnitureCatalog', 'Furniture Catalog')} ({records.length})
           </button>
           <button
             type="button"
@@ -250,7 +252,7 @@ function Admin() {
               <path d="M3 6h18" />
               <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
-            Orders & Requests ({orders.length})
+            {t('ordersAndRequests', 'Orders & Inquiries')} ({orders.length})
           </button>
           <button
             type="button"
@@ -265,7 +267,7 @@ function Admin() {
               <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            Clients & Patrons ({clients.length})
+            {t('clientDirectory', 'Client Directory')} ({clients.length})
           </button>
         </div>
 
@@ -275,10 +277,10 @@ function Admin() {
         {activeSection === 'catalog' && (
           <>
             {/* Hurfa KPI Overview Cards */}
-            <section className="admin-stats-grid" aria-label="Catalog Key Performance Indicators">
+            <section className="admin-stats-grid" aria-label={t('furnitureCatalog', 'Catalog KPIs')}>
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Total Catalog Items</span>
+                  <span className="admin-stat-label">{t('totalCatalogItems', 'Total Catalog Items')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="m7.5 4.27 9 5.15" />
@@ -289,12 +291,12 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">{records.length}</h2>
-                <span className="admin-stat-trend">Live across web & boutique</span>
+                <span className="admin-stat-trend">{t('liveAcrossWeb', 'Live across web & boutique')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Bedroom Pieces</span>
+                  <span className="admin-stat-label">{t('bedroomPieces', 'Bedroom Pieces')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M2 4v16" />
@@ -307,12 +309,12 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {records.filter((r) => r.category === 'Bedrooms' || (r.category && r.category.includes('Bedroom'))).length}
                 </h2>
-                <span className="admin-stat-trend">Frames, wardrobes & nightstands</span>
+                <span className="admin-stat-trend">{t('framesWardrobesNightstands', 'Frames, wardrobes & nightstands')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Kitchen Systems</span>
+                  <span className="admin-stat-label">{t('kitchenSystems', 'Kitchen Systems')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect width="18" height="18" x="3" y="3" rx="2" />
@@ -324,12 +326,12 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {records.filter((r) => r.category === 'Kitchens' || (r.category && r.category.includes('Kitchen'))).length}
                 </h2>
-                <span className="admin-stat-trend">Chic, Organic & Contemporary</span>
+                <span className="admin-stat-trend">{t('chicOrganicContemporary', 'Chic, Organic & Contemporary')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Signature Collections</span>
+                  <span className="admin-stat-label">{t('signatureCollections', 'Signature Collections')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -337,7 +339,7 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">2</h2>
-                <span className="admin-stat-trend">The Oud & The Wesal Suite</span>
+                <span className="admin-stat-trend">{t('theOudAndTheWesalSuite', 'The Oud & The Wesal Suite')}</span>
               </div>
             </section>
 
@@ -346,7 +348,7 @@ function Admin() {
               <input
                 type="text"
                 className="admin-search-input"
-                placeholder="Search piece name or category..."
+                placeholder={t('searchPieceNameOrCat', 'Search piece name or category...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -356,36 +358,36 @@ function Admin() {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
-                <option value="All">All Categories</option>
-                <option value="Kitchens">Kitchens</option>
-                <option value="Bedrooms">Bedrooms</option>
-                <option value="Living Room">Living Room</option>
-                <option value="Living Room Tables">Living Room Tables</option>
+                <option value="All">{t('allCategories', 'All Categories')}</option>
+                <option value="Kitchens">{t('Kitchens', 'Kitchens')}</option>
+                <option value="Bedrooms">{t('Bedrooms', 'Bedrooms')}</option>
+                <option value="Living Room">{t('Living Room', 'Living Room')}</option>
+                <option value="Living Room Tables">{t('Living Room Tables', 'Living Room Tables')}</option>
               </select>
             </div>
 
             {/* Records Table Card */}
             <div className="admin-card">
               <div className="admin-card-header">
-                <h2>Catalog Records ({filteredRecords.length})</h2>
+                <h2>{t('catalogRecords', 'Catalog Records')} ({filteredRecords.length})</h2>
               </div>
 
               <div className="admin-table-responsive">
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>Category</th>
-                      <th>Price</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th>{t('productCol', 'Product')}</th>
+                      <th>{t('category', 'Category')}</th>
+                      <th>{t('price', 'Price')}</th>
+                      <th>{t('status', 'Status')}</th>
+                      <th>{t('actions', 'Actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredRecords.length === 0 ? (
                       <tr>
                         <td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
-                          No matching records found.
+                          {t('noMatchingRecordsFound', 'No matching records found.')}
                         </td>
                       </tr>
                     ) : (
@@ -395,16 +397,16 @@ function Admin() {
                             <div className="admin-prod-cell">
                               <img
                                 src={item.image || item.images?.[0]}
-                                alt={item.name}
+                                alt={getLocalizedName(item)}
                                 className="admin-prod-thumb"
                                 loading="lazy"
                               />
                               <div>
-                                <p className="admin-prod-title">{item.name}</p>
+                                <p className="admin-prod-title">{getLocalizedName(item)}</p>
                               </div>
                             </div>
                           </td>
-                          <td>{item.category}</td>
+                          <td>{getLocalizedCategory(item.category || item)}</td>
                           <td>
                             <span className="admin-price">{item.price}</span>
                           </td>
@@ -414,7 +416,7 @@ function Admin() {
                                 item.stockStatus === 'Active' ? 'active' : 'low'
                               }`}
                             >
-                              {item.stockStatus || 'Active'}
+                              {t(item.stockStatus || 'Active', item.stockStatus || 'Active')}
                             </span>
                           </td>
                           <td>
@@ -422,17 +424,17 @@ function Admin() {
                               <Link
                                 to={`/editor?id=${item.id}`}
                                 className="admin-action-btn edit"
-                                title="Edit piece specifications"
+                                title={t('editPiece', 'Edit piece specifications')}
                               >
-                                Edit
+                                {t('edit', 'Edit')}
                               </Link>
                               <button
                                 type="button"
                                 className="admin-action-btn delete"
                                 onClick={() => handleDeleteRecord(item.id, item.name)}
-                                title="Remove piece from catalog"
+                                title={t('deletePiece', 'Remove piece from catalog')}
                               >
-                                Delete
+                                {t('delete', 'Delete')}
                               </button>
                             </div>
                           </td>
@@ -452,10 +454,10 @@ function Admin() {
         {activeSection === 'orders' && (
           <>
             {/* Orders KPIs */}
-            <section className="admin-stats-grid" aria-label="Order Performance Indicators">
+            <section className="admin-stats-grid" aria-label={t('ordersAndRequests', 'Order KPIs')}>
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Total Inquiries / Orders</span>
+                  <span className="admin-stat-label">{t('totalInquiriesOrders', 'Total Inquiries / Orders')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -464,12 +466,12 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">{orders.length}</h2>
-                <span className="admin-stat-trend">Lifetime Studio Requests</span>
+                <span className="admin-stat-trend">{t('lifetimeStudioRequests', 'Lifetime Studio Requests')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">In Production</span>
+                  <span className="admin-stat-label">{t('inProduction', 'In Production')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="12" cy="12" r="10" />
@@ -480,12 +482,12 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {orders.filter((o) => o.status === 'In Production').length}
                 </h2>
-                <span className="admin-stat-trend">Workshop Jordan Active</span>
+                <span className="admin-stat-trend">{t('workshopJordanActive', 'Workshop Jordan Active')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Ready for Delivery</span>
+                  <span className="admin-stat-label">{t('readyForDelivery', 'Ready for Delivery')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect width="18" height="18" x="3" y="3" rx="2" />
@@ -496,12 +498,12 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {orders.filter((o) => o.status === 'Ready for Delivery').length}
                 </h2>
-                <span className="admin-stat-trend">Quality Inspected & Packed</span>
+                <span className="admin-stat-trend">{t('qualityInspectedPacked', 'Quality Inspected & Packed')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Consultations Scheduled</span>
+                  <span className="admin-stat-label">{t('consultationsScheduled', 'Consultations Scheduled')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -511,7 +513,7 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {orders.filter((o) => o.status === 'Consultation Scheduled').length}
                 </h2>
-                <span className="admin-stat-trend">Architectural On-Site Visits</span>
+                <span className="admin-stat-trend">{t('architecturalOnSiteVisits', 'Architectural On-Site Visits')}</span>
               </div>
             </section>
 
@@ -520,7 +522,7 @@ function Admin() {
               <input
                 type="text"
                 className="admin-search-input"
-                placeholder="Search order ID, client name, or piece..."
+                placeholder={t('searchOrderIdClient', 'Search order ID, client name, or piece...')}
                 value={orderSearchQuery}
                 onChange={(e) => setOrderSearchQuery(e.target.value)}
               />
@@ -530,38 +532,38 @@ function Admin() {
                 value={orderStatusFilter}
                 onChange={(e) => setOrderStatusFilter(e.target.value)}
               >
-                <option value="All">All Statuses</option>
-                <option value="In Production">In Production</option>
-                <option value="Ready for Delivery">Ready for Delivery</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Consultation Scheduled">Consultation Scheduled</option>
+                <option value="All">{t('allStatuses', 'All Statuses')}</option>
+                <option value="In Production">{t('inProduction', 'In Production')}</option>
+                <option value="Ready for Delivery">{t('readyForDelivery', 'Ready for Delivery')}</option>
+                <option value="Delivered">{t('delivered', 'Delivered')}</option>
+                <option value="Consultation Scheduled">{t('consultationScheduled', 'Consultation Scheduled')}</option>
               </select>
             </div>
 
             {/* Orders Table */}
             <div className="admin-card">
               <div className="admin-card-header">
-                <h2>Bespoke Orders & Inquiries ({filteredOrders.length})</h2>
+                <h2>{t('bespokeOrdersInquiries', 'Bespoke Orders & Inquiries')} ({filteredOrders.length})</h2>
               </div>
 
               <div className="admin-table-responsive">
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Order Code</th>
-                      <th>Client Name</th>
-                      <th>Items & Details</th>
-                      <th>Total Value</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
+                      <th>{t('orderCode', 'Order Code')}</th>
+                      <th>{t('clientName', 'Client Name')}</th>
+                      <th>{t('itemsAndDetails', 'Items & Details')}</th>
+                      <th>{t('totalValue', 'Total Value')}</th>
+                      <th>{t('date', 'Date')}</th>
+                      <th>{t('status', 'Status')}</th>
+                      <th>{t('action', 'Action')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredOrders.length === 0 ? (
                       <tr>
                         <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
-                          No matching orders found.
+                          {t('noMatchingOrdersFound', 'No matching orders found.')}
                         </td>
                       </tr>
                     ) : (
@@ -581,14 +583,14 @@ function Admin() {
                           <td>
                             <span className="admin-price">{order.total}</span>
                           </td>
-                          <td>{order.date || 'Recent'}</td>
+                          <td>{order.date || t('recent', 'Recent')}</td>
                           <td>
                             <span
                               className={`admin-status-badge ${order.status
                                 .toLowerCase()
                                 .replace(/\s+/g, '-')}`}
                             >
-                              {order.status}
+                              {t(order.status, order.status)}
                             </span>
                           </td>
                           <td>
@@ -599,7 +601,7 @@ function Admin() {
                                 handleUpdateOrderStatus(order.id, order.status)
                               }
                             >
-                              Update
+                              {t('update', 'Update')}
                             </button>
                           </td>
                         </tr>
@@ -618,10 +620,10 @@ function Admin() {
         {activeSection === 'clients' && (
           <>
             {/* Clients KPIs */}
-            <section className="admin-stats-grid" aria-label="Client Directory Indicators">
+            <section className="admin-stats-grid" aria-label={t('clientDirectory', 'Client KPIs')}>
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">VIP Studio Patrons</span>
+                  <span className="admin-stat-label">{t('vipStudioPatrons', 'VIP Studio Patrons')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -631,12 +633,12 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {clients.filter((c) => c.status === 'VIP').length}
                 </h2>
-                <span className="admin-stat-trend">High-value residential architects</span>
+                <span className="admin-stat-trend">{t('highValueArchitects', 'High-value residential architects')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Active Clients</span>
+                  <span className="admin-stat-label">{t('activeClients', 'Active Clients')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -647,12 +649,12 @@ function Admin() {
                 <h2 className="admin-stat-value">
                   {clients.filter((c) => c.status === 'Active').length}
                 </h2>
-                <span className="admin-stat-trend">Recent inquiries & projects</span>
+                <span className="admin-stat-trend">{t('recentInquiriesProjects', 'Recent inquiries & projects')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Total Patrons</span>
+                  <span className="admin-stat-label">{t('totalPatrons', 'Total Patrons')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -663,12 +665,12 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">{clients.length}</h2>
-                <span className="admin-stat-trend">Jordan & GCC Directory</span>
+                <span className="admin-stat-trend">{t('jordanGccDirectory', 'Jordan & GCC Directory')}</span>
               </div>
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">Average Project Value</span>
+                  <span className="admin-stat-label">{t('averageProjectValue', 'Average Project Value')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <line x1="12" y1="1" x2="12" y2="23" />
@@ -677,7 +679,7 @@ function Admin() {
                   </div>
                 </div>
                 <h2 className="admin-stat-value">JOD 2,450</h2>
-                <span className="admin-stat-trend">Across bespoke suites</span>
+                <span className="admin-stat-trend">{t('acrossBespokeSuites', 'Across bespoke suites')}</span>
               </div>
             </section>
 
@@ -686,7 +688,7 @@ function Admin() {
               <input
                 type="text"
                 className="admin-search-input"
-                placeholder="Search patrons by name, email, city, or phone..."
+                placeholder={t('searchPatronsPlaceholder', 'Search patrons by name, email, city, or phone...')}
                 value={clientSearchQuery}
                 onChange={(e) => setClientSearchQuery(e.target.value)}
               />
@@ -696,34 +698,34 @@ function Admin() {
                 className="admin-btn admin-btn-primary"
                 onClick={handleAddClient}
               >
-                + Register Client
+                {t('registerClient', '+ Register Client')}
               </button>
             </div>
 
             {/* Clients Table */}
             <div className="admin-card">
               <div className="admin-card-header">
-                <h2>Registered Clients & Patrons ({filteredClients.length})</h2>
+                <h2>{t('registeredClientsPatrons', 'Registered Clients & Patrons')} ({filteredClients.length})</h2>
               </div>
 
               <div className="admin-table-responsive">
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Client Name</th>
-                      <th>Contact Info</th>
-                      <th>Location</th>
-                      <th>Orders Completed</th>
-                      <th>Total Value</th>
-                      <th>Status</th>
-                      <th>Last Active</th>
+                      <th>{t('clientName', 'Client Name')}</th>
+                      <th>{t('contactInfo', 'Contact Info')}</th>
+                      <th>{t('location', 'Location')}</th>
+                      <th>{t('ordersCompleted', 'Orders Completed')}</th>
+                      <th>{t('totalValue', 'Total Value')}</th>
+                      <th>{t('status', 'Status')}</th>
+                      <th>{t('lastActive', 'Last Active')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredClients.length === 0 ? (
                       <tr>
                         <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
-                          No matching clients found.
+                          {t('noMatchingClientsFound', 'No matching clients found.')}
                         </td>
                       </tr>
                     ) : (
@@ -737,7 +739,7 @@ function Admin() {
                             <small style={{ color: '#6b7280' }}>{client.phone}</small>
                           </td>
                           <td>{client.city}</td>
-                          <td>{client.orders || client.totalOrders || 0} Projects</td>
+                          <td>{client.orders || client.totalOrders || 0} {t('projects', 'Projects')}</td>
                           <td>
                             <span className="admin-price">{client.spent || client.totalSpent || 'JOD 0'}</span>
                           </td>
@@ -751,12 +753,12 @@ function Admin() {
                                   : 'ready-for-delivery'
                               }`}
                             >
-                              {client.status}
+                              {t(client.status, client.status)}
                             </span>
                           </td>
                           <td>
                             <small style={{ color: '#6b7280' }}>
-                              {client.lastActive}
+                              {t(client.lastActive || 'Just now', client.lastActive || 'Just now')}
                             </small>
                           </td>
                         </tr>

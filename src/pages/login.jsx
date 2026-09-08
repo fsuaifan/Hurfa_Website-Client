@@ -52,7 +52,7 @@ function Login() {
     if (!formData.email.trim() || !formData.password.trim()) {
       setStatusMessage({
         type: 'error',
-        text: 'Please enter both your email/username and password.',
+        text: t('enterBothEmailPass', 'Please enter both your email/username and password.'),
       });
       return;
     }
@@ -82,7 +82,7 @@ function Login() {
 
         setStatusMessage({
           type: 'success',
-          text: 'Admin authorization verified. Redirecting to Studio Dashboard...',
+          text: t('adminRedirect', 'Admin authorization verified. Redirecting to Studio Dashboard...'),
         });
 
         setTimeout(() => {
@@ -97,7 +97,7 @@ function Login() {
 
         setStatusMessage({
           type: 'success',
-          text: 'Welcome back! Redirecting to your account...',
+          text: t('welcomeRedirect', 'Welcome back! Redirecting to your account...'),
         });
 
         setTimeout(() => {
@@ -109,7 +109,7 @@ function Login() {
       console.error('Login error:', err);
       setStatusMessage({
         type: 'error',
-        text: err.message || 'Invalid credentials. Please verify and try again.',
+        text: err.message || t('invalidCredentials', 'Invalid credentials. Please verify and try again.'),
       });
     } finally {
       setLoading(false);
@@ -268,7 +268,7 @@ function Login() {
                   className="login-forgot-link"
                   onClick={(e) => {
                     e.preventDefault();
-                    alert('Password reset link sent to your registered email.');
+                    alert(t('forgotPasswordSent', 'Password reset link sent to your registered email.'));
                   }}
                 >
                   {t('forgot', 'Forgot?')}
@@ -347,7 +347,7 @@ function Login() {
             disabled={loading}
           >
             {loading ? (
-              <span className="login-spinner">Authenticating...</span>
+              <span className="login-spinner">{t('authenticating', 'Authenticating...')}</span>
             ) : (
               <span>
                 {isAdmin
@@ -362,7 +362,7 @@ function Login() {
         <footer className="login-footer">
           {isAdmin ? (
             <p>
-              Restricted management console. Authorized Hurfa studio staff only.
+              {t('restrictedStaffOnly', 'Restricted management console. Authorized Hurfa studio staff only.')}
             </p>
           ) : (
             <p>

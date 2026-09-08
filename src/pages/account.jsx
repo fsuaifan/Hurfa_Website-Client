@@ -86,7 +86,7 @@ function Account() {
         </header>
 
         {/* Profile and Details Card */}
-        <section className="admin-stats-grid" aria-label="Account Overview">
+        <section className="admin-stats-grid" aria-label={t('clientPortal', 'Account Overview')}>
           <div className="admin-stat-card">
             <div className="admin-stat-top">
               <span className="admin-stat-label">{t('membershipStatus', 'Membership Status')}</span>
@@ -98,7 +98,7 @@ function Account() {
               </div>
             </div>
             <h2 className="admin-stat-value">Hurfa Atelier</h2>
-            <span className="admin-stat-trend">Client since 2026</span>
+            <span className="admin-stat-trend">{t('clientSince', 'Client since 2026')}</span>
           </div>
 
           <div className="admin-stat-card">
@@ -111,7 +111,7 @@ function Account() {
               </div>
             </div>
             <h2 className="admin-stat-value">3</h2>
-            <span className="admin-stat-trend">Kitchens & Bedroom sets</span>
+            <span className="admin-stat-trend">{t('kitchensAndBedroomsSets', 'Kitchens & Bedroom sets')}</span>
           </div>
 
           <div className="admin-stat-card">
@@ -123,8 +123,8 @@ function Account() {
                 </svg>
               </div>
             </div>
-            <h2 className="admin-stat-value">{orders.length > 0 ? `${orders.length} Active` : '1 Active'}</h2>
-            <span className="admin-stat-trend">Consultation scheduled</span>
+            <h2 className="admin-stat-value">{orders.length > 0 ? `${orders.length} ${t('active', 'Active')}` : `1 ${t('active', 'Active')}`}</h2>
+            <span className="admin-stat-trend">{t('consultationScheduled', 'Consultation scheduled')}</span>
           </div>
 
           <div className="admin-stat-card">
@@ -137,8 +137,8 @@ function Account() {
                 </svg>
               </div>
             </div>
-            <h2 className="admin-stat-value">White-Glove</h2>
-            <span className="admin-stat-trend">Jordan installation included</span>
+            <h2 className="admin-stat-value">{t('whiteGlove', 'White-Glove')}</h2>
+            <span className="admin-stat-trend">{t('jordanInstallationIncluded', 'Jordan installation included')}</span>
           </div>
         </section>
 
@@ -170,7 +170,7 @@ function Account() {
                   {t('accountRole', 'Account Role')}
                 </label>
                 <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827', textTransform: 'capitalize' }}>
-                  {user.role || 'Client Member'}
+                  {user.role || t('clientMember', 'Client Member')}
                 </p>
               </div>
               <div className="col-md-6">
@@ -194,18 +194,18 @@ function Account() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
               <div>
                 <strong style={{ fontSize: '1.0625rem', color: '#111827' }}>
-                  On-Site Space & Material Assessment
+                  {t('spaceAssessment', 'On-Site Space & Material Assessment')}
                 </strong>
                 <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '4px' }}>
-                  Status: <span className="admin-status-badge in-production">Scheduled</span> • Dedicated Architect: Eng. Tariq
+                  {t('statusLabel', 'Status:')} <span className="admin-status-badge in-production">{t('scheduled', 'Scheduled')}</span> • {t('dedicatedArchitect', 'Dedicated Architect: Eng. Tariq')}
                 </p>
               </div>
               <button
                 type="button"
                 className="admin-btn admin-btn-outline"
-                onClick={() => alert('Consultation details sent to your registered email.')}
+                onClick={() => alert(t('consultationDetailsAlert', 'Consultation details sent to your registered email.'))}
               >
-                View Details
+                {t('viewDetails', 'View Details')}
               </button>
             </div>
           </div>

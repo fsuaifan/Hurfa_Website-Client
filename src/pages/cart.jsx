@@ -84,7 +84,7 @@ function Cart() {
     if (promoCode.trim().toUpperCase() === 'HURFA10') {
       setPromoApplied(true);
     } else {
-      alert('Invalid promo code. Try "HURFA10" for 10% off.');
+      alert(t('invalidPromo', 'Invalid promo code. Try "HURFA10" for 10% off.'));
     }
   };
 
@@ -127,7 +127,7 @@ function Cart() {
       setItems([]);
     } catch (err) {
       console.error('Checkout error:', err);
-      alert(`Checkout could not be completed: ${err.message || 'Please check your connection and try again.'}`);
+      alert(`${t('checkoutError', 'Checkout could not be completed. Please check your connection and try again.')} ${err.message || ''}`);
     } finally {
       setCheckingOut(false);
     }
@@ -240,7 +240,7 @@ function Cart() {
                   </span>
                   <h2 className="cart-item-title">{getLocalizedName(item)}</h2>
                   <span className="cart-item-unit-price">
-                    JOD {item.unitPrice.toLocaleString()} each
+                    JOD {item.unitPrice.toLocaleString()} {t('each', 'each')}
                   </span>
 
                   <div className="cart-item-controls">
