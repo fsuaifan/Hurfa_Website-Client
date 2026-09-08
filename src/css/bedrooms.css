@@ -8,7 +8,7 @@
 
 /* Bedrooms Hero Header */
 .bedroom-hero {
-  padding: 60px 5% 40px;
+  padding: 50px 5% 30px;
   max-width: 760px;
   margin: 0 auto;
   text-align: center;
@@ -16,36 +16,36 @@
 
 .bedrooms-eyebrow {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 600;
   color: #78716c;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .bedroom-hero h1 {
-  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
   font-weight: 400;
   color: #1f1d1b;
   margin: 0;
 }
 
 .bedroom-hero p {
-  margin: 16px auto 0;
+  margin: 14px auto 0;
   color: #57534e;
-  max-width: 54ch;
-  line-height: 1.7;
-  font-size: 1.05rem;
+  max-width: 52ch;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
-/* 2-Column Product Grid */
+/* 3-Column Product Grid */
 .bedrooms-product-grid {
-  padding: 0 5% 140px;
+  padding: 0 5% 100px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 36px;
-  max-width: 1100px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px 20px;
+  max-width: 1180px;
   margin: 0 auto;
 }
 
@@ -56,9 +56,9 @@
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
 .bedroom-product-card:hover {
@@ -67,10 +67,11 @@
 
 .bedroom-card-media {
   position: relative;
-  height: 320px;
+  width: 100%;
+  height: 180px;
   overflow: hidden;
   background-color: #eee9e1;
-  border-radius: 4px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,41 +89,48 @@
 }
 
 .bedroom-card-body {
-  padding: 18px 4px 0;
+  padding: 12px 2px 0;
   text-align: left;
 }
 
 .bedroom-card-body h3 {
-  margin: 0 0 6px;
-  font-size: 1.1rem;
+  margin: 0 0 4px;
+  font-size: 1.05rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   color: #1F1D1B;
 }
 
 .bedroom-card-price {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #e67e22;
   font-weight: 700;
 }
 
 .bedroom-card-desc {
-  margin: 8px 0 0;
-  font-size: 0.9rem;
+  margin: 6px 0 0;
+  font-size: 0.85rem;
   color: #57534e;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+  .bedrooms-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px 16px;
+  }
+}
+
+@media (max-width: 600px) {
   .bedrooms-product-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
-    padding: 0 6% 100px;
+    gap: 20px;
+    padding: 0 5% 70px;
   }
 
   .bedroom-card-media {
-    height: 260px;
+    height: 170px;
   }
 }
