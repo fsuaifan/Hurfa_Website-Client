@@ -95,6 +95,8 @@ export const api = {
       return request(`/products${qs}`);
     },
     getById: (id) => request(`/products/${id}`),
+    getPremium: () => request('/products/premium'),
+    getPremiumById: (id) => request(`/products/premium/${id}`),
     create: (data) =>
       request('/products', {
         method: 'POST',
@@ -189,6 +191,11 @@ export const api = {
       request(`/catalog/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
+      }),
+    updateSort: (items) =>
+      request('/catalog/sort', {
+        method: 'PUT',
+        body: JSON.stringify({ items }),
       }),
     delete: (id) =>
       request(`/catalog/${id}`, {

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { addToCart } from '../utils/cartUtils';
 import '../css/product-modal.css';
 
 function ProductModal({ isOpen, onClose, product, onAddToCart }) {
   const [activeImage, setActiveImage] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState('standard'); // 'standard' | 'set2'
+  const [addedSuccess, setAddedSuccess] = useState(false);
 
   // Normalize product images array
   const images = product?.images || (product?.image ? [product.image] : []);
@@ -11,8 +14,10 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
   // Sync active image and reset quantity when product changes or modal opens
   useEffect(() => {
     if (product) {
-      setActiveImage(images[0] || '');
+      setActiveImage(images[0] || product.mainImage || product.image || '');
       setQuantity(1);
+      setSelectedVariant('standard');
+      setAddedSuccess(false);
     }
   }, [product, isOpen]);
 
@@ -39,8 +44,36 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
 
   if (!isOpen || !product) return null;
 
-  const handleAddToCart = () => {
-    onAddToCart?.(product, quantity);
+  const hasDualPrice = Boolean(product.price2 && product.price2 > 0);
+  const isSet2 = selectedVariant === 'set2';
+
+  const activePriceNumber = isSet2 ? product.price2 : (product.priceNumber || 0);
+  const activeSalePrice = isSet2 ? (product.salePrice2 || null) : (product.salePrice || null);
+  const activePriceFormatted = isSet2 
+    ? (product.price2Formatted || `JOD ${product.price2?.toLocaleString()}`) 
+    : product.price;
+
+  const handleAddToCartClick = () => {
+    const variantLabel = hasDualPrice ? (isSet2 ? 'Suite with Wardrobe / Option B' : 'Standard Suite') : null;
+    
+    const productToAdd = {
+      ...product,
+      priceNumber: activePriceNumber,
+      price: activePriceFormatted,
+      salePrice: activeSalePrice,
+    };
+
+    if (onAddToCart) {
+      onAddToCart(productToAdd, quantity, variantLabel);
+    } else {
+      addToCart(productToAdd, quantity, variantLabel);
+    }
+
+    setAddedSuccess(true);
+    setTimeout(() => {
+      setAddedSuccess(false);
+      onClose?.();
+    }, 700);
   };
 
   const handleIncrement = () => setQuantity((prev) => prev + 1);
@@ -103,10 +136,66 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
             <span className="product-modal-eyebrow">{product.category}</span>
           )}
           <h2 id="modal-product-title">{product.name || product.title}</h2>
-          <div className="product-modal-price">{product.price}</div>
+          
+          {/* Price Display with Sale Support */}
+          <div className="product-modal-price">
+            {activeSalePrice ? (
+              <div className="d-flex align-items-center gap-2">
+                <span className="text-decoration-line-through text-secondary" style={{ fontSize: '1.1rem' }}>
+                  {activePriceFormatted}
+                </span>
+                <span className="text-danger fw-bold">
+                  JOD {activeSalePrice.toLocaleString()}
+                </span>
+                <span className="badge bg-danger ms-1" style={{ fontSize: '0.75rem' }}>
+                  Special Offer
+                </span>
+              </div>
+            ) : (
+              <span>{activePriceFormatted}</span>
+            )}
+          </div>
+
+          {/* Variant Selector if product has dual pricing (e.g. Set with Wardrobe) */}
+          {hasDualPrice && (
+            <div className="product-variant-selector mb-3">
+              <label className="d-block text-secondary small text-uppercase mb-1 fw-semibold">
+                Configuration Option
+              </label>
+              <div className="d-flex gap-2">
+                <button
+                  type="button"
+                  className={`btn btn-sm ${!isSet2 ? 'btn-dark' : 'btn-outline-dark'}`}
+                  onClick={() => setSelectedVariant('standard')}
+                >
+                  Standard Suite ({product.price})
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${isSet2 ? 'btn-dark' : 'btn-outline-dark'}`}
+                  onClick={() => setSelectedVariant('set2')}
+                >
+                  Expanded Suite ({product.price2Formatted || `JOD ${product.price2}`})
+                </button>
+              </div>
+            </div>
+          )}
+
           <p className="product-modal-desc">
-            {product.desc || product.description || 'Crafted with premium materials and signature Hurfa detail.'}
+            {product.desc || product.description || 'Crafted with premium materials and signature Hurfa architectural detail.'}
           </p>
+
+          {product.material && (
+            <div className="mb-2 small text-secondary">
+              <strong className="text-dark">Materials:</strong> {product.material}
+            </div>
+          )}
+
+          {product.dimensions && (
+            <div className="mb-3 small text-secondary">
+              <strong className="text-dark">Dimensions:</strong> {product.dimensions}
+            </div>
+          )}
 
           {/* Actions: Quantity & Add to Cart */}
           <div className="product-modal-actions">
@@ -143,9 +232,10 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
             <button
               type="button"
               className="btn-product-add-cart"
-              onClick={handleAddToCart}
+              onClick={handleAddToCartClick}
+              style={addedSuccess ? { backgroundColor: '#16a34a', borderColor: '#16a34a' } : {}}
             >
-              <span>Add to Cart</span>
+              <span>{addedSuccess ? '✓ Added to Cart' : 'Add to Cart'}</span>
             </button>
           </div>
         </div>
