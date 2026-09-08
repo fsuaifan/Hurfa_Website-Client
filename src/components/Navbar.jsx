@@ -13,10 +13,34 @@ function NavigationBar() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
-  // this checks if the dropdown menu is expanded or not
-  const [expanded, setExpanded] = useState(false);
-  // track scroll position to switch between transparent and solid
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [authDestination, setAuthDestination] = useState('/login');
+
+  useEffect(() => {
+    const updateAuthDestination = () => {
+      const isAdmin =
+        sessionStorage.getItem('hurfa_admin_authenticated') === 'true' ||
+        localStorage.getItem('hurfa_admin_authenticated') === 'true';
+      const isCustomer =
+        sessionStorage.getItem('hurfa_customer_authenticated') === 'true' ||
+        localStorage.getItem('hurfa_customer_authenticated') === 'true';
+
+      if (isAdmin) {
+        setAuthDestination('/admin');
+      } else if (isCustomer) {
+        setAuthDestination('/account');
+      } else {
+        setAuthDestination('/login');
+      }
+    };
+
+    updateAuthDestination();
+    window.addEventListener('storage', updateAuthDestination);
+    window.addEventListener('hurfa-auth-changed', updateAuthDestination);
+    return () => {
+      window.removeEventListener('storage', updateAuthDestination);
+      window.removeEventListener('hurfa-auth-changed', updateAuthDestination);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -95,13 +119,7 @@ function NavigationBar() {
             </Nav.Link>
             <Nav.Link
               as={NavLink}
-              to={
-                sessionStorage.getItem('hurfa_admin_authenticated') === 'true'
-                  ? '/admin'
-                  : sessionStorage.getItem('hurfa_customer_authenticated') === 'true'
-                  ? '/account'
-                  : '/login'
-              }
+              to={authDestination}
               onClick={closeDropdown}
               className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}

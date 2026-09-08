@@ -369,6 +369,28 @@
   transform: translateY(-2px);
 }
 
+.cart-auth-note {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: #78716c;
+  text-align: center;
+  line-height: 1.4;
+  padding: 8px 12px;
+  background-color: #f5f5f4;
+  border-radius: 6px;
+  border: 1px dashed #d6d3d1;
+}
+
+.cart-auth-note a {
+  color: #1f1d1b;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.cart-auth-note a:hover {
+  color: #e67e22;
+}
+
 /* Trust Badges */
 .cart-trust-badges {
   margin-top: 24px;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import '../css/login.css';
@@ -7,6 +7,10 @@ import '../css/login.css';
 function SignUp() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || location.state?.from || '';
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -90,14 +94,17 @@ function SignUp() {
       sessionStorage.setItem('hurfa_user', JSON.stringify(newUser));
       localStorage.setItem('hurfa_customer_authenticated', 'true');
       localStorage.setItem('hurfa_user', JSON.stringify(newUser));
+      window.dispatchEvent(new Event('hurfa-auth-changed'));
 
       setStatusMessage({
         type: 'success',
         text: t('accountCreatedSuccess', 'Account created successfully! Welcome to Hurfa.'),
       });
 
+      const destination = redirectTarget && !redirectTarget.includes('/admin') ? redirectTarget : '/account';
+
       setTimeout(() => {
-        navigate('/account', { replace: true });
+        navigate(destination, { replace: true });
       }, 600);
     } catch (err) {
       console.error('Signup error:', err);
@@ -310,7 +317,10 @@ function SignUp() {
         <footer className="login-footer">
           <p>
             {t('alreadyHaveAccount', 'Already have an account?')}{' '}
-            <Link to="/login" className="login-link">
+            <Link
+              to={redirectTarget ? `/login?redirect=${encodeURIComponent(redirectTarget)}` : '/login'}
+              className="login-link"
+            >
               {t('signIn', 'Sign In')}
             </Link>
           </p>

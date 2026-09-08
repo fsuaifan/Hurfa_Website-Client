@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import '../css/login.css';
@@ -7,8 +7,9 @@ import '../css/login.css';
 function Login() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const redirectTarget = searchParams.get('redirect') || '';
+  const redirectTarget = searchParams.get('redirect') || location.state?.from || '';
   const urlRole = searchParams.get('mode') === 'admin' || redirectTarget.includes('/admin') ? 'admin' : 'customer';
 
   const [selectedRole, setSelectedRole] = useState(null);
@@ -94,6 +95,7 @@ function Login() {
         sessionStorage.setItem('hurfa_user', JSON.stringify({ ...user, role: 'customer' }));
         storage.setItem('hurfa_customer_authenticated', 'true');
         storage.setItem('hurfa_user', JSON.stringify({ ...user, role: 'customer' }));
+        window.dispatchEvent(new Event('hurfa-auth-changed'));
 
         setStatusMessage({
           type: 'success',
@@ -367,7 +369,10 @@ function Login() {
           ) : (
             <p>
               {t('newToHurfa', 'New to Hurfa Studio?')}{' '}
-              <Link to="/signup" className="login-link">
+              <Link
+                to={redirectTarget ? `/signup?redirect=${encodeURIComponent(redirectTarget)}` : '/signup'}
+                className="login-link"
+              >
                 {t('createAccount', 'Create an account')}
               </Link>
             </p>

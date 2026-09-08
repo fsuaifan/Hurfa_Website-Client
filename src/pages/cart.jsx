@@ -88,6 +88,32 @@ function Cart() {
     }
   };
 
+  const getAuthenticatedUser = useCallback(() => {
+    const isCustomerAuth =
+      sessionStorage.getItem('hurfa_customer_authenticated') === 'true' ||
+      localStorage.getItem('hurfa_customer_authenticated') === 'true';
+    const userStr = sessionStorage.getItem('hurfa_user') || localStorage.getItem('hurfa_user');
+    if (!isCustomerAuth || !userStr) return null;
+    try {
+      const parsed = JSON.parse(userStr);
+      return parsed?.email ? parsed : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const [currentUser, setCurrentUser] = useState(() => getAuthenticatedUser());
+
+  useEffect(() => {
+    const checkUser = () => setCurrentUser(getAuthenticatedUser());
+    window.addEventListener('storage', checkUser);
+    window.addEventListener('hurfa-auth-changed', checkUser);
+    return () => {
+      window.removeEventListener('storage', checkUser);
+      window.removeEventListener('hurfa-auth-changed', checkUser);
+    };
+  }, [getAuthenticatedUser]);
+
   const totalItemCount = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
   const subtotal = items.reduce((acc, item) => {
     const unitPrice = item.unitPrice !== undefined ? item.unitPrice : item.price || 0;
@@ -97,16 +123,15 @@ function Cart() {
   const grandTotal = Math.max(0, subtotal - discount);
 
   const handleCheckout = async () => {
-    const userStr = sessionStorage.getItem('hurfa_user') || localStorage.getItem('hurfa_user');
-    let user = { name: 'Valued Patron', email: 'guest@hurfa.com', phone: '+962 7 9000 0000' };
+    const user = getAuthenticatedUser();
 
-    if (userStr) {
-      try {
-        user = JSON.parse(userStr);
-      } catch (e) {
-        console.error(e);
-      }
+    if (!user) {
+      // User is not logged in: redirect to sign up with return URL to cart
+      navigate('/signup?redirect=/cart', { state: { from: '/cart' } });
+      return;
     }
+
+    if (items.length === 0) return;
 
     const itemsSummary = items.map((i) => `${i.name} (x${i.quantity || 1})`).join(', ');
 
@@ -114,11 +139,11 @@ function Cart() {
     try {
       const order = await api.orders.create({
         clientName: user.name || 'Valued Patron',
-        clientEmail: user.email || 'patron@example.com',
+        clientEmail: user.email,
         clientPhone: user.phone || '+962 7 9000 0000',
         items: itemsSummary,
         total: grandTotal,
-        deliveryAddress: 'Amman, Jordan',
+        deliveryAddress: user.city ? `${user.city}, Jordan` : 'Amman, Jordan',
         status: 'In Production',
       });
 
@@ -337,6 +362,15 @@ function Cart() {
               >
                 {checkingOut ? t('placingOrder', 'Placing Order...') : t('proceedToCheckout', 'Proceed to Checkout')}
               </button>
+
+              {!currentUser && (
+                <p className="cart-auth-note">
+                  {t('signInToOrderPrompt', 'Please create an account or sign in to complete your bespoke order.')}{' '}
+                  <Link to="/signup?redirect=/cart">{t('createAccount', 'Sign Up')}</Link>
+                  {' · '}
+                  <Link to="/login?redirect=/cart">{t('signIn', 'Sign In')}</Link>
+                </p>
+              )}
 
               {/* Trust Badges */}
               <div className="cart-trust-badges">
