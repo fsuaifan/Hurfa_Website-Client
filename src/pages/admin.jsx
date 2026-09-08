@@ -32,10 +32,25 @@ function Admin() {
   const [orders, setOrders] = useState([]);
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('All');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [newOrderStatus, setNewOrderStatus] = useState('In Production');
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
 
   // Clients State
   const [clients, setClients] = useState([]);
   const [clientSearchQuery, setClientSearchQuery] = useState('');
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+  const [isSavingClient, setIsSavingClient] = useState(false);
+  const [clientForm, setClientForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    city: 'Amman',
+    status: 'Prospect',
+    totalOrders: 0,
+    totalSpent: 'JOD 0',
+  });
 
   // Fetch live records from backend on mount
   useEffect(() => {
@@ -102,39 +117,64 @@ function Admin() {
     }
   };
 
-  const handleUpdateOrderStatus = async (orderId, currentStatus) => {
-    const newStatus = window.prompt(
-      `${t('updateStatusFor', 'Update status for')} ${orderId} (${t('status', 'Status')}: ${currentStatus}):\nOptions: In Production, Ready for Delivery, Delivered, Consultation Scheduled`,
-      currentStatus
-    );
-    if (newStatus && newStatus.trim()) {
-      try {
-        await api.orders.updateStatus(orderId, newStatus.trim());
-      } catch (e) {
-        console.warn('Order status API fallback:', e.message);
-      }
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus.trim() } : o))
-      );
-    }
+  const openUpdateOrderModal = (order) => {
+    setSelectedOrder(order);
+    setNewOrderStatus(order.status || 'In Production');
+    setIsOrderModalOpen(true);
   };
 
-  const handleAddClient = async () => {
-    const name = window.prompt(t('enterClientFullName', 'Enter client full name:'));
-    if (!name || !name.trim()) return;
-    const email = window.prompt(t('enterClientEmail', 'Enter client email address:'), 'client@example.com') || 'client@example.com';
-    const phone = window.prompt(t('enterClientPhone', 'Enter client phone:'), '+962 7 9000 0000') || '+962 7 9000 0000';
-    const city = window.prompt(t('enterDistrictCity', 'Enter district/city:'), 'Amman (Abdoun)') || 'Amman';
+  const handleSaveOrderStatus = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!selectedOrder || !newOrderStatus) return;
+
+    setIsSavingOrder(true);
+    try {
+      await api.orders.updateStatus(selectedOrder.id, newOrderStatus);
+    } catch (e) {
+      console.warn('Order status API fallback:', e.message);
+    }
+
+    setOrders((prev) =>
+      prev.map((o) => (o.id === selectedOrder.id ? { ...o, status: newOrderStatus } : o))
+    );
+    setIsSavingOrder(false);
+    setIsOrderModalOpen(false);
+    setSelectedOrder(null);
+  };
+
+  const openRegisterClientModal = () => {
+    setClientForm({
+      name: '',
+      email: '',
+      phone: '',
+      city: 'Amman',
+      status: 'Prospect',
+      totalOrders: 0,
+      totalSpent: 'JOD 0',
+    });
+    setIsClientModalOpen(true);
+  };
+
+  const handleSaveClient = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!clientForm.name || !clientForm.name.trim()) return;
+
+    setIsSavingClient(true);
+    const spentVal = clientForm.totalSpent.trim() || '0';
+    const formattedSpent = spentVal.startsWith('JOD') ? spentVal : `JOD ${spentVal}`;
+    const ordersCount = Number(clientForm.totalOrders) || 0;
 
     const newClient = {
       id: Date.now(),
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      city: city.trim(),
-      totalOrders: 0,
-      totalSpent: 'JOD 0',
-      status: 'Prospect',
+      name: clientForm.name.trim(),
+      email: clientForm.email.trim() || 'client@hurfa.com',
+      phone: clientForm.phone.trim() || '+962 7 9000 0000',
+      city: clientForm.city.trim() || 'Amman',
+      totalOrders: ordersCount,
+      orders: ordersCount,
+      totalSpent: formattedSpent,
+      spent: formattedSpent,
+      status: clientForm.status || 'Prospect',
       lastActive: 'Just now',
     };
 
@@ -144,13 +184,17 @@ function Admin() {
         email: newClient.email,
         phone: newClient.phone,
         city: newClient.city,
-        status: 'Prospect',
+        status: newClient.status,
+        totalOrders: newClient.totalOrders,
+        totalSpent: newClient.totalSpent,
       });
     } catch (e) {
       console.warn('Client create API fallback:', e.message);
     }
 
     setClients((prev) => [newClient, ...prev]);
+    setIsSavingClient(false);
+    setIsClientModalOpen(false);
   };
 
   // Filtered Catalog
@@ -597,9 +641,7 @@ function Admin() {
                             <button
                               type="button"
                               className="admin-action-btn edit"
-                              onClick={() =>
-                                handleUpdateOrderStatus(order.id, order.status)
-                              }
+                              onClick={() => openUpdateOrderModal(order)}
                             >
                               {t('update', 'Update')}
                             </button>
@@ -696,7 +738,7 @@ function Admin() {
               <button
                 type="button"
                 className="admin-btn admin-btn-primary"
-                onClick={handleAddClient}
+                onClick={openRegisterClientModal}
               >
                 {t('registerClient', '+ Register Client')}
               </button>
@@ -769,6 +811,269 @@ function Admin() {
               </div>
             </div>
           </>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL 1: UPDATE ORDER STATUS */}
+        {/* ========================================================================= */}
+        {isOrderModalOpen && selectedOrder && (
+          <div
+            className="admin-modal-overlay"
+            onClick={() => setIsOrderModalOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="order-modal-title"
+          >
+            <div className="admin-modal-dialog" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <div>
+                  <h2 id="order-modal-title">{t('updateOrder', 'Update Order Status')}</h2>
+                  <p>{t('updateOrderDesc', 'Modify production and delivery milestones for this bespoke order.')}</p>
+                </div>
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  onClick={() => setIsOrderModalOpen(false)}
+                  aria-label={t('cancel', 'Close')}
+                >
+                  &times;
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveOrderStatus}>
+                <div className="admin-modal-body">
+                  <div className="admin-modal-summary">
+                    <div className="admin-modal-summary-row">
+                      <span className="admin-modal-summary-label">{t('orderCode', 'Order Code')}</span>
+                      <span className="admin-modal-summary-val">{selectedOrder.id}</span>
+                    </div>
+                    <div className="admin-modal-summary-row">
+                      <span className="admin-modal-summary-label">{t('clientName', 'Client')}</span>
+                      <span className="admin-modal-summary-val">{selectedOrder.clientName}</span>
+                    </div>
+                    <div className="admin-modal-summary-row">
+                      <span className="admin-modal-summary-label">{t('itemsAndDetails', 'Items')}</span>
+                      <span className="admin-modal-summary-val">{selectedOrder.items}</span>
+                    </div>
+                    <div className="admin-modal-summary-row">
+                      <span className="admin-modal-summary-label">{t('totalValue', 'Total Value')}</span>
+                      <span className="admin-modal-summary-val">{selectedOrder.total}</span>
+                    </div>
+                    <div className="admin-modal-summary-row">
+                      <span className="admin-modal-summary-label">{t('currentStatus', 'Current Status')}</span>
+                      <span
+                        className={`admin-status-badge ${selectedOrder.status
+                          ?.toLowerCase()
+                          ?.replace(/\s+/g, '-')}`}
+                      >
+                        {t(selectedOrder.status, selectedOrder.status)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" htmlFor="order-status-select">
+                      {t('newStatus', 'New Status')} <span className="required">*</span>
+                    </label>
+                    <select
+                      id="order-status-select"
+                      className="admin-form-select"
+                      value={newOrderStatus}
+                      onChange={(e) => setNewOrderStatus(e.target.value)}
+                      required
+                    >
+                      <option value="In Production">{t('inProduction', 'In Production')}</option>
+                      <option value="Ready for Delivery">{t('readyForDelivery', 'Ready for Delivery')}</option>
+                      <option value="Delivered">{t('delivered', 'Delivered')}</option>
+                      <option value="Consultation Scheduled">{t('consultationsScheduled', 'Consultation Scheduled')}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="admin-modal-footer">
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-outline"
+                    onClick={() => setIsOrderModalOpen(false)}
+                    disabled={isSavingOrder}
+                  >
+                    {t('cancel', 'Cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    className="admin-btn admin-btn-primary"
+                    disabled={isSavingOrder}
+                  >
+                    {isSavingOrder ? t('savingStatus', 'Saving...') : t('saveStatus', 'Save Status')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL 2: REGISTER NEW CLIENT */}
+        {/* ========================================================================= */}
+        {isClientModalOpen && (
+          <div
+            className="admin-modal-overlay"
+            onClick={() => setIsClientModalOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="client-modal-title"
+          >
+            <div className="admin-modal-dialog" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <div>
+                  <h2 id="client-modal-title">{t('registerNewClient', 'Register New Client')}</h2>
+                  <p>{t('registerClientDesc', 'Add a new patron or architectural client to the studio directory.')}</p>
+                </div>
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  onClick={() => setIsClientModalOpen(false)}
+                  aria-label={t('cancel', 'Close')}
+                >
+                  &times;
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveClient}>
+                <div className="admin-modal-body">
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" htmlFor="client-name">
+                      {t('clientName', 'Client Full Name')} <span className="required">*</span>
+                    </label>
+                    <input
+                      id="client-name"
+                      type="text"
+                      className="admin-form-input"
+                      placeholder="e.g. Architect Sarah Al-Qudah"
+                      value={clientForm.name}
+                      onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
+                      required
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="admin-form-grid">
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="client-email">
+                        {t('email', 'Email Address')} <span className="required">*</span>
+                      </label>
+                      <input
+                        id="client-email"
+                        type="email"
+                        className="admin-form-input"
+                        placeholder="client@hurfa.com"
+                        value={clientForm.email}
+                        onChange={(e) => setClientForm({ ...clientForm, email: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="client-phone">
+                        {t('phone', 'Phone Number')} <span className="required">*</span>
+                      </label>
+                      <input
+                        id="client-phone"
+                        type="tel"
+                        className="admin-form-input"
+                        placeholder="+962 7 9000 0000"
+                        value={clientForm.phone}
+                        onChange={(e) => setClientForm({ ...clientForm, phone: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-grid">
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="client-city">
+                        {t('city', 'District / City')} <span className="required">*</span>
+                      </label>
+                      <input
+                        id="client-city"
+                        type="text"
+                        className="admin-form-input"
+                        placeholder="e.g. Amman (Abdoun)"
+                        value={clientForm.city}
+                        onChange={(e) => setClientForm({ ...clientForm, city: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="client-tier">
+                        {t('clientTier', 'Patron Tier / Status')}
+                      </label>
+                      <select
+                        id="client-tier"
+                        className="admin-form-select"
+                        value={clientForm.status}
+                        onChange={(e) => setClientForm({ ...clientForm, status: e.target.value })}
+                      >
+                        <option value="Prospect">{t('prospect', 'Prospect')}</option>
+                        <option value="Active">{t('Active', 'Active Client')}</option>
+                        <option value="VIP">{t('VIP', 'VIP Client')}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="admin-form-grid">
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="client-projects">
+                        {t('initialProjects', 'Completed Projects')}
+                      </label>
+                      <input
+                        id="client-projects"
+                        type="number"
+                        min="0"
+                        className="admin-form-input"
+                        placeholder="0"
+                        value={clientForm.totalOrders}
+                        onChange={(e) => setClientForm({ ...clientForm, totalOrders: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="client-spent">
+                        {t('initialSpent', 'Total Spent / Value')}
+                      </label>
+                      <input
+                        id="client-spent"
+                        type="text"
+                        className="admin-form-input"
+                        placeholder="JOD 0"
+                        value={clientForm.totalSpent}
+                        onChange={(e) => setClientForm({ ...clientForm, totalSpent: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="admin-modal-footer">
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-outline"
+                    onClick={() => setIsClientModalOpen(false)}
+                    disabled={isSavingClient}
+                  >
+                    {t('cancel', 'Cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    className="admin-btn admin-btn-primary"
+                    disabled={isSavingClient}
+                  >
+                    {isSavingClient ? t('registeringClient', 'Registering...') : t('saveClient', 'Save Client')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
       </div>
     </div>
