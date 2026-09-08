@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import '../css/cart.css';
 
 function Cart() {
-  const { t, tName } = useLanguage();
+  const { t, getLocalizedName, getLocalizedCategory, isArabic } = useLanguage();
   const navigate = useNavigate();
   const [items, setItems] = useState(() => getCart());
   const [promoCode, setPromoCode] = useState('');
@@ -231,12 +231,14 @@ function Cart() {
             {items.map((item) => (
               <article key={item.id} className="cart-item-card">
                 <div className="cart-item-image">
-                  <img src={item.image} alt={tName(item.name)} loading="lazy" />
+                  <img src={item.image} alt={getLocalizedName(item)} loading="lazy" />
                 </div>
 
                 <div className="cart-item-details">
-                  <span className="cart-item-category">{t(item.category, item.category)}</span>
-                  <h2 className="cart-item-title">{tName(item.name)}</h2>
+                  <span className="cart-item-category">
+                    {item.arabicCategory && isArabic ? item.arabicCategory : getLocalizedCategory(item.category || item)}
+                  </span>
+                  <h2 className="cart-item-title">{getLocalizedName(item)}</h2>
                   <span className="cart-item-unit-price">
                     JOD {item.unitPrice.toLocaleString()} each
                   </span>
@@ -245,13 +247,13 @@ function Cart() {
                     <div
                       className="cart-qty-box"
                       role="group"
-                      aria-label={`Quantity selector for ${tName(item.name)}`}
+                      aria-label={`Quantity selector for ${getLocalizedName(item)}`}
                     >
                       <button
                         type="button"
                         className="cart-qty-btn"
                         onClick={() => handleQuantityChange(item.id, -1)}
-                        aria-label={`Decrease quantity for ${tName(item.name)}`}
+                        aria-label={`Decrease quantity for ${getLocalizedName(item)}`}
                       >
                         -
                       </button>
@@ -260,7 +262,7 @@ function Cart() {
                         type="button"
                         className="cart-qty-btn"
                         onClick={() => handleQuantityChange(item.id, 1)}
-                        aria-label={`Increase quantity for ${tName(item.name)}`}
+                        aria-label={`Increase quantity for ${getLocalizedName(item)}`}
                       >
                         +
                       </button>

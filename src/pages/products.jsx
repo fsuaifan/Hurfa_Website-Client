@@ -34,7 +34,7 @@ const FALLBACK_SIGNATURE_SUITES = [
 ];
 
 function Products() {
-  const { t, tName, tDesc } = useLanguage();
+  const { t, isArabic, getLocalizedName, getLocalizedDesc, getLocalizedTagline } = useLanguage();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [signatureSuites, setSignatureSuites] = useState(FALLBACK_SIGNATURE_SUITES);
@@ -60,8 +60,7 @@ function Products() {
             setProducts(productsData.value);
           }
           if (categoriesData.status === 'fulfilled' && Array.isArray(categoriesData.value) && categoriesData.value.length > 0) {
-            const catNames = categoriesData.value.map((c) => c.name);
-            setCategories(['All', ...catNames]);
+            setCategories([{ id: 'all', name: 'All', arabic_name: 'الكل' }, ...categoriesData.value]);
           }
           if (premiumData.status === 'fulfilled' && Array.isArray(premiumData.value) && premiumData.value.length > 0) {
             setSignatureSuites(premiumData.value);
@@ -122,18 +121,26 @@ function Products() {
         <div className="products-filter-bar">
           {/* Category Tabs */}
           <div className="products-filter-tabs" role="tablist" aria-label="Filter by category">
-            {categories.map((cat) => (
-              <button
-                type="button"
-                key={cat}
-                className={`products-filter-tab ${activeCategory === cat ? 'active' : ''}`}
-                onClick={() => setActiveCategory(cat)}
-                role="tab"
-                aria-selected={activeCategory === cat}
-              >
-                {cat === 'All' ? t('all', 'All') : t(cat, cat)}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const catKey = typeof cat === 'string' ? cat : cat.name;
+              const catLabel = typeof cat === 'string'
+                ? (cat === 'All' ? t('all', 'All') : cat)
+                : (cat.name === 'All' ? t('all', 'All') : (isArabic && cat.arabic_name ? cat.arabic_name : cat.name));
+              const isActive = activeCategory === catKey || (activeCategory === 'All' && catKey === 'All');
+
+              return (
+                <button
+                  type="button"
+                  key={catKey}
+                  className={`products-filter-tab ${isActive ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(catKey)}
+                  role="tab"
+                  aria-selected={isActive}
+                >
+                  {catLabel}
+                </button>
+              );
+            })}
           </div>
 
           {/* Sort Dropdown */}
@@ -183,7 +190,7 @@ function Products() {
                 onClick={() => handleOpenProduct(product)}
                 role="button"
                 tabIndex={0}
-                aria-label={`View details for ${tName(product.name)}`}
+                aria-label={`View details for ${getLocalizedName(product)}`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     handleOpenProduct(product);
@@ -193,7 +200,7 @@ function Products() {
                 <div className="product-card-image-wrap">
                   <img
                     src={product.images ? product.images[0] : product.image}
-                    alt={tName(product.name)}
+                    alt={getLocalizedName(product)}
                     loading="lazy"
                   />
                   {product.salePrice && (
@@ -201,8 +208,10 @@ function Products() {
                   )}
                 </div>
                 <div className="product-card-body">
-                  <span className="product-card-category">{t(product.category, product.category)}</span>
-                  <h3 className="product-card-title">{tName(product.name)}</h3>
+                  <span className="product-card-category">
+                    {isArabic && product.arabicCategory ? product.arabicCategory : product.category}
+                  </span>
+                  <h3 className="product-card-title">{getLocalizedName(product)}</h3>
                   <div className="product-card-price-row">
                     <span className="product-card-price">{product.price}</span>
                     <span className="product-card-action">{t('viewPiece', 'View Piece →')}</span>
@@ -235,7 +244,7 @@ function Products() {
               onClick={() => handleOpenProduct(suite)}
               role="button"
               tabIndex={0}
-              aria-label={`View suite details for ${tName(suite.title || suite.name)}`}
+              aria-label={`View suite details for ${getLocalizedName(suite)}`}
               style={{ cursor: 'pointer' }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -246,14 +255,14 @@ function Products() {
               <div className="products-premium-media">
                 <img
                   src={suite.image || suite.mainImage}
-                  alt={tName(suite.title || suite.name)}
+                  alt={getLocalizedName(suite)}
                   loading="lazy"
                 />
               </div>
               <div className="products-premium-info">
-                <span className="products-premium-tag">{t(suite.tagline, suite.tagline)}</span>
-                <h3>{tName(suite.title || suite.name)}</h3>
-                <p>{tDesc(suite.description || suite.desc)}</p>
+                <span className="products-premium-tag">{getLocalizedTagline(suite)}</span>
+                <h3>{getLocalizedName(suite)}</h3>
+                <p>{getLocalizedDesc(suite)}</p>
                 <span className="products-premium-price">{suite.priceRange || suite.price}</span>
               </div>
             </article>

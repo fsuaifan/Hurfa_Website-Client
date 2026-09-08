@@ -121,7 +121,7 @@ const translations = {
     roleProdSup: 'Production Supervisor',
     roleInv: 'Inventory / Data Coordinator',
 
-    // --- Product / Bedroom UI ---
+    // --- Product / Bedroom UI (Static Controls & Labels) ---
     catalog: 'Catalog',
     collections: 'Collections',
     homeFurniture: 'Home Furniture',
@@ -133,14 +133,6 @@ const translations = {
     addedToCart: '✓ Added to Cart',
     premiumCol: 'Premium collection',
     all: 'All',
-    'Living Room': 'Living Room',
-    'Living Room Tables': 'Living Room Tables',
-    'Consoles': 'Consoles',
-    'TV Units': 'TV Units',
-    'Commercial Offices': 'Commercial Offices',
-    coffeeTables: 'Coffee Tables',
-    tvUnits: 'TV Units',
-    consols: 'Consols',
     noItems: 'No items found.',
     noFurnitureFound: 'No furniture pieces found for the selected filter.',
     resetFilters: 'Reset Filters',
@@ -168,41 +160,6 @@ const translations = {
     sortPriceLow: 'Price: Low to High',
     sortPriceHigh: 'Price: High to Low',
     sortNewest: 'Newest Arrivals',
-
-    // --- Database Products & Descriptions ---
-    'Rafif': 'Rafif',
-    'Barah': 'Barah',
-    'Tayf': 'Tayf',
-    'Rawas': 'Rawas',
-    'Aziz': 'Aziz',
-    'Wesal TV Unit': 'Wesal TV Unit',
-    'Wesal Side Table': 'Wesal Side Table',
-    'Wesal Coffee Table': 'Wesal Coffee Table',
-    'Siq TV Uint ': 'Siq TV Unit',
-    'Siq TV Unit': 'Siq TV Unit',
-    'contemporary Wesal TV Unit ': 'Contemporary Wesal TV Unit',
-    'contemporary Siq TV Unit ': 'Contemporary Siq TV Unit',
-    'Siq Coffee Table': 'Siq Coffee Table',
-    'OUD Coffee Table': 'OUD Coffee Table',
-    'OUD Console': 'OUD Console',
-    'Siq Console': 'Siq Console',
-    'boho Siq TV Unit': 'Boho Siq TV Unit',
-    'organic Wesal TV Unit': 'Organic Wesal TV Unit',
-    'Wesal Console': 'Wesal Console',
-    'Oud side tables': 'Oud Side Tables',
-    'Organic siq tv unit': 'Organic Siq TV Unit',
-    'Oud Collection': 'Oud Collection',
-    'Wesal Collection': 'Wesal Collection',
-    'The Oud Collection': 'The Oud Collection',
-    'The Wesal Collection': 'The Wesal Collection',
-    'oudCol': 'Oud Collection',
-    'oudDesc': 'Oud is crafted from premium walnut veneer.',
-    'wesalCol': 'Wesal Collection',
-    'wesalDesc': 'Wesal is defined by multi-layered contrast.',
-    'Solid Oak & Bouclé': 'Solid Oak & Bouclé',
-    'Walnut & Architectural Linen': 'Walnut & Architectural Linen',
-    'oudCollectionDesc': 'A signature living-room collection built around solid oak framing, subtle warm curves, and boucle upholstery.',
-    'wesalCollectionDesc': 'A bedroom collection defined by low-profile walnut woodwork, soft textiles, and serene minimalist balance.',
 
     // --- Cart Page ---
     cartTitle: 'Shopping Cart',
@@ -418,7 +375,7 @@ const translations = {
     roleProdSup: 'مشرف الإنتاج',
     roleInv: 'منسق المخزون / البيانات',
 
-    // --- Product / Bedroom UI ---
+    // --- Product / Bedroom UI (Static Controls & Labels) ---
     catalog: 'الكتالوج',
     collections: 'المجموعات',
     homeFurniture: 'أثاث منزلي',
@@ -430,14 +387,6 @@ const translations = {
     addedToCart: '✓ تمت الإضافة إلى السلة',
     premiumCol: 'مجموعة متميزة',
     all: 'الكل',
-    'Living Room': 'غرفة المعيشة',
-    'Living Room Tables': 'طاولات غرفة المعيشة',
-    'Consoles': 'كونسول',
-    'TV Units': 'طاولات تلفاز',
-    'Commercial Offices': 'مكاتب تجارية',
-    coffeeTables: 'طاولات قهوة',
-    tvUnits: 'طاولات تلفاز',
-    consols: 'كونسول',
     noItems: 'لم يتم العثور على عناصر.',
     noFurnitureFound: 'لم يتم العثور على قطع أثاث للتصفية المحددة.',
     resetFilters: 'إعادة ضبط التصفية',
@@ -465,41 +414,6 @@ const translations = {
     sortPriceLow: 'السعر: من الأقل للأعلى',
     sortPriceHigh: 'السعر: من الأعلى للأقل',
     sortNewest: 'أحدث الإضافات',
-
-    // --- Database Products & Descriptions ---
-    'Rafif': 'رفيف',
-    'Barah': 'براءة',
-    'Tayf': 'طيف',
-    'Rawas': 'رواس',
-    'Aziz': 'عزيز',
-    'Wesal TV Unit': 'طاولة تلفاز وصال',
-    'Wesal Side Table': 'طاولة جانبية وصال',
-    'Wesal Coffee Table': 'طاولة قهوة وصال',
-    'Siq TV Uint ': 'طاولة تلفاز سيق',
-    'Siq TV Unit': 'طاولة تلفاز سيق',
-    'contemporary Wesal TV Unit ': 'طاولة تلفاز وصال المعاصرة',
-    'contemporary Siq TV Unit ': 'طاولة تلفاز سيق المعاصرة',
-    'Siq Coffee Table': 'طاولة قهوة سيق',
-    'OUD Coffee Table': 'طاولة قهوة العود',
-    'OUD Console': 'كونسول العود',
-    'Siq Console': 'كونسول سيق',
-    'boho Siq TV Unit': 'طاولة تلفاز سيق بوهو',
-    'organic Wesal TV Unit': 'طاولة تلفاز وصال العضوية',
-    'Wesal Console': 'كونسول وصال',
-    'Oud side tables': 'طاولات جانبية العود',
-    'Organic siq tv unit': 'طاولة تلفاز سيق العضوية',
-    'Oud Collection': 'مجموعة العود',
-    'Wesal Collection': 'مجموعة وصال',
-    'The Oud Collection': 'مجموعة العود',
-    'The Wesal Collection': 'مجموعة وصال',
-    'oudCol': 'مجموعة العود',
-    'oudDesc': 'مجموعة العود مصنوعة من قشرة خشب الجوز الفاخرة.',
-    'wesalCol': 'مجموعة وصال',
-    'wesalDesc': 'تتميز مجموعة وصال بالتباين المتعدد الطبقات.',
-    'Solid Oak & Bouclé': 'خشب بلوط صلب وقماش بوكليه',
-    'Walnut & Architectural Linen': 'خشب جوز وكتان معماري',
-    'oudCollectionDesc': 'مجموعة غرفة جلوس مميزة مبنية حول هيكل من خشب البلوط الصلب ومنحنيات دافئة وتنجيد بوكليه فاخر.',
-    'wesalCollectionDesc': 'مجموعة غرفة نوم تتميز بالخشب المنخفض من خشب الجوز والأقمشة الناعمة والتوازن الهادئ.',
 
     // --- Cart Page ---
     cartTitle: 'سلة التسوق',
@@ -602,8 +516,10 @@ const LanguageContext = createContext({
   toggleLanguage: () => {},
   setLanguage: () => {},
   t: (key, fallback) => fallback || key,
-  tName: (name) => name,
-  tDesc: (desc) => desc,
+  getLocalizedName: (item) => item?.name || item?.title || '',
+  getLocalizedDesc: (item) => item?.desc || item?.description || '',
+  getLocalizedCategory: (cat) => cat?.name || cat || '',
+  getLocalizedTagline: (item) => item?.tagline || '',
 });
 
 export function LanguageProvider({ children }) {
@@ -645,30 +561,66 @@ export function LanguageProvider({ children }) {
     [language]
   );
 
-  const tName = useCallback(
-    (name) => {
-      if (!name) return '';
-      const trimmed = name.trim();
-      const dict = translations[language] || translations.en;
-      if (dict && dict[trimmed] !== undefined) {
-        return dict[trimmed];
+  const getLocalizedName = useCallback(
+    (item) => {
+      if (!item) return '';
+      if (typeof item === 'string') {
+        const tr = t(item);
+        return tr !== item ? tr : item;
       }
-      return name;
+      if (language === 'ar' && item.arabicName) {
+        return item.arabicName;
+      }
+      return item.name || item.title || '';
     },
-    [language]
+    [language, t]
   );
 
-  const tDesc = useCallback(
-    (desc) => {
-      if (!desc) return '';
-      const trimmed = desc.trim();
-      const dict = translations[language] || translations.en;
-      if (dict && dict[trimmed] !== undefined) {
-        return dict[trimmed];
+  const getLocalizedDesc = useCallback(
+    (item) => {
+      if (!item) return '';
+      if (typeof item === 'string') {
+        const tr = t(item);
+        return tr !== item ? tr : item;
       }
-      return desc;
+      if (language === 'ar' && item.arabicDesc) {
+        return item.arabicDesc;
+      }
+      return item.desc || item.description || '';
     },
-    [language]
+    [language, t]
+  );
+
+  const getLocalizedCategory = useCallback(
+    (cat) => {
+      if (!cat) return '';
+      if (typeof cat === 'object') {
+        return (language === 'ar' && (cat.arabic_name || cat.arabicName))
+          ? (cat.arabic_name || cat.arabicName)
+          : (cat.name || '');
+      }
+      if (typeof cat === 'string') {
+        const tr = t(cat);
+        return tr !== cat ? tr : cat;
+      }
+      return cat;
+    },
+    [language, t]
+  );
+
+  const getLocalizedTagline = useCallback(
+    (item) => {
+      if (!item) return '';
+      if (typeof item === 'string') {
+        const tr = t(item);
+        return tr !== item ? tr : item;
+      }
+      if (language === 'ar' && item.arabicTagline) {
+        return item.arabicTagline;
+      }
+      return item.tagline || '';
+    },
+    [language, t]
   );
 
   const value = {
@@ -677,8 +629,12 @@ export function LanguageProvider({ children }) {
     toggleLanguage,
     setLanguage,
     t,
-    tName,
-    tDesc,
+    tName: getLocalizedName,
+    tDesc: getLocalizedDesc,
+    getLocalizedName,
+    getLocalizedDesc,
+    getLocalizedCategory,
+    getLocalizedTagline,
     translations,
   };
 

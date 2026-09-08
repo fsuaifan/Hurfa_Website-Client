@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import '../css/product-modal.css';
 
 function ProductModal({ isOpen, onClose, product, onAddToCart }) {
-  const { t, tName, tDesc } = useLanguage();
+  const { t, isArabic, getLocalizedName, getLocalizedDesc } = useLanguage();
   const [activeImage, setActiveImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState('standard'); // 'standard' | 'set2'
@@ -81,6 +81,10 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
+  const localizedName = getLocalizedName(product);
+  const localizedDesc = getLocalizedDesc(product) || 'Crafted with premium materials and signature Hurfa architectural detail.';
+  const localizedCategory = isArabic && product.arabicCategory ? product.arabicCategory : product.category;
+
   return (
     <div
       className={`product-modal-overlay ${isOpen ? 'open' : ''}`}
@@ -108,7 +112,7 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
             {activeImage && (
               <img
                 src={activeImage}
-                alt={tName(product.name || product.title || 'Product view')}
+                alt={localizedName || 'Product view'}
               />
             )}
           </div>
@@ -134,10 +138,10 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
 
         {/* Right Column: Product Information */}
         <div className="product-modal-info">
-          {product.category && (
-            <span className="product-modal-eyebrow">{t(product.category, product.category)}</span>
+          {localizedCategory && (
+            <span className="product-modal-eyebrow">{localizedCategory}</span>
           )}
-          <h2 id="modal-product-title">{tName(product.name || product.title)}</h2>
+          <h2 id="modal-product-title">{localizedName}</h2>
           
           {/* Price Display with Sale Support */}
           <div className="product-modal-price">
@@ -184,7 +188,7 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
           )}
 
           <p className="product-modal-desc">
-            {tDesc(product.desc || product.description || 'Crafted with premium materials and signature Hurfa architectural detail.')}
+            {localizedDesc}
           </p>
 
           {product.material && (

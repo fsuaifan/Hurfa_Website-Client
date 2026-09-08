@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import '../css/bedrooms.css';
 
 function Bedrooms() {
-  const { t, tName, tDesc } = useLanguage();
+  const { t, getLocalizedName, getLocalizedDesc } = useLanguage();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -64,7 +64,7 @@ function Bedrooms() {
             onClick={() => handleOpenProduct(product)}
             role="button"
             tabIndex={0}
-            aria-label={`View details for ${tName(product.name)}`}
+            aria-label={`View details for ${getLocalizedName(product)}`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 handleOpenProduct(product);
@@ -74,14 +74,14 @@ function Bedrooms() {
             <div className="bedroom-card-media">
               <img
                 src={product.images ? product.images[0] : product.image}
-                alt={tName(product.name)}
+                alt={getLocalizedName(product)}
                 loading="lazy"
               />
             </div>
             <div className="bedroom-card-body">
-              <h3>{tName(product.name)}</h3>
+              <h3>{getLocalizedName(product)}</h3>
               <p className="bedroom-card-price">{product.price}</p>
-              <p className="bedroom-card-desc">{tDesc(product.desc)}</p>
+              <p className="bedroom-card-desc">{getLocalizedDesc(product)}</p>
             </div>
           </article>
         ))}
