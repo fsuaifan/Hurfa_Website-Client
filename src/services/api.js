@@ -107,6 +107,11 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(data),
       }),
+    updateSort: (items) =>
+      request('/products/sort', {
+        method: 'PUT',
+        body: JSON.stringify({ items }),
+      }),
     delete: (id) =>
       request(`/products/${id}`, {
         method: 'DELETE',
@@ -124,6 +129,25 @@ export const api = {
   bedrooms: {
     getAll: () => request('/bedrooms'),
     getById: (id) => request(`/bedrooms/${id}`),
+    create: (data) =>
+      request('/bedrooms', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id, data) =>
+      request(`/bedrooms/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    updateSort: (items) =>
+      request('/bedrooms/sort', {
+        method: 'PUT',
+        body: JSON.stringify({ items }),
+      }),
+    delete: (id) =>
+      request(`/bedrooms/${id}`, {
+        method: 'DELETE',
+      }),
   },
 
   // Shopping Cart

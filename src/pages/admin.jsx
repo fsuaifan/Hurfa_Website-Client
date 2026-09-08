@@ -7,10 +7,10 @@ import '../css/admin.css';
 function Admin() {
   const { t, getLocalizedName, getLocalizedCategory } = useLanguage();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState('catalog'); // 'catalog' | 'orders' | 'clients'
+  const [activeSection, setActiveSection] = useState('catalog'); // 'catalog' | 'bedrooms' | 'orders' | 'clients'
   const [loading, setLoading] = useState(true);
 
-  // Catalog State
+  // Catalog State (Products)
   const [records, setRecords] = useState(() => {
     try {
       const stored = localStorage.getItem('hurfa_catalog_records');
@@ -27,6 +27,11 @@ function Admin() {
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Bedrooms State
+  const [bedroomRecords, setBedroomRecords] = useState([]);
+  const [bedroomSearchQuery, setBedroomSearchQuery] = useState('');
+  const [orderSaveToast, setOrderSaveToast] = useState('');
 
   // Orders State
   const [orders, setOrders] = useState([]);
@@ -64,6 +69,15 @@ function Admin() {
         }
       } catch (e) {
         console.warn('Catalog API warning:', e.message);
+      }
+
+      try {
+        const bedroomsData = await api.bedrooms.getAll();
+        if (isMounted && Array.isArray(bedroomsData)) {
+          setBedroomRecords(bedroomsData);
+        }
+      } catch (e) {
+        console.warn('Bedrooms API warning:', e.message);
       }
 
       try {
@@ -221,7 +235,121 @@ function Admin() {
     setIsClientModalOpen(false);
   };
 
-  // Filtered Catalog
+  // Reorder Products
+  const handleMoveProductUp = async (itemId) => {
+    const idx = records.findIndex((r) => r.id === itemId);
+    if (idx <= 0) return;
+    const next = [...records];
+    const temp = next[idx];
+    next[idx] = next[idx - 1];
+    next[idx - 1] = temp;
+    setRecords(next);
+
+    try {
+      localStorage.setItem('hurfa_catalog_records', JSON.stringify(next));
+    } catch (e) {
+      console.error(e);
+    }
+
+    const sortPayload = next.map((item, i) => ({
+      id: item.id,
+      sortOrder: i + 1,
+    }));
+    try {
+      await api.catalog.updateSort(sortPayload);
+      setOrderSaveToast(t('orderSaved', '✓ Display order updated'));
+      setTimeout(() => setOrderSaveToast(''), 2500);
+    } catch (err) {
+      console.warn('Sort update warning:', err.message);
+    }
+  };
+
+  const handleMoveProductDown = async (itemId) => {
+    const idx = records.findIndex((r) => r.id === itemId);
+    if (idx < 0 || idx >= records.length - 1) return;
+    const next = [...records];
+    const temp = next[idx];
+    next[idx] = next[idx + 1];
+    next[idx + 1] = temp;
+    setRecords(next);
+
+    try {
+      localStorage.setItem('hurfa_catalog_records', JSON.stringify(next));
+    } catch (e) {
+      console.error(e);
+    }
+
+    const sortPayload = next.map((item, i) => ({
+      id: item.id,
+      sortOrder: i + 1,
+    }));
+    try {
+      await api.catalog.updateSort(sortPayload);
+      setOrderSaveToast(t('orderSaved', '✓ Display order updated'));
+      setTimeout(() => setOrderSaveToast(''), 2500);
+    } catch (err) {
+      console.warn('Sort update warning:', err.message);
+    }
+  };
+
+  // Reorder Bedrooms
+  const handleMoveBedroomUp = async (bedroomId) => {
+    const idx = bedroomRecords.findIndex((b) => b.id === bedroomId);
+    if (idx <= 0) return;
+    const next = [...bedroomRecords];
+    const temp = next[idx];
+    next[idx] = next[idx - 1];
+    next[idx - 1] = temp;
+    setBedroomRecords(next);
+
+    const sortPayload = next.map((item, i) => ({
+      id: item.id,
+      sortOrder: i + 1,
+    }));
+    try {
+      await api.bedrooms.updateSort(sortPayload);
+      setOrderSaveToast(t('orderSaved', '✓ Display order updated'));
+      setTimeout(() => setOrderSaveToast(''), 2500);
+    } catch (err) {
+      console.warn('Bedroom sort update warning:', err.message);
+    }
+  };
+
+  const handleMoveBedroomDown = async (bedroomId) => {
+    const idx = bedroomRecords.findIndex((b) => b.id === bedroomId);
+    if (idx < 0 || idx >= bedroomRecords.length - 1) return;
+    const next = [...bedroomRecords];
+    const temp = next[idx];
+    next[idx] = next[idx + 1];
+    next[idx + 1] = temp;
+    setBedroomRecords(next);
+
+    const sortPayload = next.map((item, i) => ({
+      id: item.id,
+      sortOrder: i + 1,
+    }));
+    try {
+      await api.bedrooms.updateSort(sortPayload);
+      setOrderSaveToast(t('orderSaved', '✓ Display order updated'));
+      setTimeout(() => setOrderSaveToast(''), 2500);
+    } catch (err) {
+      console.warn('Bedroom sort update warning:', err.message);
+    }
+  };
+
+  const handleDeleteBedroom = async (id, name) => {
+    const confirmMsg = `${t('confirmDeleteBedroom', 'Are you sure you want to remove bedroom piece')} "${name}"?`;
+    if (window.confirm(confirmMsg)) {
+      try {
+        await api.bedrooms.delete(id);
+      } catch (e) {
+        console.warn('Bedroom delete fallback:', e.message);
+      }
+      setBedroomRecords((prev) => prev.filter((b) => b.id !== id));
+    }
+  };
+
+  // Filtered Catalog (Products)
   const filteredRecords = useMemo(() => {
     return records.filter((r) => {
       const matchesCategory =
@@ -232,6 +360,18 @@ function Admin() {
       return matchesCategory && matchesSearch;
     });
   }, [records, searchQuery, selectedCategory]);
+
+  // Filtered Bedrooms
+  const filteredBedrooms = useMemo(() => {
+    return bedroomRecords.filter((b) => {
+      const query = bedroomSearchQuery.toLowerCase();
+      return (
+        (b.name || '').toLowerCase().includes(query) ||
+        (b.desc || '').toLowerCase().includes(query) ||
+        (b.arabicName || '').toLowerCase().includes(query)
+      );
+    });
+  }, [bedroomRecords, bedroomSearchQuery]);
 
   // Filtered Orders
   const filteredOrders = useMemo(() => {
@@ -306,7 +446,22 @@ function Admin() {
               <rect width="7" height="9" x="14" y="12" rx="1" />
               <rect width="7" height="5" x="3" y="16" rx="1" />
             </svg>
-            {t('furnitureCatalog', 'Furniture Catalog')} ({records.length})
+            {t('furnitureProducts', 'Furniture Products')} ({records.length})
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeSection === 'bedrooms'}
+            className={`admin-nav-tab ${activeSection === 'bedrooms' ? 'active' : ''}`}
+            onClick={() => setActiveSection('bedrooms')}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M2 4v16" />
+              <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+              <path d="M2 17h20" />
+              <path d="M6 8v9" />
+            </svg>
+            {t('bedroomsCollection', 'Bedrooms Collection')} ({bedroomRecords.length})
           </button>
           <button
             type="button"
@@ -340,10 +495,30 @@ function Admin() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECTION 1: CATALOG */}
+        {/* SECTION 1: FURNITURE PRODUCTS */}
         {/* ========================================================================= */}
         {activeSection === 'catalog' && (
           <>
+            {/* Sub-nav Pills */}
+            <div className="admin-subnav-pills">
+              <button
+                type="button"
+                className="admin-subnav-pill active"
+                onClick={() => setActiveSection('catalog')}
+              >
+                {t('furnitureProducts', 'Furniture Products')}
+                <span className="pill-count">{records.length}</span>
+              </button>
+              <button
+                type="button"
+                className="admin-subnav-pill"
+                onClick={() => setActiveSection('bedrooms')}
+              >
+                {t('bedroomsCollection', 'Bedrooms Collection')}
+                <span className="pill-count">{bedroomRecords.length}</span>
+              </button>
+            </div>
+
             {/* Hurfa KPI Overview Cards */}
             <section className="admin-stats-grid" aria-label={t('furnitureCatalog', 'Catalog KPIs')}>
               <div className="admin-stat-card">
@@ -364,20 +539,18 @@ function Admin() {
 
               <div className="admin-stat-card">
                 <div className="admin-stat-top">
-                  <span className="admin-stat-label">{t('bedroomPieces', 'Bedroom Pieces')}</span>
+                  <span className="admin-stat-label">{t('orderRank', 'Display Ordering')}</span>
                   <div className="admin-stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M2 4v16" />
-                      <path d="M2 8h18a2 2 0 0 1 2 2v10" />
-                      <path d="M2 17h20" />
-                      <path d="M6 8v9" />
+                      <path d="m3 16 4 4 4-4" />
+                      <path d="M7 20V4" />
+                      <path d="m21 8-4-4-4 4" />
+                      <path d="M17 4v16" />
                     </svg>
                   </div>
                 </div>
-                <h2 className="admin-stat-value">
-                  {records.filter((r) => r.category === 'Bedrooms' || (r.category && r.category.includes('Bedroom'))).length}
-                </h2>
-                <span className="admin-stat-trend">{t('framesWardrobesNightstands', 'Frames, wardrobes & nightstands')}</span>
+                <h2 className="admin-stat-value">{t('activeInStock', 'Active')}</h2>
+                <span className="admin-stat-trend">{t('reorderCatalogDesc', 'Reorder sequence on live website')}</span>
               </div>
 
               <div className="admin-stat-card">
@@ -427,11 +600,17 @@ function Admin() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="All">{t('allCategories', 'All Categories')}</option>
-                <option value="Kitchens">{t('Kitchens', 'Kitchens')}</option>
-                <option value="Bedrooms">{t('Bedrooms', 'Bedrooms')}</option>
                 <option value="Living Room">{t('Living Room', 'Living Room')}</option>
                 <option value="Living Room Tables">{t('Living Room Tables', 'Living Room Tables')}</option>
+                <option value="Kitchens">{t('Kitchens', 'Kitchens')}</option>
+                <option value="Bedrooms">{t('Bedrooms', 'Bedrooms')}</option>
               </select>
+
+              {orderSaveToast && (
+                <div className="admin-toast-banner" role="status">
+                  {orderSaveToast}
+                </div>
+              )}
             </div>
 
             {/* Records Table Card */}
@@ -444,6 +623,7 @@ function Admin() {
                 <table className="admin-table">
                   <thead>
                     <tr>
+                      <th style={{ width: '90px' }}>{t('orderRank', 'Order')}</th>
                       <th>{t('productCol', 'Product')}</th>
                       <th>{t('category', 'Category')}</th>
                       <th>{t('price', 'Price')}</th>
@@ -454,60 +634,97 @@ function Admin() {
                   <tbody>
                     {filteredRecords.length === 0 ? (
                       <tr>
-                        <td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
+                        <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
                           {t('noMatchingRecordsFound', 'No matching records found.')}
                         </td>
                       </tr>
                     ) : (
-                      filteredRecords.map((item) => (
-                        <tr key={item.id}>
-                          <td>
-                            <div className="admin-prod-cell">
-                              <img
-                                src={item.image || item.images?.[0]}
-                                alt={getLocalizedName(item)}
-                                className="admin-prod-thumb"
-                                loading="lazy"
-                              />
-                              <div>
-                                <p className="admin-prod-title">{getLocalizedName(item)}</p>
+                      filteredRecords.map((item) => {
+                        const originalIdx = records.findIndex((r) => r.id === item.id);
+                        const isFirst = originalIdx === 0;
+                        const isLast = originalIdx === records.length - 1;
+
+                        return (
+                          <tr key={item.id}>
+                            <td>
+                              <div className="admin-reorder-cell">
+                                <span className="admin-rank-badge">#{originalIdx + 1}</span>
+                                <div className="admin-reorder-btn-group">
+                                  <button
+                                    type="button"
+                                    className="admin-reorder-btn"
+                                    onClick={() => handleMoveProductUp(item.id)}
+                                    disabled={isFirst}
+                                    title={t('moveUp', 'Move Up')}
+                                    aria-label={t('moveUp', 'Move Up')}
+                                  >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <polyline points="18 15 12 9 6 15" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="admin-reorder-btn"
+                                    onClick={() => handleMoveProductDown(item.id)}
+                                    disabled={isLast}
+                                    title={t('moveDown', 'Move Down')}
+                                    aria-label={t('moveDown', 'Move Down')}
+                                  >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td>{getLocalizedCategory(item.category || item)}</td>
-                          <td>
-                            <span className="admin-price">{item.price}</span>
-                          </td>
-                          <td>
-                            <span
-                              className={`admin-badge-stock ${
-                                item.stockStatus === 'Active' ? 'active' : 'low'
-                              }`}
-                            >
-                              {t(item.stockStatus || 'Active', item.stockStatus || 'Active')}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="admin-actions-cell">
-                              <Link
-                                to={`/editor?id=${item.id}`}
-                                className="admin-action-btn edit"
-                                title={t('editPiece', 'Edit piece specifications')}
+                            </td>
+                            <td>
+                              <div className="admin-prod-cell">
+                                <img
+                                  src={item.image || item.images?.[0]}
+                                  alt={getLocalizedName(item)}
+                                  className="admin-prod-thumb"
+                                  loading="lazy"
+                                />
+                                <div>
+                                  <p className="admin-prod-title">{getLocalizedName(item)}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td>{getLocalizedCategory(item.category || item)}</td>
+                            <td>
+                              <span className="admin-price">{item.price}</span>
+                            </td>
+                            <td>
+                              <span
+                                className={`admin-badge-stock ${
+                                  item.stockStatus === 'Active' ? 'active' : 'low'
+                                }`}
                               >
-                                {t('edit', 'Edit')}
-                              </Link>
-                              <button
-                                type="button"
-                                className="admin-action-btn delete"
-                                onClick={() => handleDeleteRecord(item.id, item.name)}
-                                title={t('deletePiece', 'Remove piece from catalog')}
-                              >
-                                {t('delete', 'Delete')}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
+                                {t(item.stockStatus || 'Active', item.stockStatus || 'Active')}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="admin-actions-cell">
+                                <Link
+                                  to={`/editor?id=${item.id}`}
+                                  className="admin-action-btn edit"
+                                  title={t('editPiece', 'Edit piece specifications')}
+                                >
+                                  {t('edit', 'Edit')}
+                                </Link>
+                                <button
+                                  type="button"
+                                  className="admin-action-btn delete"
+                                  onClick={() => handleDeleteRecord(item.id, item.name)}
+                                  title={t('deletePiece', 'Remove piece from catalog')}
+                                >
+                                  {t('delete', 'Delete')}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -517,7 +734,224 @@ function Admin() {
         )}
 
         {/* ========================================================================= */}
-        {/* SECTION 2: ORDERS & INQUIRIES */}
+        {/* SECTION 2: BEDROOMS COLLECTION */}
+        {/* ========================================================================= */}
+        {activeSection === 'bedrooms' && (
+          <>
+            {/* Sub-nav Pills */}
+            <div className="admin-subnav-pills">
+              <button
+                type="button"
+                className="admin-subnav-pill"
+                onClick={() => setActiveSection('catalog')}
+              >
+                {t('furnitureProducts', 'Furniture Products')}
+                <span className="pill-count">{records.length}</span>
+              </button>
+              <button
+                type="button"
+                className="admin-subnav-pill active"
+                onClick={() => setActiveSection('bedrooms')}
+              >
+                {t('bedroomsCollection', 'Bedrooms Collection')}
+                <span className="pill-count">{bedroomRecords.length}</span>
+              </button>
+            </div>
+
+            {/* Bedrooms KPIs */}
+            <section className="admin-stats-grid" aria-label={t('bedroomsCollection', 'Bedrooms KPIs')}>
+              <div className="admin-stat-card">
+                <div className="admin-stat-top">
+                  <span className="admin-stat-label">{t('totalBedroomPieces', 'Total Bedroom Pieces')}</span>
+                  <div className="admin-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M2 4v16" />
+                      <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+                      <path d="M2 17h20" />
+                      <path d="M6 8v9" />
+                    </svg>
+                  </div>
+                </div>
+                <h2 className="admin-stat-value">{bedroomRecords.length}</h2>
+                <span className="admin-stat-trend">{t('liveAcrossWeb', 'Live across web & boutique')}</span>
+              </div>
+
+              <div className="admin-stat-card">
+                <div className="admin-stat-top">
+                  <span className="admin-stat-label">{t('orderRank', 'Display Ordering')}</span>
+                  <div className="admin-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="m3 16 4 4 4-4" />
+                      <path d="M7 20V4" />
+                      <path d="m21 8-4-4-4 4" />
+                      <path d="M17 4v16" />
+                    </svg>
+                  </div>
+                </div>
+                <h2 className="admin-stat-value">{t('activeInStock', 'Active')}</h2>
+                <span className="admin-stat-trend">{t('reorderCatalogDesc', 'Reorder sequence on live website')}</span>
+              </div>
+
+              <div className="admin-stat-card">
+                <div className="admin-stat-top">
+                  <span className="admin-stat-label">{t('theTayfSuite', 'Featured Bedroom Suite')}</span>
+                  <div className="admin-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </div>
+                </div>
+                <h2 className="admin-stat-value">Tayf</h2>
+                <span className="admin-stat-trend">{t('chicOrganicContemporary', 'Solid Walnut & Organic Minimalist')}</span>
+              </div>
+
+              <div className="admin-stat-card">
+                <div className="admin-stat-top">
+                  <span className="admin-stat-label">{t('warranty', 'Structural Warranty')}</span>
+                  <div className="admin-stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                    </svg>
+                  </div>
+                </div>
+                <h2 className="admin-stat-value">5 Yrs</h2>
+                <span className="admin-stat-trend">{t('warranty5Year', 'Craftsmanship Warranty')}</span>
+              </div>
+            </section>
+
+            {/* Filter and Search Controls */}
+            <div className="admin-table-controls">
+              <input
+                type="text"
+                className="admin-search-input"
+                placeholder={t('searchBedroomsPlaceholder', 'Search bedrooms by model or wood type...')}
+                value={bedroomSearchQuery}
+                onChange={(e) => setBedroomSearchQuery(e.target.value)}
+              />
+
+              {orderSaveToast && (
+                <div className="admin-toast-banner" role="status">
+                  {orderSaveToast}
+                </div>
+              )}
+            </div>
+
+            {/* Bedrooms Table Card */}
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <h2>{t('bedroomsCollection', 'Bedrooms Collection')} ({filteredBedrooms.length})</h2>
+              </div>
+
+              <div className="admin-table-responsive">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '90px' }}>{t('orderRank', 'Order')}</th>
+                      <th>{t('bedroomPiece', 'Bedroom Piece')}</th>
+                      <th>{t('standardPrice', 'Standard Price')}</th>
+                      <th>{t('wardrobeOptionPrice', 'With Wardrobe / Option B')}</th>
+                      <th>{t('status', 'Status')}</th>
+                      <th>{t('actions', 'Actions')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredBedrooms.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                          {t('noMatchingBedroomsFound', 'No matching bedroom pieces found.')}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredBedrooms.map((item) => {
+                        const originalIdx = bedroomRecords.findIndex((b) => b.id === item.id);
+                        const isFirst = originalIdx === 0;
+                        const isLast = originalIdx === bedroomRecords.length - 1;
+
+                        return (
+                          <tr key={item.id}>
+                            <td>
+                              <div className="admin-reorder-cell">
+                                <span className="admin-rank-badge">#{originalIdx + 1}</span>
+                                <div className="admin-reorder-btn-group">
+                                  <button
+                                    type="button"
+                                    className="admin-reorder-btn"
+                                    onClick={() => handleMoveBedroomUp(item.id)}
+                                    disabled={isFirst}
+                                    title={t('moveUp', 'Move Up')}
+                                    aria-label={t('moveUp', 'Move Up')}
+                                  >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <polyline points="18 15 12 9 6 15" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="admin-reorder-btn"
+                                    onClick={() => handleMoveBedroomDown(item.id)}
+                                    disabled={isLast}
+                                    title={t('moveDown', 'Move Down')}
+                                    aria-label={t('moveDown', 'Move Down')}
+                                  >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="admin-prod-cell">
+                                <img
+                                  src={item.image || item.images?.[0]}
+                                  alt={getLocalizedName(item)}
+                                  className="admin-prod-thumb"
+                                  loading="lazy"
+                                />
+                                <div>
+                                  <p className="admin-prod-title">{getLocalizedName(item)}</p>
+                                  {item.desc && (
+                                    <small style={{ color: '#7d7365' }}>{item.desc.slice(0, 50)}...</small>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <span className="admin-price">{item.price}</span>
+                            </td>
+                            <td>
+                              <span className="admin-price">{item.price2Formatted || item.price2 || '—'}</span>
+                            </td>
+                            <td>
+                              <span className="admin-badge-stock active">
+                                {t('activeInStock', 'Active')}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="admin-actions-cell">
+                                <button
+                                  type="button"
+                                  className="admin-action-btn delete"
+                                  onClick={() => handleDeleteBedroom(item.id, item.name)}
+                                  title={t('deletePiece', 'Remove bedroom piece')}
+                                >
+                                  {t('delete', 'Delete')}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ========================================================================= */}
+        {/* SECTION 3: ORDERS & INQUIRIES */}
         {/* ========================================================================= */}
         {activeSection === 'orders' && (
           <>
