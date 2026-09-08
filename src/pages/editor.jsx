@@ -49,7 +49,8 @@ function Editor() {
     category: queryType === 'bedroom' ? 'Bedrooms' : 'Kitchens',
     price: '',
     price2: '',
-    stockStatus: 'Active',
+    stockStatus: 'In Stock',
+    isVisible: true,
     image: '',
     desc: '',
     dimensions: '',
@@ -88,7 +89,8 @@ function Editor() {
               category: isBed ? 'Bedrooms' : (item.category || 'Kitchens'),
               price: item.price || item.priceNumber || '',
               price2: item.price2 || item.price2Formatted || '',
-              stockStatus: (item.isVisible === false || item.stockStatus === 'Hidden') ? 'Hidden' : (item.stockStatus || 'Active'),
+              stockStatus: item.stockStatus || 'In Stock',
+              isVisible: item.isVisible !== false,
               image: item.image || item.images?.[0] || '',
               desc: item.desc || '',
               dimensions: item.dimensions || '',
@@ -134,7 +136,8 @@ function Editor() {
       : `JOD ${formData.price.trim()}`;
 
     const isBedroom = formData.category === 'Bedrooms' || queryType === 'bedroom';
-    const isHidden = formData.stockStatus === 'Hidden';
+    const finalIsVisible = formData.isVisible !== false;
+    const finalStockStatus = formData.stockStatus || 'In Stock';
     const cleanPrice = String(formData.price).replace(/[^0-9.]/g, '');
     const cleanPrice2 = String(formData.price2 || '').replace(/[^0-9.]/g, '');
 
@@ -146,10 +149,10 @@ function Editor() {
           img: finalImage,
           price: cleanPrice ? parseFloat(cleanPrice) : null,
           price2: cleanPrice2 ? parseFloat(cleanPrice2) : null,
-          isvisible: !isHidden,
-          isVisible: !isHidden,
-          stock_status: formData.stockStatus,
-          stockStatus: formData.stockStatus,
+          isvisible: finalIsVisible,
+          isVisible: finalIsVisible,
+          stock_status: finalStockStatus,
+          stockStatus: finalStockStatus,
         };
 
         if (isEditMode) {
@@ -162,10 +165,10 @@ function Editor() {
           name: formData.name.trim(),
           category: formData.category,
           price: formattedPrice,
-          stockStatus: formData.stockStatus,
-          stock_status: formData.stockStatus,
-          isVisible: !isHidden,
-          isvisible: !isHidden,
+          stockStatus: finalStockStatus,
+          stock_status: finalStockStatus,
+          isVisible: finalIsVisible,
+          isvisible: finalIsVisible,
           img: finalImage,
           desc: formData.desc.trim(),
           dimensions: formData.dimensions.trim(),
@@ -355,7 +358,7 @@ function Editor() {
 
               <div className="admin-form-group">
                 <label htmlFor="stockStatus" className="admin-form-label">
-                  {t('stockStatus', 'Stock Status & Visibility')}
+                  {t('stockStatus', 'Stock Status')}
                 </label>
                 <select
                   id="stockStatus"
@@ -364,10 +367,30 @@ function Editor() {
                   value={formData.stockStatus}
                   onChange={handleChange}
                 >
-                  <option value="Active">{t('visibleActive', 'Visible (Active / In Stock)')}</option>
-                  <option value="Hidden">{t('hiddenPiece', 'Hidden (Hide from Website)')}</option>
-                  <option value="Low Stock">{t('lowStock', 'Low Stock')}</option>
-                  <option value="Made to Order">{t('madeToOrder', 'Made to Order (Bespoke)')}</option>
+                  <option value="In Stock">{t('inStock', 'In-stock')}</option>
+                  <option value="Low Stock">{t('lowStock', 'Low-stock')}</option>
+                  <option value="Out of Stock">{t('outOfStock', 'Out-of-stock')}</option>
+                </select>
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="isVisible" className="admin-form-label">
+                  {t('visibility', 'Catalog Visibility')}
+                </label>
+                <select
+                  id="isVisible"
+                  name="isVisible"
+                  className="admin-form-select"
+                  value={formData.isVisible ? 'visible' : 'hidden'}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isVisible: e.target.value === 'visible',
+                    }))
+                  }
+                >
+                  <option value="visible">{t('visibleActive', 'Visible (Published on Website)')}</option>
+                  <option value="hidden">{t('hiddenPiece', 'Hidden (Draft / Unpublished)')}</option>
                 </select>
               </div>
             </div>
