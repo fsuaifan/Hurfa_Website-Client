@@ -14,12 +14,20 @@ const PRESET_IMAGES = [
     url: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg?updatedAt=1787138960280',
   },
   {
-    label: 'Tayf Kitchen',
+    label: 'Tayf Bedroom / Suite',
     url: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Tayf_4iPZv6iGf.png?updatedAt=1782466205843',
   },
   {
     label: 'Oud Collection',
     url: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Oud-Collection_u9dsnBlwn.jpg?updatedAt=1787138978278',
+  },
+  {
+    label: 'Rawas Suite',
+    url: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Rawas_II_J2llqj_AWB.png',
+  },
+  {
+    label: 'Barah Suite',
+    url: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Sanam_lq-is0WSy.png',
   },
   {
     label: 'Kitchen Island V4',
@@ -32,13 +40,15 @@ function Editor() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const productId = searchParams.get('id');
+  const queryType = searchParams.get('type');
   const isEditMode = Boolean(productId);
 
   // Initialize form state
   const [formData, setFormData] = useState({
     name: '',
-    category: 'Kitchens',
+    category: queryType === 'bedroom' ? 'Bedrooms' : 'Kitchens',
     price: '',
+    price2: '',
     stockStatus: 'Active',
     image: '',
     desc: '',
@@ -50,19 +60,35 @@ function Editor() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showImgKitModal, setShowImgKitModal] = useState(false);
 
-  // Fetch product from API if in edit mode
+  // Fetch product or bedroom from API if in edit mode
   useEffect(() => {
     let isMounted = true;
     async function loadItem() {
       if (productId) {
         try {
-          const item = await api.catalog.getById(productId);
+          let item = null;
+          if (queryType === 'bedroom') {
+            try {
+              item = await api.bedrooms.getById(productId);
+            } catch (e) {
+              item = await api.catalog.getById(productId);
+            }
+          } else {
+            try {
+              item = await api.catalog.getById(productId);
+            } catch (e) {
+              item = await api.bedrooms.getById(productId);
+            }
+          }
+
           if (isMounted && item && !item.message) {
+            const isBed = queryType === 'bedroom' || item.category === 'Bedrooms';
             setFormData({
               name: item.name || '',
-              category: item.category || 'Kitchens',
+              category: isBed ? 'Bedrooms' : (item.category || 'Kitchens'),
               price: item.price || item.priceNumber || '',
-              stockStatus: item.stockStatus || 'Active',
+              price2: item.price2 || item.price2Formatted || '',
+              stockStatus: (item.isVisible === false || item.stockStatus === 'Hidden') ? 'Hidden' : (item.stockStatus || 'Active'),
               image: item.image || item.images?.[0] || '',
               desc: item.desc || '',
               dimensions: item.dimensions || '',
@@ -78,7 +104,7 @@ function Editor() {
     return () => {
       isMounted = false;
     };
-  }, [productId]);
+  }, [productId, queryType]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,7 +121,7 @@ function Editor() {
     if (!formData.name.trim() || !formData.price.trim()) {
       setStatusMessage({
         type: 'error',
-        text: t('editorFillRequired', 'Please provide both a product name and price.'),
+        text: t('editorFillRequired', 'Please provide both a piece name and price.'),
       });
       return;
     }
@@ -107,69 +133,57 @@ function Editor() {
       ? formData.price.trim()
       : `JOD ${formData.price.trim()}`;
 
-    const payload = {
-      name: formData.name.trim(),
-      category: formData.category,
-      price: formattedPrice,
-      stockStatus: formData.stockStatus,
-      img: finalImage,
-      desc: formData.desc.trim(),
-      dimensions: formData.dimensions.trim(),
-      material: formData.material.trim(),
-    };
+    const isBedroom = formData.category === 'Bedrooms' || queryType === 'bedroom';
+    const isHidden = formData.stockStatus === 'Hidden';
+    const cleanPrice = String(formData.price).replace(/[^0-9.]/g, '');
+    const cleanPrice2 = String(formData.price2 || '').replace(/[^0-9.]/g, '');
 
     try {
-      if (isEditMode) {
-        await api.catalog.update(productId, payload);
-      } else {
-        await api.catalog.create(payload);
-      }
-    } catch (err) {
-      console.warn('Catalog API warning:', err.message);
-    }
+      if (isBedroom) {
+        const bedroomPayload = {
+          name: formData.name.trim(),
+          desc: formData.desc.trim(),
+          img: finalImage,
+          price: cleanPrice ? parseFloat(cleanPrice) : null,
+          price2: cleanPrice2 ? parseFloat(cleanPrice2) : null,
+          isvisible: !isHidden,
+          isVisible: !isHidden,
+          stock_status: formData.stockStatus,
+          stockStatus: formData.stockStatus,
+        };
 
-    try {
-      const stored = localStorage.getItem('hurfa_catalog_records');
-      let records = stored ? JSON.parse(stored) : [];
-
-      if (isEditMode) {
-        records = records.map((item) =>
-          String(item.id) === String(productId)
-            ? {
-                ...item,
-                name: formData.name.trim(),
-                category: formData.category,
-                price: formattedPrice,
-                stockStatus: formData.stockStatus,
-                image: finalImage,
-                desc: formData.desc.trim(),
-                dimensions: formData.dimensions.trim(),
-                material: formData.material.trim(),
-              }
-            : item
-        );
+        if (isEditMode) {
+          await api.bedrooms.update(productId, bedroomPayload);
+        } else {
+          await api.bedrooms.create(bedroomPayload);
+        }
       } else {
-        const newProduct = {
-          id: Date.now(),
+        const catalogPayload = {
           name: formData.name.trim(),
           category: formData.category,
           price: formattedPrice,
           stockStatus: formData.stockStatus,
-          image: finalImage,
+          stock_status: formData.stockStatus,
+          isVisible: !isHidden,
+          isvisible: !isHidden,
+          img: finalImage,
           desc: formData.desc.trim(),
           dimensions: formData.dimensions.trim(),
           material: formData.material.trim(),
         };
-        records = [newProduct, ...records];
-      }
 
-      localStorage.setItem('hurfa_catalog_records', JSON.stringify(records));
+        if (isEditMode) {
+          await api.catalog.update(productId, catalogPayload);
+        } else {
+          await api.catalog.create(catalogPayload);
+        }
+      }
 
       setStatusMessage({
         type: 'success',
         text: isEditMode
-          ? t('editorChangesSaved', 'Product changes saved successfully!')
-          : t('editorAddedSuccess', 'New product added to catalog!'),
+          ? t('editorChangesSaved', 'Piece changes saved successfully!')
+          : t('editorAddedSuccess', 'New piece added to catalog!'),
       });
 
       setTimeout(() => {
@@ -305,23 +319,43 @@ function Editor() {
             <div className="admin-form-grid">
               <div className="admin-form-group">
                 <label htmlFor="price" className="admin-form-label">
-                  {t('priceJod', 'Price (JOD)')} <span className="required">*</span>
+                  {formData.category === 'Bedrooms'
+                    ? t('standardPrice', 'Standard Price (JOD)')
+                    : t('priceJod', 'Price (JOD)')}{' '}
+                  <span className="required">*</span>
                 </label>
                 <input
                   type="text"
                   id="price"
                   name="price"
                   className="admin-form-input"
-                  placeholder="e.g. 420 or JOD 420"
+                  placeholder={formData.category === 'Bedrooms' ? 'e.g. 1450' : 'e.g. 420 or JOD 420'}
                   value={formData.price}
                   onChange={handleChange}
                   required
                 />
               </div>
 
+              {formData.category === 'Bedrooms' && (
+                <div className="admin-form-group">
+                  <label htmlFor="price2" className="admin-form-label">
+                    {t('wardrobeOptionPrice', 'With Wardrobe / Option B (JOD)')}
+                  </label>
+                  <input
+                    type="text"
+                    id="price2"
+                    name="price2"
+                    className="admin-form-input"
+                    placeholder="e.g. 2100"
+                    value={formData.price2}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+
               <div className="admin-form-group">
                 <label htmlFor="stockStatus" className="admin-form-label">
-                  {t('stockStatus', 'Stock Status')}
+                  {t('stockStatus', 'Stock Status & Visibility')}
                 </label>
                 <select
                   id="stockStatus"
@@ -330,7 +364,8 @@ function Editor() {
                   value={formData.stockStatus}
                   onChange={handleChange}
                 >
-                  <option value="Active">{t('activeInStock', 'Active / In Stock')}</option>
+                  <option value="Active">{t('visibleActive', 'Visible (Active / In Stock)')}</option>
+                  <option value="Hidden">{t('hiddenPiece', 'Hidden (Hide from Website)')}</option>
                   <option value="Low Stock">{t('lowStock', 'Low Stock')}</option>
                   <option value="Made to Order">{t('madeToOrder', 'Made to Order (Bespoke)')}</option>
                 </select>

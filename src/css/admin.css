@@ -459,6 +459,22 @@ html[lang="ar"] .admin-table {
   border: 1px solid #fde68a;
 }
 
+.admin-badge-stock.hidden {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.admin-row-hidden {
+  background-color: rgba(248, 250, 252, 0.6) !important;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.admin-row-hidden:hover {
+  opacity: 0.95;
+}
+
 /* Order Status Badges */
 .admin-status-badge {
   display: inline-flex;
@@ -540,6 +556,40 @@ html[lang="ar"] .admin-table {
   background-color: #c0392b;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+}
+
+.admin-action-btn.visibility {
+  background-color: #f1f5f9;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1;
+}
+
+.admin-action-btn.visibility:hover {
+  background-color: #e2e8f0;
+  color: #1e293b !important;
+  transform: translateY(-1px);
+}
+
+.admin-action-btn.visibility.hide {
+  background-color: #fef2f2;
+  color: #b91c1c !important;
+  border: 1px solid #fecaca;
+}
+
+.admin-action-btn.visibility.hide:hover {
+  background-color: #fee2e2;
+  color: #991b1b !important;
+}
+
+.admin-action-btn.visibility.show {
+  background-color: #f0fdf4;
+  color: #15803d !important;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-action-btn.visibility.show:hover {
+  background-color: #dcfce7;
+  color: #166534 !important;
 }
 
 /* ==========================================================================

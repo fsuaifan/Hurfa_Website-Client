@@ -362,6 +362,7 @@ function Admin() {
   };
 
   const openEditBedroomModal = (bedroom) => {
+    const isHidden = bedroom.isVisible === false || bedroom.stockStatus === 'Hidden';
     setEditingBedroom({
       id: bedroom.id,
       name: bedroom.name || '',
@@ -369,8 +370,8 @@ function Admin() {
       price: bedroom.price || '',
       price2: bedroom.price2 || bedroom.price2Formatted || '',
       image: bedroom.image || bedroom.images?.[0] || '',
-      isVisible: bedroom.isVisible !== false,
-      stockStatus: bedroom.isVisible !== false ? 'Active' : 'Low Stock',
+      isVisible: !isHidden,
+      stockStatus: isHidden ? 'Hidden' : (bedroom.stockStatus || 'Active'),
     });
     setIsBedroomModalOpen(true);
   };
@@ -382,6 +383,7 @@ function Admin() {
     setIsSavingBedroom(true);
     const cleanPrice = String(editingBedroom.price).replace(/[^0-9.]/g, '');
     const cleanPrice2 = String(editingBedroom.price2).replace(/[^0-9.]/g, '');
+    const isHidden = editingBedroom.isVisible === false || editingBedroom.stockStatus === 'Hidden';
 
     const payload = {
       name: editingBedroom.name.trim(),
@@ -389,9 +391,10 @@ function Admin() {
       img: editingBedroom.image.trim(),
       price: cleanPrice ? parseFloat(cleanPrice) : null,
       price2: cleanPrice2 ? parseFloat(cleanPrice2) : null,
-      isvisible: editingBedroom.isVisible !== false,
-      isVisible: editingBedroom.isVisible !== false,
-      stock_status: editingBedroom.isVisible !== false ? 'Active' : 'Low Stock',
+      isvisible: !isHidden,
+      isVisible: !isHidden,
+      stock_status: isHidden ? 'Hidden' : (editingBedroom.stockStatus || 'Active'),
+      stockStatus: isHidden ? 'Hidden' : (editingBedroom.stockStatus || 'Active'),
     };
 
     try {
@@ -426,20 +429,27 @@ function Admin() {
   };
 
   const handleToggleProductStatus = async (item) => {
-    const isCurrentlyActive = item.stockStatus === 'Active';
-    const nextStatus = isCurrentlyActive ? 'Low Stock' : 'Active';
+    const isCurrentlyHidden = item.isVisible === false || item.stockStatus === 'Hidden';
+    const nextIsVisible = isCurrentlyHidden;
+    const nextStatus = nextIsVisible ? 'Active' : 'Hidden';
 
     // Optimistic update
     setRecords((prev) =>
-      prev.map((r) => (r.id === item.id ? { ...r, stockStatus: nextStatus } : r))
+      prev.map((r) => (r.id === item.id ? { ...r, isVisible: nextIsVisible, stockStatus: nextStatus } : r))
     );
 
     try {
       await api.catalog.update(item.id, {
         stockStatus: nextStatus,
-        isVisible: nextStatus === 'Active',
+        stock_status: nextStatus,
+        isVisible: nextIsVisible,
+        isvisible: nextIsVisible,
       });
-      setOrderSaveToast(t('statusUpdatedSuccess', 'Status updated successfully!'));
+      setOrderSaveToast(
+        nextIsVisible
+          ? t('pieceVisibleSuccess', 'Piece is now visible on the website.')
+          : t('pieceHiddenSuccess', 'Piece is now hidden from the website.')
+      );
       setTimeout(() => setOrderSaveToast(''), 2500);
     } catch (err) {
       console.warn('Toggle product status warning:', err.message);
@@ -447,9 +457,9 @@ function Admin() {
   };
 
   const handleToggleBedroomStatus = async (bedroom) => {
-    const isCurrentlyActive = bedroom.isVisible !== false && bedroom.stockStatus !== 'Low Stock';
-    const nextIsVisible = !isCurrentlyActive;
-    const nextStatus = nextIsVisible ? 'Active' : 'Low Stock';
+    const isCurrentlyHidden = bedroom.isVisible === false || bedroom.stockStatus === 'Hidden';
+    const nextIsVisible = isCurrentlyHidden;
+    const nextStatus = nextIsVisible ? 'Active' : 'Hidden';
 
     // Optimistic update
     setBedroomRecords((prev) =>
@@ -463,8 +473,13 @@ function Admin() {
         isvisible: nextIsVisible,
         isVisible: nextIsVisible,
         stock_status: nextStatus,
+        stockStatus: nextStatus,
       });
-      setOrderSaveToast(t('statusUpdatedSuccess', 'Status updated successfully!'));
+      setOrderSaveToast(
+        nextIsVisible
+          ? t('pieceVisibleSuccess', 'Piece is now visible on the website.')
+          : t('pieceHiddenSuccess', 'Piece is now hidden from the website.')
+      );
       setTimeout(() => setOrderSaveToast(''), 2500);
     } catch (err) {
       console.warn('Toggle bedroom status warning:', err.message);
@@ -766,8 +781,10 @@ function Admin() {
                         const isFirst = originalIdx === 0;
                         const isLast = originalIdx === records.length - 1;
 
+                        const isHidden = item.isVisible === false || item.stockStatus === 'Hidden';
+
                         return (
-                          <tr key={item.id}>
+                          <tr key={item.id} className={isHidden ? 'admin-row-hidden' : ''}>
                             <td>
                               <div className="admin-reorder-cell">
                                 <span className="admin-rank-badge">#{originalIdx + 1}</span>
@@ -820,12 +837,12 @@ function Admin() {
                               <button
                                 type="button"
                                 className={`admin-badge-stock clickable ${
-                                  item.stockStatus === 'Active' ? 'active' : 'low'
+                                  isHidden ? 'hidden' : (item.stockStatus === 'Low Stock' ? 'low' : 'active')
                                 }`}
                                 onClick={() => handleToggleProductStatus(item)}
-                                title={t('clickToToggleStatus', 'Click to toggle active/low stock status')}
+                                title={t('clickToToggleVisibility', 'Click to toggle visibility (Visible / Hidden)')}
                               >
-                                {t(item.stockStatus || 'Active', item.stockStatus || 'Active')}
+                                {isHidden ? t('hidden', 'Hidden') : t(item.stockStatus || 'Active', item.stockStatus || 'Active')}
                               </button>
                             </td>
                             <td>
@@ -837,6 +854,14 @@ function Admin() {
                                 >
                                   {t('edit', 'Edit')}
                                 </Link>
+                                <button
+                                  type="button"
+                                  className={`admin-action-btn visibility ${isHidden ? 'show' : 'hide'}`}
+                                  onClick={() => handleToggleProductStatus(item)}
+                                  title={isHidden ? t('showPiece', 'Show piece on website') : t('hidePiece', 'Hide piece from website')}
+                                >
+                                  {isHidden ? t('show', 'Show') : t('hide', 'Hide')}
+                                </button>
                                 <button
                                   type="button"
                                   className="admin-action-btn delete"
@@ -992,8 +1017,10 @@ function Admin() {
                         const isFirst = originalIdx === 0;
                         const isLast = originalIdx === bedroomRecords.length - 1;
 
+                        const isHidden = item.isVisible === false || item.stockStatus === 'Hidden';
+
                         return (
-                          <tr key={item.id}>
+                          <tr key={item.id} className={isHidden ? 'admin-row-hidden' : ''}>
                             <td>
                               <div className="admin-reorder-cell">
                                 <span className="admin-rank-badge">#{originalIdx + 1}</span>
@@ -1051,25 +1078,30 @@ function Admin() {
                               <button
                                 type="button"
                                 className={`admin-badge-stock clickable ${
-                                  item.isVisible !== false && item.stockStatus !== 'Low Stock' ? 'active' : 'low'
+                                  isHidden ? 'hidden' : 'active'
                                 }`}
                                 onClick={() => handleToggleBedroomStatus(item)}
-                                title={t('clickToToggleStatus', 'Click to toggle active/low stock status')}
+                                title={t('clickToToggleVisibility', 'Click to toggle visibility (Visible / Hidden)')}
                               >
-                                {item.isVisible !== false && item.stockStatus !== 'Low Stock'
-                                  ? t('activeInStock', 'Active')
-                                  : t('lowStock', 'Low Stock')}
+                                {isHidden ? t('hidden', 'Hidden') : t('activeInStock', 'Active')}
                               </button>
                             </td>
                             <td>
                               <div className="admin-actions-cell">
-                                <button
-                                  type="button"
+                                <Link
+                                  to={`/editor?id=${item.id}&type=bedroom`}
                                   className="admin-action-btn edit"
-                                  onClick={() => openEditBedroomModal(item)}
                                   title={t('editPiece', 'Edit piece specifications')}
                                 >
                                   {t('edit', 'Edit')}
+                                </Link>
+                                <button
+                                  type="button"
+                                  className={`admin-action-btn visibility ${isHidden ? 'show' : 'hide'}`}
+                                  onClick={() => handleToggleBedroomStatus(item)}
+                                  title={isHidden ? t('showPiece', 'Show piece on website') : t('hidePiece', 'Hide piece from website')}
+                                >
+                                  {isHidden ? t('show', 'Show') : t('hide', 'Hide')}
                                 </button>
                                 <button
                                   type="button"
@@ -1803,21 +1835,26 @@ function Admin() {
 
                   <div className="admin-form-group">
                     <label className="admin-form-label" htmlFor="bedroom-status">
-                      {t('status', 'Status')}
+                      {t('stockStatus', 'Stock Status & Visibility')}
                     </label>
                     <select
                       id="bedroom-status"
                       className="admin-form-select"
-                      value={editingBedroom.isVisible ? 'Active' : 'Low Stock'}
+                      value={
+                        editingBedroom.isVisible === false || editingBedroom.stockStatus === 'Hidden'
+                          ? 'Hidden'
+                          : editingBedroom.stockStatus || 'Active'
+                      }
                       onChange={(e) =>
                         setEditingBedroom({
                           ...editingBedroom,
-                          isVisible: e.target.value === 'Active',
+                          isVisible: e.target.value !== 'Hidden',
                           stockStatus: e.target.value,
                         })
                       }
                     >
-                      <option value="Active">{t('activeInStock', 'Active')}</option>
+                      <option value="Active">{t('visibleActive', 'Visible (Active)')}</option>
+                      <option value="Hidden">{t('hiddenPiece', 'Hidden (Hide from Website)')}</option>
                       <option value="Low Stock">{t('lowStock', 'Low Stock')}</option>
                     </select>
                   </div>

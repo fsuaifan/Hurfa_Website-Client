@@ -88,6 +88,7 @@ export const api = {
   products: {
     getAll: (params = {}) => {
       const query = new URLSearchParams();
+      if (params.all) query.append('all', 'true');
       if (params.category && params.category !== 'All') query.append('category', params.category);
       if (params.search) query.append('search', params.search);
       if (params.sort && params.sort !== 'default') query.append('sort', params.sort);
@@ -204,6 +205,7 @@ export const api = {
     getStats: () => request('/catalog/stats'),
     getAll: (params = {}) => {
       const query = new URLSearchParams();
+      if (params.all !== false) query.append('all', 'true');
       if (params.category && params.category !== 'All') query.append('category', params.category);
       if (params.search) query.append('search', params.search);
       if (params.sort) query.append('sort', params.sort);
