@@ -462,6 +462,11 @@ const translations = {
     clientDetails: 'Client Details',
     initialProjects: 'Completed Projects',
     initialSpent: 'Total Spent / Value',
+    deleteOrder: 'Delete Order',
+    confirmDeleteOrder: 'Are you sure you want to delete order',
+    deleteClient: 'Delete Client',
+    confirmDeleteClient: 'Are you sure you want to delete client',
+    fromClientDirectory: 'from the client directory?',
 
     // --- Signature & Premium Collections Fallbacks ---
     'The Oud Collection': 'The Oud Collection',
@@ -949,6 +954,11 @@ const translations = {
     clientDetails: 'تفاصيل العميل',
     initialProjects: 'المشاريع المنجزة',
     initialSpent: 'إجمالي القيمة / المشتريات',
+    deleteOrder: 'حذف الطلب',
+    confirmDeleteOrder: 'هل أنت متأكد من حذف الطلب',
+    deleteClient: 'حذف العميل',
+    confirmDeleteClient: 'هل أنت متأكد من حذف العميل',
+    fromClientDirectory: 'من دليل العملاء؟',
 
     // --- Signature & Premium Collections Fallbacks ---
     'The Oud Collection': 'مجموعة العود',

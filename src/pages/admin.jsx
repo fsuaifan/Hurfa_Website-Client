@@ -117,6 +117,30 @@ function Admin() {
     }
   };
 
+  const handleDeleteOrder = async (orderId, clientName) => {
+    const confirmMsg = `${t('confirmDeleteOrder', 'Are you sure you want to delete order')} ${orderId}${clientName ? ` (${clientName})` : ''}?`;
+    if (window.confirm(confirmMsg)) {
+      try {
+        await api.orders.delete(orderId);
+      } catch (e) {
+        console.warn('Delete order API fallback:', e.message);
+      }
+      setOrders((prev) => prev.filter((o) => o.id !== orderId && o.orderId !== orderId));
+    }
+  };
+
+  const handleDeleteClient = async (clientId, clientName) => {
+    const confirmMsg = `${t('confirmDeleteClient', 'Are you sure you want to delete client')} "${clientName}" ${t('fromClientDirectory', 'from the client directory?')}`;
+    if (window.confirm(confirmMsg)) {
+      try {
+        await api.clients.delete(clientId);
+      } catch (e) {
+        console.warn('Delete client API fallback:', e.message);
+      }
+      setClients((prev) => prev.filter((c) => c.id !== clientId));
+    }
+  };
+
   const openUpdateOrderModal = (order) => {
     setSelectedOrder(order);
     setNewOrderStatus(order.status || 'In Production');
@@ -638,13 +662,24 @@ function Admin() {
                             </span>
                           </td>
                           <td>
-                            <button
-                              type="button"
-                              className="admin-action-btn edit"
-                              onClick={() => openUpdateOrderModal(order)}
-                            >
-                              {t('update', 'Update')}
-                            </button>
+                            <div className="admin-actions-cell">
+                              <button
+                                type="button"
+                                className="admin-action-btn edit"
+                                onClick={() => openUpdateOrderModal(order)}
+                                title={t('updateOrder', 'Update order status')}
+                              >
+                                {t('update', 'Update')}
+                              </button>
+                              <button
+                                type="button"
+                                className="admin-action-btn delete"
+                                onClick={() => handleDeleteOrder(order.id, order.clientName)}
+                                title={t('deleteOrder', 'Delete order')}
+                              >
+                                {t('delete', 'Delete')}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -761,12 +796,13 @@ function Admin() {
                       <th>{t('totalValue', 'Total Value')}</th>
                       <th>{t('status', 'Status')}</th>
                       <th>{t('lastActive', 'Last Active')}</th>
+                      <th>{t('actions', 'Actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredClients.length === 0 ? (
                       <tr>
-                        <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '40px' }}>
                           {t('noMatchingClientsFound', 'No matching clients found.')}
                         </td>
                       </tr>
@@ -802,6 +838,18 @@ function Admin() {
                             <small style={{ color: '#6b7280' }}>
                               {t(client.lastActive || 'Just now', client.lastActive || 'Just now')}
                             </small>
+                          </td>
+                          <td>
+                            <div className="admin-actions-cell">
+                              <button
+                                type="button"
+                                className="admin-action-btn delete"
+                                onClick={() => handleDeleteClient(client.id, client.name)}
+                                title={t('deleteClient', 'Delete client from directory')}
+                              >
+                                {t('delete', 'Delete')}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
