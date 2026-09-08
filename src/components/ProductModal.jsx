@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { addToCart } from '../utils/cartUtils';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/product-modal.css';
 
 function ProductModal({ isOpen, onClose, product, onAddToCart }) {
+  const { t, tName, tDesc } = useLanguage();
   const [activeImage, setActiveImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState('standard'); // 'standard' | 'set2'
@@ -106,7 +108,7 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
             {activeImage && (
               <img
                 src={activeImage}
-                alt={product.name || product.title || 'Product view'}
+                alt={tName(product.name || product.title || 'Product view')}
               />
             )}
           </div>
@@ -133,9 +135,9 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
         {/* Right Column: Product Information */}
         <div className="product-modal-info">
           {product.category && (
-            <span className="product-modal-eyebrow">{product.category}</span>
+            <span className="product-modal-eyebrow">{t(product.category, product.category)}</span>
           )}
-          <h2 id="modal-product-title">{product.name || product.title}</h2>
+          <h2 id="modal-product-title">{tName(product.name || product.title)}</h2>
           
           {/* Price Display with Sale Support */}
           <div className="product-modal-price">
@@ -148,7 +150,7 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
                   JOD {activeSalePrice.toLocaleString()}
                 </span>
                 <span className="badge bg-danger ms-1" style={{ fontSize: '0.75rem' }}>
-                  Special Offer
+                  {t('specialOffer', 'Special Offer')}
                 </span>
               </div>
             ) : (
@@ -160,7 +162,7 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
           {hasDualPrice && (
             <div className="product-variant-selector mb-3">
               <label className="d-block text-secondary small text-uppercase mb-1 fw-semibold">
-                Configuration Option
+                {t('configurationOption', 'Configuration Option')}
               </label>
               <div className="d-flex gap-2">
                 <button
@@ -168,39 +170,39 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
                   className={`btn btn-sm ${!isSet2 ? 'btn-dark' : 'btn-outline-dark'}`}
                   onClick={() => setSelectedVariant('standard')}
                 >
-                  Standard Suite ({product.price})
+                  {t('standardSuite', 'Standard Suite')} ({product.price})
                 </button>
                 <button
                   type="button"
                   className={`btn btn-sm ${isSet2 ? 'btn-dark' : 'btn-outline-dark'}`}
                   onClick={() => setSelectedVariant('set2')}
                 >
-                  Expanded Suite ({product.price2Formatted || `JOD ${product.price2}`})
+                  {t('expandedSuite', 'Expanded Suite')} ({product.price2Formatted || `JOD ${product.price2}`})
                 </button>
               </div>
             </div>
           )}
 
           <p className="product-modal-desc">
-            {product.desc || product.description || 'Crafted with premium materials and signature Hurfa architectural detail.'}
+            {tDesc(product.desc || product.description || 'Crafted with premium materials and signature Hurfa architectural detail.')}
           </p>
 
           {product.material && (
             <div className="mb-2 small text-secondary">
-              <strong className="text-dark">Materials:</strong> {product.material}
+              <strong className="text-dark">{t('materials', 'Materials:')}</strong> {product.material}
             </div>
           )}
 
           {product.dimensions && (
             <div className="mb-3 small text-secondary">
-              <strong className="text-dark">Dimensions:</strong> {product.dimensions}
+              <strong className="text-dark">{t('dimensions', 'Dimensions:')}</strong> {product.dimensions}
             </div>
           )}
 
           {/* Actions: Quantity & Add to Cart */}
           <div className="product-modal-actions">
             <div className="product-modal-qty-row">
-              <label htmlFor="modal-qty-input">Quantity</label>
+              <label htmlFor="modal-qty-input">{t('quantity', 'Quantity')}</label>
               <div className="product-modal-qty-controls">
                 <button
                   type="button"
@@ -235,7 +237,7 @@ function ProductModal({ isOpen, onClose, product, onAddToCart }) {
               onClick={handleAddToCartClick}
               style={addedSuccess ? { backgroundColor: '#16a34a', borderColor: '#16a34a' } : {}}
             >
-              <span>{addedSuccess ? '✓ Added to Cart' : 'Add to Cart'}</span>
+              <span>{addedSuccess ? t('addedToCart', '✓ Added to Cart') : t('addToCart', 'Add to Cart')}</span>
             </button>
           </div>
         </div>

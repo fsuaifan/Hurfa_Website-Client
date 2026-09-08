@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/login.css';
 
 function SignUp() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -113,10 +115,13 @@ function SignUp() {
       <div className="login-card">
         {/* Header */}
         <header className="login-header">
-          <span className="login-eyebrow">Hurfa Membership</span>
-          <h1>Create Your Account</h1>
+          <span className="login-eyebrow">{t('hurfaMembership', 'Hurfa Membership')}</span>
+          <h1>{t('createAccountTitle', 'Create Your Account')}</h1>
           <p className="login-subtitle">
-            Join Hurfa Studio to save custom palettes, request architectural consultations, and track bespoke orders.
+            {t(
+              'createAccountSubtitle',
+              'Join Hurfa Studio to save custom palettes, request architectural consultations, and track bespoke orders.'
+            )}
           </p>
         </header>
 
@@ -165,7 +170,7 @@ function SignUp() {
         {/* Form */}
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="login-input-group">
-            <label htmlFor="fullName">Full Name</label>
+            <label htmlFor="fullName">{t('fullName', 'Full Name')}</label>
             <input
               type="text"
               id="fullName"
@@ -179,7 +184,7 @@ function SignUp() {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">{t('emailAddress', 'Email Address')}</label>
             <input
               type="email"
               id="email"
@@ -193,7 +198,7 @@ function SignUp() {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="phone">Phone Number (Optional)</label>
+            <label htmlFor="phone">{t('phoneNumber', 'Phone Number')} (Optional)</label>
             <input
               type="tel"
               id="phone"
@@ -206,7 +211,7 @@ function SignUp() {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="password">Password (min. 6 characters)</label>
+            <label htmlFor="password">{t('password', 'Password')} (min. 6 characters)</label>
             <div className="login-password-wrapper">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -262,7 +267,7 @@ function SignUp() {
           </div>
 
           <div className="login-input-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">{t('confirmPassword', 'Confirm Password')}</label>
             <input
               type="password"
               id="confirmPassword"
@@ -284,20 +289,7 @@ function SignUp() {
                 onChange={handleChange}
                 required
               />
-              <span>
-                I agree to the Hurfa{' '}
-                <a
-                  href="#terms"
-                  className="login-link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert('Hurfa Terms: Crafted bespoke furniture with architectural warranty.');
-                  }}
-                >
-                  Terms of Service
-                </a>{' '}
-                and Privacy Policy.
-              </span>
+              <span>{t('agreeTermsText', 'I agree to the Hurfa Terms of Service and Privacy Policy.')}</span>
             </label>
           </div>
 
@@ -309,7 +301,7 @@ function SignUp() {
             {loading ? (
               <span className="login-spinner">Creating Account...</span>
             ) : (
-              <span>Create Account</span>
+              <span>{t('createAccount', 'Create Account')}</span>
             )}
           </button>
         </form>
@@ -317,9 +309,9 @@ function SignUp() {
         {/* Footer info */}
         <footer className="login-footer">
           <p>
-            Already have an account?{' '}
+            {t('alreadyHaveAccount', 'Already have an account?')}{' '}
             <Link to="/login" className="login-link">
-              Sign In
+              {t('signIn', 'Sign In')}
             </Link>
           </p>
         </footer>

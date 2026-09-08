@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import ProductModal from '../components/ProductModal';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/bedrooms.css';
 
 function Bedrooms() {
+  const { t, tName, tDesc } = useLanguage();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -43,11 +45,13 @@ function Bedrooms() {
     <div className="bedrooms-page">
       {/* Bedrooms Hero Header */}
       <header className="bedroom-hero">
-        <span className="bedrooms-eyebrow">Collections</span>
-        <h1>Bedrooms</h1>
+        <span className="bedrooms-eyebrow">{t('collections', 'Collections')}</span>
+        <h1>{t('bedrooms', 'Bedrooms')}</h1>
         <p>
-          Bed frames, wardrobes, and nightstands built to match — pick a piece to
-          see finishes, pricing, and details.
+          {t(
+            'bedroomsHeroDesc',
+            'Bed frames, wardrobes, and nightstands built to match — pick a piece to see finishes, pricing, and details.'
+          )}
         </p>
       </header>
 
@@ -60,7 +64,7 @@ function Bedrooms() {
             onClick={() => handleOpenProduct(product)}
             role="button"
             tabIndex={0}
-            aria-label={`View details for ${product.name}`}
+            aria-label={`View details for ${tName(product.name)}`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 handleOpenProduct(product);
@@ -70,14 +74,14 @@ function Bedrooms() {
             <div className="bedroom-card-media">
               <img
                 src={product.images ? product.images[0] : product.image}
-                alt={product.name}
+                alt={tName(product.name)}
                 loading="lazy"
               />
             </div>
             <div className="bedroom-card-body">
-              <h3>{product.name}</h3>
+              <h3>{tName(product.name)}</h3>
               <p className="bedroom-card-price">{product.price}</p>
-              <p className="bedroom-card-desc">{product.desc}</p>
+              <p className="bedroom-card-desc">{tDesc(product.desc)}</p>
             </div>
           </article>
         ))}

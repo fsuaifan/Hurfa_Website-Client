@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
 import NavigationBar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingCart from './components/FloatingCart';
@@ -20,9 +21,10 @@ import './App.css';
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="d-flex flex-column min-vh-100">
-        <NavigationBar />
+    <LanguageProvider>
+      <BrowserRouter>
+        <div className="d-flex flex-column min-vh-100">
+          <NavigationBar />
         <div className="main-content flex-grow-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -57,6 +59,7 @@ function App() {
         <FloatingCart />
       </div>
     </BrowserRouter>
+  </LanguageProvider>
   );
 }
 

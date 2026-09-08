@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/login.css';
 
 function Login() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const redirectTarget = searchParams.get('redirect') || '';
@@ -142,7 +144,7 @@ function Login() {
               <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            <span>Customer Portal</span>
+            <span>{t('customerPortal', 'Customer Portal')}</span>
           </button>
           <button
             type="button"
@@ -166,20 +168,28 @@ function Login() {
               <path d="M3 9h18" />
               <path d="M9 21V9" />
             </svg>
-            <span>Studio Admin</span>
+            <span>{t('studioAdmin', 'Studio Admin')}</span>
           </button>
         </div>
 
         {/* Header */}
         <header className="login-header">
           <span className="login-eyebrow">
-            {isAdmin ? 'Management Console' : 'Hurfa Client Access'}
+            {isAdmin
+              ? t('managementConsole', 'Management Console')
+              : t('hurfaClientAccess', 'Hurfa Client Access')}
           </span>
-          <h1>{isAdmin ? 'Studio Portal' : 'Welcome Back'}</h1>
+          <h1>{isAdmin ? t('studioPortal', 'Studio Portal') : t('welcomeBack', 'Welcome Back')}</h1>
           <p className="login-subtitle">
             {isAdmin
-              ? 'Sign in with studio credentials to manage furniture catalog, customer orders, and client inquiries.'
-              : 'Sign in to access your bespoke orders, saved palettes, and consultation requests.'}
+              ? t(
+                  'adminLoginSubtitle',
+                  'Sign in with studio credentials to manage furniture catalog, customer orders, and client inquiries.'
+                )
+              : t(
+                  'customerLoginSubtitle',
+                  'Sign in to access your bespoke orders, saved palettes, and consultation requests.'
+                )}
           </p>
         </header>
 
@@ -229,7 +239,9 @@ function Login() {
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="login-input-group">
             <label htmlFor="email">
-              {isAdmin ? 'Admin Username or Email' : 'Email Address'}
+              {isAdmin
+                ? t('adminUsernameOrEmail', 'Admin Username or Email')
+                : t('emailAddress', 'Email Address')}
             </label>
             <input
               type={isAdmin ? 'text' : 'email'}
@@ -249,7 +261,7 @@ function Login() {
 
           <div className="login-input-group">
             <div className="login-password-label-row">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t('password', 'Password')}</label>
               {!isAdmin && (
                 <a
                   href="#forgot"
@@ -259,7 +271,7 @@ function Login() {
                     alert('Password reset link sent to your registered email.');
                   }}
                 >
-                  Forgot?
+                  {t('forgot', 'Forgot?')}
                 </a>
               )}
             </div>
@@ -325,7 +337,7 @@ function Login() {
                 checked={formData.rememberMe}
                 onChange={handleChange}
               />
-              <span>Remember session on this device</span>
+              <span>{t('rememberSession', 'Remember session on this device')}</span>
             </label>
           </div>
 
@@ -337,7 +349,11 @@ function Login() {
             {loading ? (
               <span className="login-spinner">Authenticating...</span>
             ) : (
-              <span>{isAdmin ? 'Sign In to Studio Console' : 'Sign In'}</span>
+              <span>
+                {isAdmin
+                  ? t('signInToStudio', 'Sign In to Studio Console')
+                  : t('signIn', 'Sign In')}
+              </span>
             )}
           </button>
         </form>
@@ -350,9 +366,9 @@ function Login() {
             </p>
           ) : (
             <p>
-              New to Hurfa Studio?{' '}
+              {t('newToHurfa', 'New to Hurfa Studio?')}{' '}
               <Link to="/signup" className="login-link">
-                Create an account
+                {t('createAccount', 'Create an account')}
               </Link>
             </p>
           )}

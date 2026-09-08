@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { getCart, removeFromCart, updateCartQuantity, clearCart } from '../utils/cartUtils';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/cart.css';
 
 function Cart() {
+  const { t, tName } = useLanguage();
   const navigate = useNavigate();
   const [items, setItems] = useState(() => getCart());
   const [promoCode, setPromoCode] = useState('');
@@ -135,10 +137,10 @@ function Cart() {
     <div className="cart-page">
       {/* Header */}
       <header className="cart-header">
-        <span className="cart-eyebrow">Your Selection</span>
-        <h1>Shopping Cart</h1>
+        <span className="cart-eyebrow">{t('yourSelection', 'Your Selection')}</span>
+        <h1>{t('cartTitle', 'Shopping Cart')}</h1>
         <p className="cart-subtitle">
-          Review your chosen architectural pieces before proceeding to checkout.
+          {t('cartSubtitle', 'Review your chosen architectural pieces before proceeding to checkout.')}
         </p>
       </header>
 
@@ -161,19 +163,19 @@ function Cart() {
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
           </div>
-          <h2>Thank you for your order!</h2>
+          <h2>{t('thankYouOrder', 'Thank you for your order!')}</h2>
           <p className="mb-2">
-            Order Reference: <strong>{orderSuccess.id}</strong>
+            {t('orderRef', 'Order Reference:')} <strong>{orderSuccess.id}</strong>
           </p>
           <p className="text-secondary mb-4">
-            Your bespoke architectural order has been received and scheduled for production.
+            {t('orderScheduled', 'Your bespoke architectural order has been received and scheduled for production.')}
           </p>
           <div className="d-flex gap-3 justify-content-center">
             <Link to="/products" className="cart-empty-btn">
-              Explore More Pieces
+              {t('exploreMorePieces', 'Explore More Pieces')}
             </Link>
             <Link to="/account" className="btn btn-outline-dark px-4 py-2">
-              View My Orders
+              {t('viewMyOrders', 'View My Orders')}
             </Link>
           </div>
         </div>
@@ -197,13 +199,15 @@ function Cart() {
               <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
           </div>
-          <h2>Your cart is currently empty</h2>
+          <h2>{t('emptyCart', 'Your cart is currently empty')}</h2>
           <p>
-            Explore our curated collections of bespoke kitchens, bedrooms, and signature
-            furniture crafted with material integrity.
+            {t(
+              'emptyCartDesc',
+              'Explore our curated collections of bespoke kitchens, bedrooms, and signature furniture crafted with material integrity.'
+            )}
           </p>
           <Link to="/products" className="cart-empty-btn">
-            Explore Collections
+            {t('exploreCollections', 'Explore Collections')}
           </Link>
         </div>
       ) : (
@@ -213,26 +217,26 @@ function Cart() {
           <section className="cart-items-column" aria-label="Cart Items">
             <div className="cart-items-topbar">
               <span className="cart-items-count">
-                {totalItemCount} {totalItemCount === 1 ? 'Item' : 'Items'}
+                {totalItemCount} {totalItemCount === 1 ? t('item', 'Item') : t('items', 'Items')}
               </span>
               <button
                 type="button"
                 className="cart-clear-btn"
                 onClick={handleClearCart}
               >
-                Clear Cart
+                {t('clearCart', 'Clear Cart')}
               </button>
             </div>
 
             {items.map((item) => (
               <article key={item.id} className="cart-item-card">
                 <div className="cart-item-image">
-                  <img src={item.image} alt={item.name} loading="lazy" />
+                  <img src={item.image} alt={tName(item.name)} loading="lazy" />
                 </div>
 
                 <div className="cart-item-details">
-                  <span className="cart-item-category">{item.category}</span>
-                  <h2 className="cart-item-title">{item.name}</h2>
+                  <span className="cart-item-category">{t(item.category, item.category)}</span>
+                  <h2 className="cart-item-title">{tName(item.name)}</h2>
                   <span className="cart-item-unit-price">
                     JOD {item.unitPrice.toLocaleString()} each
                   </span>
@@ -241,13 +245,13 @@ function Cart() {
                     <div
                       className="cart-qty-box"
                       role="group"
-                      aria-label={`Quantity selector for ${item.name}`}
+                      aria-label={`Quantity selector for ${tName(item.name)}`}
                     >
                       <button
                         type="button"
                         className="cart-qty-btn"
                         onClick={() => handleQuantityChange(item.id, -1)}
-                        aria-label={`Decrease quantity for ${item.name}`}
+                        aria-label={`Decrease quantity for ${tName(item.name)}`}
                       >
                         -
                       </button>
@@ -256,7 +260,7 @@ function Cart() {
                         type="button"
                         className="cart-qty-btn"
                         onClick={() => handleQuantityChange(item.id, 1)}
-                        aria-label={`Increase quantity for ${item.name}`}
+                        aria-label={`Increase quantity for ${tName(item.name)}`}
                       >
                         +
                       </button>
@@ -267,7 +271,7 @@ function Cart() {
                       className="cart-item-remove-btn"
                       onClick={() => handleRemoveItem(item.id)}
                     >
-                      Remove
+                      {t('remove', 'Remove')}
                     </button>
                   </div>
                 </div>
@@ -282,28 +286,28 @@ function Cart() {
           {/* Right Column: Summary Card */}
           <aside className="cart-summary-column" aria-label="Order Summary">
             <div className="cart-summary-card">
-              <h2>Order Summary</h2>
+              <h2>{t('orderSummary', 'Order Summary')}</h2>
 
               <div className="cart-summary-rows">
                 <div className="cart-summary-row">
-                  <span>Items Subtotal</span>
+                  <span>{t('itemsSubtotal', 'Items Subtotal')}</span>
                   <span>JOD {subtotal.toLocaleString()}</span>
                 </div>
 
                 {promoApplied && (
                   <div className="cart-summary-row discount">
-                    <span>Architectural Discount (10%)</span>
+                    <span>{t('discountLabel', 'Architectural Discount (10%)')}</span>
                     <span>-JOD {discount.toLocaleString()}</span>
                   </div>
                 )}
 
                 <div className="cart-summary-row">
-                  <span>White-Glove Delivery</span>
-                  <span className="cart-free-tag">Complimentary</span>
+                  <span>{t('deliveryLabel', 'White-Glove Delivery')}</span>
+                  <span className="cart-free-tag">{t('complimentary', 'Complimentary')}</span>
                 </div>
 
                 <div className="cart-summary-row total">
-                  <span>Estimated Total</span>
+                  <span>{t('estimatedTotal', 'Estimated Total')}</span>
                   <span>JOD {grandTotal.toLocaleString()}</span>
                 </div>
               </div>
@@ -313,12 +317,12 @@ function Cart() {
                 <input
                   type="text"
                   className="cart-promo-input"
-                  placeholder="Promo Code (HURFA10)"
+                  placeholder={t('promoPlaceholder', 'Promo Code (HURFA10)')}
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value)}
                 />
                 <button type="submit" className="cart-promo-btn">
-                  Apply
+                  {t('apply', 'Apply')}
                 </button>
               </form>
 
@@ -329,7 +333,7 @@ function Cart() {
                 disabled={checkingOut}
                 onClick={handleCheckout}
               >
-                {checkingOut ? 'Placing Order...' : 'Proceed to Checkout'}
+                {checkingOut ? t('placingOrder', 'Placing Order...') : t('proceedToCheckout', 'Proceed to Checkout')}
               </button>
 
               {/* Trust Badges */}
@@ -348,7 +352,7 @@ function Cart() {
                   >
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                   </svg>
-                  <span>5-Year Structural Craftsmanship Warranty</span>
+                  <span>{t('warranty5Year', '5-Year Structural Craftsmanship Warranty')}</span>
                 </div>
                 <div className="cart-trust-item">
                   <svg
@@ -368,7 +372,7 @@ function Cart() {
                     <circle cx="17" cy="18" r="2" />
                     <circle cx="7" cy="18" r="2" />
                   </svg>
-                  <span>White-Glove Delivery & Installation in Jordan</span>
+                  <span>{t('deliveryJordan', 'White-Glove Delivery & Installation in Jordan')}</span>
                 </div>
               </div>
             </div>

@@ -1,10 +1,13 @@
 import React from "react";
 import { Container, Row, Col, Nav } from "react-bootstrap";
+import { useLanguage } from "../context/LanguageContext";
 import "../css/footer.css";
 
 const LOGO_URL = "https://ik.imagekit.io/6dghafkgmq/tr:x-1648,y-950,w-677,h-753/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204";
 
 function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="hurfa-footer bg-dark text-light pt-5 pb-4 mt-auto">
       <Container>
@@ -56,8 +59,8 @@ function Footer() {
 
         {/* Bottom section: copyright and location */}
         <div className="border-top border-secondary pt-3 d-flex flex-column flex-sm-row justify-content-between align-items-center small text-white-50 gap-2">
-          <span>© 2026 Hurfa LLC. All rights reserved.</span>
-          <span>Amman, Jordan</span>
+          <span>{t('allRightsReserved', '© 2026 Hurfa LLC. All rights reserved.')}</span>
+          <span>{t('ammanJordan', 'Amman, Jordan')}</span>
         </div>
       </Container>
     </footer>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api';
 import ProductModal from '../components/ProductModal';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/products.css';
 
 const DEFAULT_CATEGORIES = ['All', 'Kitchens', 'Bedrooms', 'Living Room', 'Living Room Tables', 'Consoles', 'TV Units', 'Commercial Offices'];
@@ -33,6 +34,7 @@ const FALLBACK_SIGNATURE_SUITES = [
 ];
 
 function Products() {
+  const { t, tName, tDesc } = useLanguage();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [signatureSuites, setSignatureSuites] = useState(FALLBACK_SIGNATURE_SUITES);
@@ -114,8 +116,8 @@ function Products() {
     <div className="products-page">
       {/* Header & Filter Controls */}
       <header className="products-header">
-        <span className="products-eyebrow">Catalog</span>
-        <h1>Home Furniture</h1>
+        <span className="products-eyebrow">{t('catalog', 'Catalog')}</span>
+        <h1>{t('homeFurniture', 'Home Furniture')}</h1>
 
         <div className="products-filter-bar">
           {/* Category Tabs */}
@@ -129,7 +131,7 @@ function Products() {
                 role="tab"
                 aria-selected={activeCategory === cat}
               >
-                {cat}
+                {cat === 'All' ? t('all', 'All') : t(cat, cat)}
               </button>
             ))}
           </div>
@@ -146,10 +148,10 @@ function Products() {
               onChange={(e) => setSortBy(e.target.value)}
               aria-label="Sort products by price"
             >
-              <option value="default">Featured / Default</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="newest">Newest Arrivals</option>
+              <option value="default">{t('sortFeatured', 'Featured / Default')}</option>
+              <option value="price-low">{t('sortPriceLow', 'Price: Low to High')}</option>
+              <option value="price-high">{t('sortPriceHigh', 'Price: High to Low')}</option>
+              <option value="newest">{t('sortNewest', 'Newest Arrivals')}</option>
             </select>
           </div>
         </div>
@@ -159,17 +161,17 @@ function Products() {
       <section className="products-grid-section" aria-label="Furniture Products Grid">
         {loading && products.length === 0 ? (
           <div className="products-loading-state py-5 text-center">
-            <p>Loading Hurfa collection...</p>
+            <p>{t('loadingCollection', 'Loading Hurfa collection...')}</p>
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="products-empty-state">
-            <p>No furniture pieces found for the selected filter.</p>
+            <p>{t('noFurnitureFound', 'No furniture pieces found for the selected filter.')}</p>
             <button
               type="button"
               className="btn btn-outline-dark mt-3"
               onClick={() => setActiveCategory('All')}
             >
-              Reset Filters
+              {t('resetFilters', 'Reset Filters')}
             </button>
           </div>
         ) : (
@@ -181,7 +183,7 @@ function Products() {
                 onClick={() => handleOpenProduct(product)}
                 role="button"
                 tabIndex={0}
-                aria-label={`View details for ${product.name}`}
+                aria-label={`View details for ${tName(product.name)}`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     handleOpenProduct(product);
@@ -191,19 +193,19 @@ function Products() {
                 <div className="product-card-image-wrap">
                   <img
                     src={product.images ? product.images[0] : product.image}
-                    alt={product.name}
+                    alt={tName(product.name)}
                     loading="lazy"
                   />
                   {product.salePrice && (
-                    <span className="product-card-badge">Bespoke Offer</span>
+                    <span className="product-card-badge">{t('bespokeOffer', 'Bespoke Offer')}</span>
                   )}
                 </div>
                 <div className="product-card-body">
-                  <span className="product-card-category">{product.category}</span>
-                  <h3 className="product-card-title">{product.name}</h3>
+                  <span className="product-card-category">{t(product.category, product.category)}</span>
+                  <h3 className="product-card-title">{tName(product.name)}</h3>
                   <div className="product-card-price-row">
                     <span className="product-card-price">{product.price}</span>
-                    <span className="product-card-action">View Piece →</span>
+                    <span className="product-card-action">{t('viewPiece', 'View Piece →')}</span>
                   </div>
                 </div>
               </article>
@@ -215,10 +217,13 @@ function Products() {
       {/* Signature & Premium Collections Section */}
       <section className="products-premium-section" aria-label="Signature Collections">
         <div className="products-premium-header">
-          <span className="products-eyebrow">Exclusives</span>
-          <h2>Signature Suites</h2>
+          <span className="products-eyebrow">{t('exclusives', 'Exclusives')}</span>
+          <h2>{t('signatureSuites', 'Signature Suites')}</h2>
           <p>
-            Explore our architectural whole-room conceptual collections, engineered with unified tone and materiality.
+            {t(
+              'signatureSuitesDesc',
+              'Explore our architectural whole-room conceptual collections, engineered with unified tone and materiality.'
+            )}
           </p>
         </div>
 
@@ -230,7 +235,7 @@ function Products() {
               onClick={() => handleOpenProduct(suite)}
               role="button"
               tabIndex={0}
-              aria-label={`View suite details for ${suite.title || suite.name}`}
+              aria-label={`View suite details for ${tName(suite.title || suite.name)}`}
               style={{ cursor: 'pointer' }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -239,12 +244,16 @@ function Products() {
               }}
             >
               <div className="products-premium-media">
-                <img src={suite.image || suite.mainImage} alt={suite.title || suite.name} loading="lazy" />
+                <img
+                  src={suite.image || suite.mainImage}
+                  alt={tName(suite.title || suite.name)}
+                  loading="lazy"
+                />
               </div>
               <div className="products-premium-info">
-                <span className="products-premium-tag">{suite.tagline}</span>
-                <h3>{suite.title || suite.name}</h3>
-                <p>{suite.description || suite.desc}</p>
+                <span className="products-premium-tag">{t(suite.tagline, suite.tagline)}</span>
+                <h3>{tName(suite.title || suite.name)}</h3>
+                <p>{tDesc(suite.description || suite.desc)}</p>
                 <span className="products-premium-price">{suite.priceRange || suite.price}</span>
               </div>
             </article>

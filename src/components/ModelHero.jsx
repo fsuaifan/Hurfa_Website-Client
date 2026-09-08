@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/Kitchens.css';
 
 function ModelHero({ model }) {
+  const { t, tName, tDesc } = useLanguage();
   const variations = model.variations || [];
   const initialMain = variations[0]?.mainImg || variations[0]?.mainImage || model.mainImage || '';
   const [activeMain, setActiveMain] = useState(initialMain);
@@ -23,12 +25,12 @@ function ModelHero({ model }) {
   };
 
   return (
-    <section className="model-hero-section" aria-label={`${model.title || model.name} Showcase`}>
+    <section className="model-hero-section" aria-label={`${tName(model.title || model.name)} Showcase`}>
       {/* Main Large Display Image */}
       <div className="model-main-display">
         <img
           src={activeMain || model.mainImage}
-          alt={`${model.title || model.name} main view`}
+          alt={`${tName(model.title || model.name)} main view`}
         />
       </div>
 
@@ -64,8 +66,16 @@ function ModelHero({ model }) {
 
       {/* Model Meta Information */}
       <div className="model-meta-info">
-        <h1>{model.title || model.name}</h1>
-        <p>{model.desc || 'Experience the perfect blend of architectural style and functionality with our premium kitchen designs.'}</p>
+        <h1>{tName(model.title || model.name)}</h1>
+        <p>
+          {tDesc(
+            model.desc ||
+              t(
+                `${model.title || model.name}Desc`,
+                'Experience the perfect blend of architectural style and functionality with our premium kitchen designs.'
+              )
+          )}
+        </p>
       </div>
     </section>
   );

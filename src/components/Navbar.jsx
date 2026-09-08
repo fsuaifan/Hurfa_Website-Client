@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/logo.css';
 import '../css/Navbar.css';
 
 const LOGO_URL = "https://ik.imagekit.io/6dghafkgmq/tr:x-1648,y-950,w-677,h-753/001-Identity_Dark%20Green%20Logo.png?updatedAt=1777813390204";
 
 function NavigationBar() {
+  const { language, toggleLanguage, t } = useLanguage();
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
@@ -62,7 +64,7 @@ function NavigationBar() {
               className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
-              Kitchens
+              {t('kitchens', 'Kitchens')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -71,7 +73,7 @@ function NavigationBar() {
               className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
-              Bedrooms
+              {t('bedrooms', 'Bedrooms')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -80,7 +82,7 @@ function NavigationBar() {
               className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
-              Products
+              {t('products', 'Products')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -89,7 +91,7 @@ function NavigationBar() {
               className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
-              About
+              {t('aboutUs', 'About Us')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -104,17 +106,21 @@ function NavigationBar() {
               className="py-2 px-3 fw-semibold text-uppercase small"
               style={{ fontSize: '0.8rem', letterSpacing: '0.1em' }}
             >
-              Account
+              {t('account', 'Account')}
             </Nav.Link>
 
             <div className="py-2 py-lg-0 ps-lg-2">
               <button
                 type="button"
+                id="lang-toggle-btn"
                 className={`btn btn-sm px-3 ${isTransparent ? 'btn-outline-light' : 'btn-outline-dark'}`}
                 style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}
-                onClick={closeDropdown}
+                onClick={() => {
+                  toggleLanguage();
+                  closeDropdown();
+                }}
               >
-                العربية
+                {t('langBtn', language === 'en' ? 'العربية' : 'English')}
               </button>
             </div>
           </Nav>

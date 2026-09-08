@@ -1,79 +1,102 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/aboutUs.css';
 
-const CORE_PILLARS = [
-  {
-    title: 'Our Mission',
-    text: 'To design and manufacture bedrooms, furniture, and kitchens through a design approach defined by proportion, material integrity, precision, and long-term relevance.',
-  },
-  {
-    title: 'Our Goal',
-    text: 'To establish Hurfa as a design house defined by clarity and lasting relevance.',
-  },
-  {
-    title: 'Our Philosophy',
-    text: 'Design is approached through uncompromising standards, where clarity, material integrity, precision, and enduring quality are essential — not optional.',
-  },
-];
-
-const PROCESS_STEPS = [
-  {
-    step: 'Consultation',
-    desc: 'During this stage, client meetings are held to discuss the scope of the project, goals, budget, and timeline.',
-  },
-  {
-    step: 'Design & Material Selection',
-    desc: 'Based on the client meeting outcome, the design process starts and material selection is finalized.',
-  },
-  {
-    step: 'Production',
-    desc: 'Using the latest technologies in cutting & edge banding, ensuring precision and quality. Our on-site installation is carried out with professionalism.',
-  },
-  {
-    step: 'QA & Control',
-    desc: 'We prioritize your needs, exceeding expectations with standardized procedures, detailed checklists, and robust QA/QC processes.',
-  },
-];
-
-const TEAM_MEMBERS = [
-  { name: 'Zaid Suaifan', role: 'CEO / Co-Founder', initials: 'ZS' },
-  { name: 'Raad Suaifan', role: 'CPO / Co-Founder', initials: 'RS' },
-  { name: 'Dana Suaifan', role: 'CCO', initials: 'DS' },
-  { name: 'Taimaa Alshibli', role: 'Senior Interior Architect', initials: 'TA' },
-  { name: 'Ali Alazzawi', role: 'Technical Interior Architect', initials: 'AA' },
-  { name: 'Rami Almani', role: 'Sales Architect', initials: 'RA' },
-  { name: 'Fahed Suaifan', role: 'HR Officer', initials: 'FS' },
-  { name: 'Mohammad Alhammouri', role: 'IT / Software Engineer', initials: 'MA' },
-  { name: 'Ibrahem Alzoubadi', role: 'Operations Supervisor', initials: 'IA' },
-  { name: 'Basem Abo-Edaq', role: 'Production Supervisor', initials: 'BA' },
-  { name: 'Mohammad Nazeeh', role: 'Inventory / Data Coordinator', initials: 'MN' },
-];
-
 function AboutUs() {
+  const { t } = useLanguage();
+
+  const corePillars = [
+    {
+      title: t('mission', 'Our Mission'),
+      text: t(
+        'missionText',
+        'To design and manufacture bedrooms, furniture, and kitchens through a design approach defined by proportion, material integrity, precision, and long-term relevance.'
+      ),
+    },
+    {
+      title: t('goal', 'Our Goal'),
+      text: t(
+        'goalText',
+        'To establish Hurfa as a design house defined by clarity and lasting relevance.'
+      ),
+    },
+    {
+      title: t('philosophy', 'Our Philosophy'),
+      text: t(
+        'philosophyText',
+        'Design is approached through uncompromising standards, where clarity, material integrity, precision, and enduring quality are essential — not optional.'
+      ),
+    },
+  ];
+
+  const processSteps = [
+    {
+      step: t('consultation', 'Consultation'),
+      desc: t(
+        'consultationText',
+        'During this stage, client meetings are held to discuss the scope of the project, goals, budget, and timeline.'
+      ),
+    },
+    {
+      step: t('designSelection', 'Design & Material Selection'),
+      desc: t(
+        'designText',
+        'Based on the client meeting outcome, the design process starts and material selection is finalized.'
+      ),
+    },
+    {
+      step: t('production', 'Production'),
+      desc: t(
+        'productionText',
+        'Using the latest technologies in cutting & edge banding, ensuring precision and quality. Our on-site installation is carried out with professionalism.'
+      ),
+    },
+    {
+      step: t('qa', 'QA & Control'),
+      desc: t(
+        'qaText',
+        'We prioritize your needs, exceeding expectations with standardized procedures, detailed checklists, and robust QA/QC processes.'
+      ),
+    },
+  ];
+
+  const teamMembers = [
+    { name: t('nameZaid', 'Zaid Suaifan'), role: t('roleCeo', 'CEO / Co-Founder'), initials: 'ZS' },
+    { name: t('nameRaad', 'Raad Suaifan'), role: t('roleCpo', 'CPO / Co-Founder'), initials: 'RS' },
+    { name: t('nameDana', 'Dana Suaifan'), role: t('roleCco', 'CCO'), initials: 'DS' },
+    { name: t('nameTaimaa', 'Taimaa Alshibli'), role: t('roleSeniorArch', 'Senior Interior Architect'), initials: 'TA' },
+    { name: t('nameAli', 'Ali Alazzawi'), role: t('roleTechArch', 'Technical Interior Architect'), initials: 'AA' },
+    { name: t('nameRami', 'Rami Almani'), role: t('roleSalesArch', 'Sales Architect'), initials: 'RA' },
+    { name: t('nameFahed', 'Fahed Suaifan'), role: t('roleHr', 'HR Officer'), initials: 'FS' },
+    { name: t('nameMohammad', 'Mohammad Alhammouri'), role: t('roleIt', 'IT / Software Engineer'), initials: 'MA' },
+    { name: t('nameIbrahem', 'Ibrahem Alzoubadi'), role: t('roleOpSup', 'Operations Supervisor'), initials: 'IA' },
+    { name: t('nameBasem', 'Basem Abo-Edaq'), role: t('roleProdSup', 'Production Supervisor'), initials: 'BA' },
+    { name: t('nameNazeeh', 'Mohammad Nazeeh'), role: t('roleInv', 'Inventory / Data Coordinator'), initials: 'MN' },
+  ];
+
   return (
     <div className="about-page">
       {/* Hero Narrative */}
       <header className="about-hero">
-        <span className="about-eyebrow">Story & Heritage</span>
-        <h1>About Us</h1>
+        <span className="about-eyebrow">{t('storyAndHeritage', 'Story & Heritage')}</span>
+        <h1>{t('aboutTitle', 'About Us')}</h1>
         <p>
-          Hurfa is a design house and LLC established in Amman, Jordan in 2021,
-          specializing in bedrooms, furniture, and kitchens. Guided by architectural
-          principles, each collection is defined by proportion, material integrity,
-          precision, longevity, and functional clarity. Our boutique on Mecca Street
-          presents these collections within a controlled architectural environment.
+          {t(
+            'aboutText',
+            'Hurfa is a design house and LLC established in Amman, Jordan in 2021, specializing in bedrooms, furniture, and kitchens. Guided by architectural principles, each collection is defined by proportion, material integrity, precision, longevity, and functional clarity. Our boutique on Mecca Street presents these collections within a controlled architectural environment.'
+          )}
         </p>
       </header>
 
       {/* Signature Tagline */}
       <section className="about-tagline-section" aria-label="Brand Vision">
-        <h2 className="about-tagline">Design That Endures.</h2>
+        <h2 className="about-tagline">{t('designEndures', 'Design That Endures.')}</h2>
       </section>
 
       {/* Info Cards: Mission, Goal, Philosophy */}
       <section className="about-cards-section" aria-label="Core Pillars">
         <div className="about-cards-grid">
-          {CORE_PILLARS.map((pillar) => (
+          {corePillars.map((pillar) => (
             <article key={pillar.title} className="about-card">
               <h3>{pillar.title}</h3>
               <p>{pillar.text}</p>
@@ -85,12 +108,12 @@ function AboutUs() {
       {/* Our Process */}
       <section className="about-process-section" aria-label="Craftsmanship Process">
         <div className="about-section-header">
-          <span className="about-eyebrow">Methodology</span>
-          <h2>Our Process</h2>
+          <span className="about-eyebrow">{t('methodology', 'Methodology')}</span>
+          <h2>{t('process', 'Our Process')}</h2>
         </div>
 
         <div className="about-process-grid">
-          {PROCESS_STEPS.map((item) => (
+          {processSteps.map((item) => (
             <div key={item.step} className="about-process-step">
               <div className="dot" />
               <h3>{item.step}</h3>
@@ -102,48 +125,48 @@ function AboutUs() {
 
       {/* Organization Structure Tree */}
       <section className="about-org-section" aria-label="Organization Structure">
-        <h2>Organization Structure</h2>
+        <h2>{t('orgStructure', 'Organization Structure')}</h2>
         <div className="about-underline" />
         <div className="org-tree">
           <ul>
             <li>
               <div className="org-node">
-                <strong>CEO</strong>
+                <strong>{t('ceo', 'CEO')}</strong>
               </div>
               <ul>
                 <li>
                   <div className="org-node">
-                    <strong>CCO</strong>
+                    <strong>{t('cco', 'CCO')}</strong>
                   </div>
                   <ul>
                     <li>
                       <div className="org-node">
-                        <strong>Marketing</strong>
+                        <strong>{t('marketing', 'Marketing')}</strong>
                       </div>
                     </li>
                   </ul>
                 </li>
                 <li>
                   <div className="org-node">
-                    <strong>CPO</strong>
+                    <strong>{t('cpo', 'CPO')}</strong>
                   </div>
                   <ul>
                     <li>
                       <div className="org-node">
-                        <strong>Inventory</strong>
-                        <span>Coordinator</span>
+                        <strong>{t('inventory', 'Inventory')}</strong>
+                        <span>{t('coordinator', 'Coordinator')}</span>
                       </div>
                     </li>
                     <li>
                       <div className="org-node">
-                        <strong>Operations</strong>
-                        <span>Team</span>
+                        <strong>{t('operations', 'Operations')}</strong>
+                        <span>{t('prodTeam', 'Team')}</span>
                       </div>
                     </li>
                     <li>
                       <div className="org-node">
-                        <strong>Design</strong>
-                        <span>Architect</span>
+                        <strong>{t('design', 'Design')}</strong>
+                        <span>{t('salesArch', 'Architect')}</span>
                       </div>
                     </li>
                   </ul>
@@ -157,12 +180,12 @@ function AboutUs() {
       {/* Our Team Section */}
       <section className="about-team-section" aria-label="Team Members">
         <div className="about-section-header">
-          <span className="about-eyebrow">People</span>
-          <h2>Our Team</h2>
+          <span className="about-eyebrow">{t('people', 'People')}</span>
+          <h2>{t('ourTeam', 'Our Team')}</h2>
         </div>
 
         <div className="about-team-grid">
-          {TEAM_MEMBERS.map((member) => (
+          {teamMembers.map((member) => (
             <div key={member.name} className="about-team-member">
               <div className="about-team-avatar">
                 {member.initials}

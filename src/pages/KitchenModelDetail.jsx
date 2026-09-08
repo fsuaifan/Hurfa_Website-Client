@@ -3,9 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import ModelHero from '../components/ModelHero';
 import ModelDetailRows from '../components/ModelDetailRows';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/Kitchens.css';
 
 function KitchenModelDetail() {
+  const { t } = useLanguage();
   const { modelId } = useParams();
   const [model, setModel] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ function KitchenModelDetail() {
     return (
       <div className="kitchen-detail-page text-center py-5">
         <div className="container py-5">
-          <p className="text-secondary">Loading kitchen specifications...</p>
+          <p className="text-secondary">{t('loadingSpecs', 'Loading kitchen specifications...')}</p>
         </div>
       </div>
     );
@@ -51,12 +53,12 @@ function KitchenModelDetail() {
     return (
       <div className="kitchen-detail-page text-center py-5">
         <div className="container py-5">
-          <h2 className="mb-3">Kitchen Model Not Found</h2>
+          <h2 className="mb-3">{t('modelNotFound', 'Kitchen Model Not Found')}</h2>
           <p className="text-secondary mb-4">
-            We couldn't find the kitchen model you were looking for.
+            {t('modelNotFoundDesc', "We couldn't find the kitchen model you were looking for.")}
           </p>
           <Link to="/kitchens" className="btn btn-outline-dark px-4">
-            ← Back to Kitchens
+            {t('backToKitchensArrow', '← Back to Collections')}
           </Link>
         </div>
       </div>
@@ -68,7 +70,7 @@ function KitchenModelDetail() {
       {/* Back Navigation */}
       <div className="model-back-bar">
         <Link to="/kitchens" className="back-link">
-          ← Back to Collections
+          {t('backToKitchensArrow', '← Back to Collections')}
         </Link>
       </div>
 

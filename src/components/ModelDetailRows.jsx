@@ -1,7 +1,9 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import '../css/Kitchens.css';
 
 function ModelDetailRows({ details }) {
+  const { t, tName, tDesc } = useLanguage();
   if (!details || details.length === 0) return null;
 
   return (
@@ -16,14 +18,14 @@ function ModelDetailRows({ details }) {
             <div className="model-row-image">
               <img
                 src={row.image}
-                alt={`${row.title} detail`}
+                alt={`${tName(row.title)} detail`}
                 loading="lazy"
               />
             </div>
             <div className="model-row-copy">
-              <span className="kitchens-eyebrow">Craftsmanship</span>
-              <h3>{row.title}</h3>
-              <p>{row.copy}</p>
+              <span className="kitchens-eyebrow">{t('craftsmanship', 'Craftsmanship')}</span>
+              <h3>{tName(row.title)}</h3>
+              <p>{tDesc(row.copy)}</p>
             </div>
           </article>
         );
