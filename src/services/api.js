@@ -127,7 +127,12 @@ export const api = {
 
   // Bedrooms Collection
   bedrooms: {
-    getAll: () => request('/bedrooms'),
+    getAll: (params = {}) => {
+      const query = new URLSearchParams();
+      if (params.all) query.append('all', 'true');
+      const qs = query.toString() ? `?${query.toString()}` : '';
+      return request(`/bedrooms${qs}`);
+    },
     getById: (id) => request(`/bedrooms/${id}`),
     create: (data) =>
       request('/bedrooms', {

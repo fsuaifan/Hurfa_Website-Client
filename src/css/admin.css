@@ -424,6 +424,29 @@ html[lang="ar"] .admin-table {
   white-space: nowrap;
 }
 
+.admin-badge-stock.clickable {
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.admin-badge-stock.clickable:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.admin-badge-stock.clickable.active:hover {
+  background-color: #bbf7d0;
+  border-color: #86efac;
+}
+
+.admin-badge-stock.clickable.low:hover {
+  background-color: #fde68a;
+  border-color: #fcd34d;
+}
+
 .admin-badge-stock.active {
   background-color: #dcfce7;
   color: #15803d;

@@ -32,6 +32,18 @@ function Admin() {
   const [bedroomRecords, setBedroomRecords] = useState([]);
   const [bedroomSearchQuery, setBedroomSearchQuery] = useState('');
   const [orderSaveToast, setOrderSaveToast] = useState('');
+  const [isBedroomModalOpen, setIsBedroomModalOpen] = useState(false);
+  const [isSavingBedroom, setIsSavingBedroom] = useState(false);
+  const [editingBedroom, setEditingBedroom] = useState({
+    id: null,
+    name: '',
+    desc: '',
+    price: '',
+    price2: '',
+    image: '',
+    isVisible: true,
+    stockStatus: 'Active',
+  });
 
   // Orders State
   const [orders, setOrders] = useState([]);
@@ -72,7 +84,7 @@ function Admin() {
       }
 
       try {
-        const bedroomsData = await api.bedrooms.getAll();
+        const bedroomsData = await api.bedrooms.getAll({ all: true });
         if (isMounted && Array.isArray(bedroomsData)) {
           setBedroomRecords(bedroomsData);
         }
@@ -346,6 +358,116 @@ function Admin() {
         console.warn('Bedroom delete fallback:', e.message);
       }
       setBedroomRecords((prev) => prev.filter((b) => b.id !== id));
+    }
+  };
+
+  const openEditBedroomModal = (bedroom) => {
+    setEditingBedroom({
+      id: bedroom.id,
+      name: bedroom.name || '',
+      desc: bedroom.desc || '',
+      price: bedroom.price || '',
+      price2: bedroom.price2 || bedroom.price2Formatted || '',
+      image: bedroom.image || bedroom.images?.[0] || '',
+      isVisible: bedroom.isVisible !== false,
+      stockStatus: bedroom.isVisible !== false ? 'Active' : 'Low Stock',
+    });
+    setIsBedroomModalOpen(true);
+  };
+
+  const handleSaveBedroom = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!editingBedroom.id || !editingBedroom.name.trim()) return;
+
+    setIsSavingBedroom(true);
+    const cleanPrice = String(editingBedroom.price).replace(/[^0-9.]/g, '');
+    const cleanPrice2 = String(editingBedroom.price2).replace(/[^0-9.]/g, '');
+
+    const payload = {
+      name: editingBedroom.name.trim(),
+      desc: editingBedroom.desc.trim(),
+      img: editingBedroom.image.trim(),
+      price: cleanPrice ? parseFloat(cleanPrice) : null,
+      price2: cleanPrice2 ? parseFloat(cleanPrice2) : null,
+      isvisible: editingBedroom.isVisible !== false,
+      isVisible: editingBedroom.isVisible !== false,
+      stock_status: editingBedroom.isVisible !== false ? 'Active' : 'Low Stock',
+    };
+
+    try {
+      await api.bedrooms.update(editingBedroom.id, payload);
+      setOrderSaveToast(t('bedroomUpdatedSuccess', 'Bedroom piece updated successfully!'));
+      setTimeout(() => setOrderSaveToast(''), 2500);
+    } catch (err) {
+      console.warn('Bedroom update warning:', err.message);
+    }
+
+    setBedroomRecords((prev) =>
+      prev.map((b) =>
+        b.id === editingBedroom.id
+          ? {
+              ...b,
+              name: payload.name,
+              desc: payload.desc,
+              image: payload.img,
+              images: [payload.img],
+              price: cleanPrice ? `JOD ${parseFloat(cleanPrice).toLocaleString()}` : b.price,
+              price2: cleanPrice2 ? parseFloat(cleanPrice2) : null,
+              price2Formatted: cleanPrice2 ? `JOD ${parseFloat(cleanPrice2).toLocaleString()}` : null,
+              isVisible: payload.isvisible,
+              stockStatus: payload.stock_status,
+            }
+          : b
+      )
+    );
+
+    setIsSavingBedroom(false);
+    setIsBedroomModalOpen(false);
+  };
+
+  const handleToggleProductStatus = async (item) => {
+    const isCurrentlyActive = item.stockStatus === 'Active';
+    const nextStatus = isCurrentlyActive ? 'Low Stock' : 'Active';
+
+    // Optimistic update
+    setRecords((prev) =>
+      prev.map((r) => (r.id === item.id ? { ...r, stockStatus: nextStatus } : r))
+    );
+
+    try {
+      await api.catalog.update(item.id, {
+        stockStatus: nextStatus,
+        isVisible: nextStatus === 'Active',
+      });
+      setOrderSaveToast(t('statusUpdatedSuccess', 'Status updated successfully!'));
+      setTimeout(() => setOrderSaveToast(''), 2500);
+    } catch (err) {
+      console.warn('Toggle product status warning:', err.message);
+    }
+  };
+
+  const handleToggleBedroomStatus = async (bedroom) => {
+    const isCurrentlyActive = bedroom.isVisible !== false && bedroom.stockStatus !== 'Low Stock';
+    const nextIsVisible = !isCurrentlyActive;
+    const nextStatus = nextIsVisible ? 'Active' : 'Low Stock';
+
+    // Optimistic update
+    setBedroomRecords((prev) =>
+      prev.map((b) =>
+        b.id === bedroom.id ? { ...b, isVisible: nextIsVisible, stockStatus: nextStatus } : b
+      )
+    );
+
+    try {
+      await api.bedrooms.update(bedroom.id, {
+        isvisible: nextIsVisible,
+        isVisible: nextIsVisible,
+        stock_status: nextStatus,
+      });
+      setOrderSaveToast(t('statusUpdatedSuccess', 'Status updated successfully!'));
+      setTimeout(() => setOrderSaveToast(''), 2500);
+    } catch (err) {
+      console.warn('Toggle bedroom status warning:', err.message);
     }
   };
 
@@ -695,13 +817,16 @@ function Admin() {
                               <span className="admin-price">{item.price}</span>
                             </td>
                             <td>
-                              <span
-                                className={`admin-badge-stock ${
+                              <button
+                                type="button"
+                                className={`admin-badge-stock clickable ${
                                   item.stockStatus === 'Active' ? 'active' : 'low'
                                 }`}
+                                onClick={() => handleToggleProductStatus(item)}
+                                title={t('clickToToggleStatus', 'Click to toggle active/low stock status')}
                               >
                                 {t(item.stockStatus || 'Active', item.stockStatus || 'Active')}
-                              </span>
+                              </button>
                             </td>
                             <td>
                               <div className="admin-actions-cell">
@@ -923,12 +1048,29 @@ function Admin() {
                               <span className="admin-price">{item.price2Formatted || item.price2 || '—'}</span>
                             </td>
                             <td>
-                              <span className="admin-badge-stock active">
-                                {t('activeInStock', 'Active')}
-                              </span>
+                              <button
+                                type="button"
+                                className={`admin-badge-stock clickable ${
+                                  item.isVisible !== false && item.stockStatus !== 'Low Stock' ? 'active' : 'low'
+                                }`}
+                                onClick={() => handleToggleBedroomStatus(item)}
+                                title={t('clickToToggleStatus', 'Click to toggle active/low stock status')}
+                              >
+                                {item.isVisible !== false && item.stockStatus !== 'Low Stock'
+                                  ? t('activeInStock', 'Active')
+                                  : t('lowStock', 'Low Stock')}
+                              </button>
                             </td>
                             <td>
                               <div className="admin-actions-cell">
+                                <button
+                                  type="button"
+                                  className="admin-action-btn edit"
+                                  onClick={() => openEditBedroomModal(item)}
+                                  title={t('editPiece', 'Edit piece specifications')}
+                                >
+                                  {t('edit', 'Edit')}
+                                </button>
                                 <button
                                   type="button"
                                   className="admin-action-btn delete"
@@ -1551,6 +1693,151 @@ function Admin() {
                     disabled={isSavingClient}
                   >
                     {isSavingClient ? t('registeringClient', 'Registering...') : t('saveClient', 'Save Client')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL 3: EDIT BEDROOM PIECE */}
+        {/* ========================================================================= */}
+        {isBedroomModalOpen && editingBedroom && (
+          <div
+            className="admin-modal-overlay"
+            onClick={() => setIsBedroomModalOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bedroom-modal-title"
+          >
+            <div className="admin-modal-dialog" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <div>
+                  <h2 id="bedroom-modal-title">{t('editBedroom', 'Edit Bedroom Piece')}</h2>
+                  <p>{t('editBedroomDesc', 'Modify dimensions, pricing, and visual media for this bedroom suite.')}</p>
+                </div>
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  onClick={() => setIsBedroomModalOpen(false)}
+                  aria-label={t('cancel', 'Close')}
+                >
+                  &times;
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveBedroom}>
+                <div className="admin-modal-body">
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" htmlFor="bedroom-name">
+                      {t('pieceName', 'Piece Name')} <span className="required">*</span>
+                    </label>
+                    <input
+                      id="bedroom-name"
+                      type="text"
+                      className="admin-form-input"
+                      value={editingBedroom.name}
+                      onChange={(e) => setEditingBedroom({ ...editingBedroom, name: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="admin-form-grid">
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="bedroom-price">
+                        {t('standardPrice', 'Standard Price (JOD)')} <span className="required">*</span>
+                      </label>
+                      <input
+                        id="bedroom-price"
+                        type="text"
+                        className="admin-form-input"
+                        placeholder="e.g. 1450"
+                        value={editingBedroom.price}
+                        onChange={(e) => setEditingBedroom({ ...editingBedroom, price: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" htmlFor="bedroom-price2">
+                        {t('wardrobeOptionPrice', 'With Wardrobe / Option B (JOD)')}
+                      </label>
+                      <input
+                        id="bedroom-price2"
+                        type="text"
+                        className="admin-form-input"
+                        placeholder="e.g. 2100"
+                        value={editingBedroom.price2}
+                        onChange={(e) => setEditingBedroom({ ...editingBedroom, price2: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" htmlFor="bedroom-image">
+                      {t('imageMedia', 'Image / Media URL')}
+                    </label>
+                    <input
+                      id="bedroom-image"
+                      type="text"
+                      className="admin-form-input"
+                      placeholder="https://ik.imagekit.io/..."
+                      value={editingBedroom.image}
+                      onChange={(e) => setEditingBedroom({ ...editingBedroom, image: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" htmlFor="bedroom-desc">
+                      {t('description', 'Description')}
+                    </label>
+                    <textarea
+                      id="bedroom-desc"
+                      className="admin-form-textarea"
+                      rows="3"
+                      value={editingBedroom.desc}
+                      onChange={(e) => setEditingBedroom({ ...editingBedroom, desc: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" htmlFor="bedroom-status">
+                      {t('status', 'Status')}
+                    </label>
+                    <select
+                      id="bedroom-status"
+                      className="admin-form-select"
+                      value={editingBedroom.isVisible ? 'Active' : 'Low Stock'}
+                      onChange={(e) =>
+                        setEditingBedroom({
+                          ...editingBedroom,
+                          isVisible: e.target.value === 'Active',
+                          stockStatus: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="Active">{t('activeInStock', 'Active')}</option>
+                      <option value="Low Stock">{t('lowStock', 'Low Stock')}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="admin-modal-footer">
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-outline"
+                    onClick={() => setIsBedroomModalOpen(false)}
+                    disabled={isSavingBedroom}
+                  >
+                    {t('cancel', 'Cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    className="admin-btn admin-btn-primary"
+                    disabled={isSavingBedroom}
+                  >
+                    {isSavingBedroom ? t('savingBedroom', 'Saving...') : t('saveBedroom', 'Save Bedroom Piece')}
                   </button>
                 </div>
               </form>

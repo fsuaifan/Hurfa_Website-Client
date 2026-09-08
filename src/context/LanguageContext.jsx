@@ -484,6 +484,13 @@ const translations = {
     theTayfSuite: 'The Tayf & Signature Suites',
     reorderPiece: 'Reorder Piece',
     bedroomsManagement: 'Bedrooms Management',
+    editBedroom: 'Edit Bedroom Piece',
+    editBedroomDesc: 'Modify dimensions, pricing, and visual media for this bedroom suite.',
+    clickToToggleStatus: 'Click to toggle active/low stock status',
+    statusUpdatedSuccess: 'Status updated successfully!',
+    bedroomUpdatedSuccess: 'Bedroom piece updated successfully!',
+    saveBedroom: 'Save Bedroom Piece',
+    savingBedroom: 'Saving...',
 
     // --- Signature & Premium Collections Fallbacks ---
     'The Oud Collection': 'The Oud Collection',
@@ -993,6 +1000,13 @@ const translations = {
     theTayfSuite: 'طيف والمجموعات المعمارية الخاصة',
     reorderPiece: 'إعادة ترتيب القطعة',
     bedroomsManagement: 'إدارة غرف النوم',
+    editBedroom: 'تعديل قطعة غرفة النوم',
+    editBedroomDesc: 'تعديل الأبعاد والأسعار والوسائط المرئية لغرفة النوم.',
+    clickToToggleStatus: 'اضغط لتغيير الحالة بين نشط / منخفض المخزون',
+    statusUpdatedSuccess: 'تم تحديث الحالة بنجاح!',
+    bedroomUpdatedSuccess: 'تم حفظ تعديلات غرفة النوم بنجاح!',
+    saveBedroom: 'حفظ قطعة غرفة النوم',
+    savingBedroom: 'جاري الحفظ...',
 
     // --- Signature & Premium Collections Fallbacks ---
     'The Oud Collection': 'مجموعة العود',
