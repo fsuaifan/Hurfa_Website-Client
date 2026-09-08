@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BEDROOM_PRODUCTS } from '../data/bedroomsData';
 import { api } from '../services/api';
 import ProductModal from '../components/ProductModal';
 import '../css/bedrooms.css';
 
 function Bedrooms() {
-  const [products, setProducts] = useState(BEDROOM_PRODUCTS);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -13,12 +13,15 @@ function Bedrooms() {
     let isMounted = true;
     async function loadBedrooms() {
       try {
+        setLoading(true);
         const data = await api.bedrooms.getAll();
-        if (isMounted && Array.isArray(data) && data.length > 0) {
+        if (isMounted && Array.isArray(data)) {
           setProducts(data);
         }
       } catch (err) {
-        console.warn('Using local bedrooms fallback:', err.message);
+        console.warn('Bedrooms API warning:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     }
     loadBedrooms();

@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { KITCHEN_MODELS } from '../data/kitchensData';
 import { api } from '../services/api';
 import '../css/Kitchens.css';
 
 function KitchenGallery() {
-  const [models, setModels] = useState(KITCHEN_MODELS);
+  const [models, setModels] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     async function loadKitchens() {
       try {
+        setLoading(true);
         const data = await api.kitchens.getAll();
-        if (isMounted && Array.isArray(data) && data.length > 0) {
+        if (isMounted && Array.isArray(data)) {
           setModels(data);
         }
       } catch (err) {
-        console.warn('Using local kitchens fallback:', err.message);
+        console.warn('Kitchens API warning:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     }
     loadKitchens();

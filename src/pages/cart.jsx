@@ -3,27 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import '../css/cart.css';
 
-const INITIAL_CART_ITEMS = [
-  {
-    id: 'wardrobe-oak',
-    name: 'Wardrobe — Oak',
-    category: 'Bedrooms',
-    unitPrice: 420,
-    quantity: 1,
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Tayf_4iPZv6iGf.png?updatedAt=1782466205843',
-  },
-  {
-    id: 'wesal-bed-frame',
-    name: 'Bed Frame — Wesal',
-    category: 'Bedrooms',
-    unitPrice: 310,
-    quantity: 1,
-    image:
-      'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg?updatedAt=1787138960280',
-  },
-];
-
 function Cart() {
   const navigate = useNavigate();
   const [items, setItems] = useState(() => {
@@ -31,12 +10,12 @@ function Cart() {
       const stored = localStorage.getItem('hurfa_cart');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.error(e);
     }
-    return INITIAL_CART_ITEMS;
+    return [];
   });
 
   const [promoCode, setPromoCode] = useState('');
@@ -152,16 +131,7 @@ function Cart() {
       localStorage.removeItem('hurfa_cart');
     } catch (err) {
       console.error('Checkout error:', err);
-      // Fallback local order confirmation if server offline
-      const mockOrder = {
-        id: `ORD-2026-${Math.floor(100 + Math.random() * 900)}`,
-        total: `JOD ${grandTotal.toLocaleString()}`,
-        status: 'In Production',
-        clientName: user.name,
-      };
-      setOrderSuccess(mockOrder);
-      setItems([]);
-      localStorage.removeItem('hurfa_cart');
+      alert(`Checkout could not be completed: ${err.message || 'Please check your connection and try again.'}`);
     } finally {
       setCheckingOut(false);
     }

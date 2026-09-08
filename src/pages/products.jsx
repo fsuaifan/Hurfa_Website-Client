@@ -1,18 +1,36 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CATALOG_PRODUCTS, PREMIUM_COLLECTIONS } from '../data/productsData';
 import { api } from '../services/api';
 import ProductModal from '../components/ProductModal';
 import '../css/products.css';
 
 const CATEGORIES = ['All', 'Kitchens', 'Bedrooms', 'Living Room'];
 
+const SIGNATURE_SUITES = [
+  {
+    id: 'the-oud-collection',
+    title: 'The Oud Collection',
+    tagline: 'Solid Oak & Bouclé',
+    description: 'A signature living-room collection built around solid oak framing, subtle warm curves, and boucle upholstery.',
+    priceRange: 'JOD 2,400',
+    image: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Oud-Collection_u9dsnBlwn.jpg?updatedAt=1787138978278',
+  },
+  {
+    id: 'the-wesal-collection',
+    title: 'The Wesal Collection',
+    tagline: 'Walnut & Architectural Linen',
+    description: 'A bedroom collection defined by low-profile walnut woodwork, soft textiles, and serene minimalist balance.',
+    priceRange: 'JOD 1,980',
+    image: 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg?updatedAt=1787138960280',
+  },
+];
+
 function Products() {
-  const [products, setProducts] = useState(CATALOG_PRODUCTS);
+  const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -20,11 +38,11 @@ function Products() {
       try {
         setLoading(true);
         const data = await api.products.getAll();
-        if (isMounted && Array.isArray(data) && data.length > 0) {
+        if (isMounted && Array.isArray(data)) {
           setProducts(data);
         }
       } catch (err) {
-        console.warn('Using local catalog fallback:', err.message);
+        console.warn('Products API warning:', err.message);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -177,7 +195,7 @@ function Products() {
         </div>
 
         <div className="products-premium-grid">
-          {PREMIUM_COLLECTIONS.map((suite) => (
+          {SIGNATURE_SUITES.map((suite) => (
             <article key={suite.id} className="products-premium-card">
               <div className="products-premium-media">
                 <img src={suite.image} alt={suite.title} loading="lazy" />

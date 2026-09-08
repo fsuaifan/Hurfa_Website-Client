@@ -105,22 +105,10 @@ function Login() {
       }
     } catch (err) {
       console.error('Login error:', err);
-      // Fallback credentials if server is offline or mock login
-      if (
-        loginRole === 'admin' &&
-        (formData.email === 'admin' || formData.email === 'admin@hurfa.com') &&
-        (formData.password === 'admin' || formData.password === 'password' || formData.password === 'admin123')
-      ) {
-        sessionStorage.setItem('hurfa_admin_authenticated', 'true');
-        sessionStorage.setItem('hurfa_user', JSON.stringify({ role: 'admin', email: 'admin@hurfa.com', name: 'Studio Administrator' }));
-        setStatusMessage({ type: 'success', text: 'Admin authorization verified. Redirecting...' });
-        setTimeout(() => navigate('/admin', { replace: true }), 600);
-      } else {
-        setStatusMessage({
-          type: 'error',
-          text: err.message || 'Invalid credentials. Please verify and try again.',
-        });
-      }
+      setStatusMessage({
+        type: 'error',
+        text: err.message || 'Invalid credentials. Please verify and try again.',
+      });
     } finally {
       setLoading(false);
     }

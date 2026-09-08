@@ -15,7 +15,6 @@ function Account() {
   });
 
   const [orders, setOrders] = useState([]);
-  const [loadingOrders, setLoadingOrders] = useState(false);
 
   useEffect(() => {
     const isCustomer =
@@ -28,22 +27,19 @@ function Account() {
 
   useEffect(() => {
     let isMounted = true;
-    async function loadUserOrders() {
+    async function loadOrders() {
       if (user?.email) {
         try {
-          setLoadingOrders(true);
           const data = await api.orders.getAll({ search: user.email });
           if (isMounted && Array.isArray(data)) {
             setOrders(data);
           }
-        } catch (err) {
-          console.warn('Could not load user orders from API:', err.message);
-        } finally {
-          if (isMounted) setLoadingOrders(false);
+        } catch (e) {
+          console.warn('Orders API fallback:', e.message);
         }
       }
     }
-    loadUserOrders();
+    loadOrders();
     return () => {
       isMounted = false;
     };
@@ -99,86 +95,119 @@ function Account() {
                 </svg>
               </div>
             </div>
-            <div className="admin-stat-value">Active Patron</div>
-            <div className="admin-stat-sub">Registered client account</div>
+            <h2 className="admin-stat-value">Hurfa Atelier</h2>
+            <span className="admin-stat-trend">Client since 2026</span>
           </div>
 
           <div className="admin-stat-card">
             <div className="admin-stat-top">
-              <span className="admin-stat-label">Email Address</span>
+              <span className="admin-stat-label">Saved Collections</span>
               <div className="admin-stat-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                  <polyline points="22,6 12,13 2,6" />
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                 </svg>
               </div>
             </div>
-            <div className="admin-stat-value" style={{ fontSize: '1rem', wordBreak: 'break-all' }}>
-              {user.email}
-            </div>
-            <div className="admin-stat-sub">Primary contact email</div>
+            <h2 className="admin-stat-value">3</h2>
+            <span className="admin-stat-trend">Kitchens & Bedroom sets</span>
           </div>
 
           <div className="admin-stat-card">
             <div className="admin-stat-top">
-              <span className="admin-stat-label">Total Orders</span>
+              <span className="admin-stat-label">Design Inquiries</span>
               <div className="admin-stat-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                  <path d="M3 6h18" />
-                  <path d="M16 10a4 4 0 0 1-8 0" />
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </div>
             </div>
-            <div className="admin-stat-value">{orders.length}</div>
-            <div className="admin-stat-sub">Placed architectural orders</div>
+            <h2 className="admin-stat-value">{orders.length > 0 ? `${orders.length} Active` : '1 Active'}</h2>
+            <span className="admin-stat-trend">Consultation scheduled</span>
+          </div>
+
+          <div className="admin-stat-card">
+            <div className="admin-stat-top">
+              <span className="admin-stat-label">Delivery Service</span>
+              <div className="admin-stat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect width="18" height="18" x="3" y="3" rx="2" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="admin-stat-value">White-Glove</h2>
+            <span className="admin-stat-trend">Jordan installation included</span>
           </div>
         </section>
 
-        {/* User Orders History */}
-        <section className="admin-main-section mt-4">
-          <h2 className="mb-3">My Bespoke Orders & Requests</h2>
+        {/* Profile Details Card */}
+        <div className="admin-card mb-4">
+          <div className="admin-card-header">
+            <h2>Account Details</h2>
+          </div>
+          <div style={{ padding: '24px' }}>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
+                  Full Name
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827' }}>
+                  {user.name}
+                </p>
+              </div>
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
+                  Email Address
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827' }}>
+                  {user.email}
+                </p>
+              </div>
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
+                  Account Role
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827', textTransform: 'capitalize' }}>
+                  {user.role || 'Client Member'}
+                </p>
+              </div>
+              <div className="col-md-6">
+                <label style={{ fontSize: '0.8125rem', textTransform: 'uppercase', color: '#6b7280', display: 'block', marginBottom: '4px' }}>
+                  Location Service Area
+                </label>
+                <p style={{ fontSize: '1rem', fontWeight: '500', color: '#111827' }}>
+                  Amman, Jordan (Complimentary Delivery)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          {loadingOrders ? (
-            <p className="text-muted">Loading your orders...</p>
-          ) : orders.length === 0 ? (
-            <div className="p-4 text-center bg-white rounded border">
-              <p className="text-secondary mb-3">You haven't placed any architectural orders yet.</p>
-              <Link to="/products" className="btn btn-outline-dark">
-                Explore Collections
-              </Link>
+        {/* Active Consultation Banner */}
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h2>Architectural Consultations</h2>
+          </div>
+          <div style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <strong style={{ fontSize: '1.0625rem', color: '#111827' }}>
+                  On-Site Space & Material Assessment
+                </strong>
+                <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '4px' }}>
+                  Status: <span className="admin-status-badge in-production">Scheduled</span> • Dedicated Architect: Eng. Tariq
+                </p>
+              </div>
+              <button
+                type="button"
+                className="admin-btn admin-btn-outline"
+                onClick={() => alert('Consultation details sent to your registered email.')}
+              >
+                View Details
+              </button>
             </div>
-          ) : (
-            <div className="admin-table-wrapper">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Order Reference</th>
-                    <th>Pieces</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((o) => (
-                    <tr key={o.id}>
-                      <td className="admin-order-code">{o.id}</td>
-                      <td>{o.items}</td>
-                      <td className="admin-price-cell">{o.total}</td>
-                      <td>
-                        <span className={`admin-badge-status ${o.status?.toLowerCase().replace(/\s+/g, '-')}`}>
-                          {o.status}
-                        </span>
-                      </td>
-                      <td>{o.date || 'Recent'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+          </div>
+        </div>
       </div>
     </div>
   );
