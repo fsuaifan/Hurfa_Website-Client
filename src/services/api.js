@@ -3,7 +3,14 @@
  * Centralized HTTP Client connecting Hurfa_Website-Client to Hurfa_Website-Server
  */
 
-const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:5000/api';
+const rawServerUrl =
+  import.meta.env?.VITE_SERVER_URL ||
+  import.meta.env?.VITE_API_URL ||
+  'http://localhost:5000';
+
+const API_BASE_URL = rawServerUrl.endsWith('/api')
+  ? rawServerUrl
+  : `${rawServerUrl.replace(/\/+$/, '')}/api`;
 
 /**
  * Helper to build auth & role headers from active session
