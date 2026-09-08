@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getCart } from '../utils/cartUtils';
 import '../css/floating-cart.css';
 
-function FloatingCart({ count = 0, onClick, ariaLabel }) {
+function FloatingCart({ onClick, ariaLabel }) {
   const navigate = useNavigate();
+  const [count, setCount] = useState(() => {
+    const items = getCart();
+    return items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  });
+
+  useEffect(() => {
+    const syncCount = () => {
+      const items = getCart();
+      setCount(items.reduce((acc, item) => acc + (item.quantity || 1), 0));
+    };
+
+    window.addEventListener('storage', syncCount);
+    window.addEventListener('hurfa-cart-updated', syncCount);
+    return () => {
+      window.removeEventListener('storage', syncCount);
+      window.removeEventListener('hurfa-cart-updated', syncCount);
+    };
+  }, []);
+
   const label = ariaLabel || `Shopping cart with ${count} ${count === 1 ? 'item' : 'items'}`;
   const handleClick = onClick || (() => navigate('/cart'));
 

@@ -184,7 +184,7 @@ function Account() {
         </div>
 
         {/* Active Consultation Banner */}
-        <div className="admin-card">
+        <div className="admin-card mb-4">
           <div className="admin-card-header">
             <h2>Architectural Consultations</h2>
           </div>
@@ -206,6 +206,57 @@ function Account() {
                 View Details
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* My Orders Table */}
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h2>My Orders & Bespoke Requests ({orders.length})</h2>
+          </div>
+          <div className="admin-table-responsive">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Order Code</th>
+                  <th>Pieces & Details</th>
+                  <th>Total</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '36px', color: '#6b7280' }}>
+                      No past orders found. Explore the <Link to="/products" style={{ color: '#0f3a2b', fontWeight: 600 }}>Catalog</Link> to commission your first piece.
+                    </td>
+                  </tr>
+                ) : (
+                  orders.map((order) => (
+                    <tr key={order.id}>
+                      <td>
+                        <strong className="admin-order-id">{order.id}</strong>
+                      </td>
+                      <td>{order.items}</td>
+                      <td>
+                        <span className="admin-price">{order.total}</span>
+                      </td>
+                      <td>{order.date}</td>
+                      <td>
+                        <span
+                          className={`admin-status-badge ${order.status
+                            ?.toLowerCase()
+                            .replace(/\s+/g, '-') || 'in-production'}`}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

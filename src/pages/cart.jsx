@@ -1,36 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { getCart, removeFromCart, updateCartQuantity, clearCart } from '../utils/cartUtils';
 import '../css/cart.css';
 
 function Cart() {
   const navigate = useNavigate();
-  const [items, setItems] = useState(() => {
-    try {
-      const stored = localStorage.getItem('hurfa_cart');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    return [];
-  });
-
+  const [items, setItems] = useState(() => getCart());
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
 
-  // Sync to localStorage
+  // Sync state from cartUtils / storage events
+  const syncCartState = useCallback(() => {
+    setItems(getCart());
+  }, []);
+
   useEffect(() => {
-    try {
-      localStorage.setItem('hurfa_cart', JSON.stringify(items));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [items]);
+    syncCartState();
+    window.addEventListener('hurfa-cart-updated', syncCartState);
+    window.addEventListener('storage', syncCartState);
+    return () => {
+      window.removeEventListener('hurfa-cart-updated', syncCartState);
+      window.removeEventListener('storage', syncCartState);
+    };
+  }, [syncCartState]);
 
   // Load from backend if user is logged in
   useEffect(() => {
@@ -48,6 +43,7 @@ function Cart() {
                 name: row.name,
                 category: row.category || 'Furniture',
                 unitPrice: parseFloat(row.price) || 0,
+                price: parseFloat(row.price) || 0,
                 quantity: row.quantity || 1,
                 image: row.img || row.image || 'https://ik.imagekit.io/6dghafkgmq/hurfa_catalog/Wesal-Collection_n299cVlM5.jpg',
               }));
@@ -67,22 +63,17 @@ function Cart() {
 
   // Handlers
   const handleQuantityChange = (id, delta) => {
-    setItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === id) {
-          const newQty = Math.max(1, item.quantity + delta);
-          return { ...item, quantity: newQty };
-        }
-        return item;
-      })
-    );
+    const updated = updateCartQuantity(id, delta);
+    setItems(updated);
   };
 
   const handleRemoveItem = (id) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    const updated = removeFromCart(id);
+    setItems(updated);
   };
 
   const handleClearCart = () => {
+    clearCart();
     setItems([]);
   };
 
@@ -95,8 +86,11 @@ function Cart() {
     }
   };
 
-  const totalItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = items.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
+  const totalItemCount = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  const subtotal = items.reduce((acc, item) => {
+    const unitPrice = item.unitPrice !== undefined ? item.unitPrice : item.price || 0;
+    return acc + unitPrice * (item.quantity || 1);
+  }, 0);
   const discount = promoApplied ? subtotal * 0.1 : 0;
   const grandTotal = Math.max(0, subtotal - discount);
 
@@ -112,7 +106,7 @@ function Cart() {
       }
     }
 
-    const itemsSummary = items.map((i) => `${i.name} (x${i.quantity})`).join(', ');
+    const itemsSummary = items.map((i) => `${i.name} (x${i.quantity || 1})`).join(', ');
 
     setCheckingOut(true);
     try {
@@ -127,8 +121,8 @@ function Cart() {
       });
 
       setOrderSuccess(order);
+      clearCart();
       setItems([]);
-      localStorage.removeItem('hurfa_cart');
     } catch (err) {
       console.error('Checkout error:', err);
       alert(`Checkout could not be completed: ${err.message || 'Please check your connection and try again.'}`);
