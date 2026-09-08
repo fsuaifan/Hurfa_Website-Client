@@ -1,17 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { KITCHEN_MODELS_DATA } from '../data/kitchensData';
+import { api } from '../services/api';
 import ModelHero from '../components/ModelHero';
 import ModelDetailRows from '../components/ModelDetailRows';
 import '../css/Kitchens.css';
 
 function KitchenModelDetail() {
   const { modelId } = useParams();
-  const model = KITCHEN_MODELS_DATA[modelId?.toLowerCase()];
+  const [model, setModel] = useState(KITCHEN_MODELS_DATA[modelId?.toLowerCase()]);
 
-  // Scroll to top when entering a model detail page
   useEffect(() => {
     window.scrollTo(0, 0);
+    let isMounted = true;
+
+    async function loadModel() {
+      try {
+        const data = await api.kitchens.getById(modelId);
+        if (isMounted && data && !data.message) {
+          setModel(data);
+        }
+      } catch (err) {
+        console.warn('Using local model fallback:', err.message);
+      }
+    }
+
+    if (modelId) {
+      loadModel();
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [modelId]);
 
   if (!model) {
@@ -43,7 +63,7 @@ function KitchenModelDetail() {
       <ModelHero model={model} />
 
       {/* Craftsmanship & Feature Breakdown */}
-      <ModelDetailRows details={model.details} />
+      <ModelDetailRows details={model.details || []} />
     </div>
   );
 }
