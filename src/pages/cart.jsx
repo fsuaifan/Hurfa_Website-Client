@@ -69,14 +69,30 @@ function Cart() {
     setItems(updated);
   };
 
-  const handleRemoveItem = (id) => {
+  const handleRemoveItem = async (id) => {
     const updated = removeFromCart(id);
     setItems(updated);
+    const user = getAuthenticatedUser();
+    if (user?.email) {
+      try {
+        await api.cart.remove(user.email, id);
+      } catch (err) {
+        console.warn('Backend cart remove error:', err.message);
+      }
+    }
   };
 
-  const handleClearCart = () => {
+  const handleClearCart = async () => {
     clearCart();
     setItems([]);
+    const user = getAuthenticatedUser();
+    if (user?.email) {
+      try {
+        await api.cart.clear(user.email);
+      } catch (err) {
+        console.warn('Backend cart clear error:', err.message);
+      }
+    }
   };
 
   const handleApplyPromo = (e) => {
@@ -150,6 +166,9 @@ function Cart() {
       setOrderSuccess(order);
       clearCart();
       setItems([]);
+      if (user.email) {
+        api.cart.clear(user.email).catch((e) => console.warn('Cart clear error after checkout:', e.message));
+      }
     } catch (err) {
       console.error('Checkout error:', err);
       alert(`${t('checkoutError', 'Checkout could not be completed. Please check your connection and try again.')} ${err.message || ''}`);

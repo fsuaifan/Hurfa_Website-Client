@@ -23,17 +23,23 @@ function getHeaders(customHeaders = {}) {
 
   try {
     const userStr = sessionStorage.getItem('hurfa_user') || localStorage.getItem('hurfa_user');
-    const isAdminAuth = sessionStorage.getItem('hurfa_admin_authenticated') === 'true';
+    const isAdminAuth =
+      sessionStorage.getItem('hurfa_admin_authenticated') === 'true' ||
+      localStorage.getItem('hurfa_admin_authenticated') === 'true';
+
+    const isOnAdminPage =
+      typeof window !== 'undefined' &&
+      (window.location.pathname.startsWith('/admin') || window.location.hash.includes('/admin'));
 
     if (userStr) {
       const user = JSON.parse(userStr);
-      if (user.role === 'admin' || isAdminAuth) {
+      if (user.role === 'admin' || isAdminAuth || isOnAdminPage) {
         headers['x-role'] = 'admin';
       }
       if (user.email) {
         headers['x-user-email'] = user.email;
       }
-    } else if (isAdminAuth) {
+    } else if (isAdminAuth || isOnAdminPage) {
       headers['x-role'] = 'admin';
     }
   } catch (err) {

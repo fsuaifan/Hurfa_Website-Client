@@ -128,11 +128,15 @@ function Admin() {
     if (window.confirm(`${t('confirmDeleteRecord', 'Are you sure you want to remove')} "${name}" ${t('fromTheCatalog', 'from the catalog?')}`)) {
       try {
         await api.catalog.delete(id);
+        setOrderSaveToast(t('pieceDeleted', '✓ Piece removed from catalog'));
+        setTimeout(() => setOrderSaveToast(''), 2500);
       } catch (e) {
-        console.warn('Delete API fallback:', e.message);
+        console.error('Delete API error:', e);
+        alert(`${t('deleteFailed', 'Failed to delete piece from database:')} ${e.message || ''}`);
+        return;
       }
       setRecords((prev) => {
-        const updated = prev.filter((r) => r.id !== id);
+        const updated = prev.filter((r) => String(r.id) !== String(id));
         try {
           localStorage.setItem('hurfa_catalog_records', JSON.stringify(updated));
         } catch (e) {
@@ -148,10 +152,14 @@ function Admin() {
     if (window.confirm(confirmMsg)) {
       try {
         await api.orders.delete(orderId);
+        setOrderSaveToast(t('orderDeleted', '✓ Order deleted successfully'));
+        setTimeout(() => setOrderSaveToast(''), 2500);
       } catch (e) {
-        console.warn('Delete order API fallback:', e.message);
+        console.error('Delete order error:', e);
+        alert(`${t('deleteFailed', 'Failed to delete order:')} ${e.message || ''}`);
+        return;
       }
-      setOrders((prev) => prev.filter((o) => o.id !== orderId && o.orderId !== orderId));
+      setOrders((prev) => prev.filter((o) => String(o.id) !== String(orderId) && String(o.orderId) !== String(orderId)));
     }
   };
 
@@ -160,10 +168,14 @@ function Admin() {
     if (window.confirm(confirmMsg)) {
       try {
         await api.clients.delete(clientId);
+        setOrderSaveToast(t('clientDeleted', '✓ Client removed from directory'));
+        setTimeout(() => setOrderSaveToast(''), 2500);
       } catch (e) {
-        console.warn('Delete client API fallback:', e.message);
+        console.error('Delete client error:', e);
+        alert(`${t('deleteFailed', 'Failed to delete client:')} ${e.message || ''}`);
+        return;
       }
-      setClients((prev) => prev.filter((c) => c.id !== clientId));
+      setClients((prev) => prev.filter((c) => String(c.id) !== String(clientId)));
     }
   };
 
@@ -354,10 +366,14 @@ function Admin() {
     if (window.confirm(confirmMsg)) {
       try {
         await api.bedrooms.delete(id);
+        setOrderSaveToast(t('bedroomDeleted', '✓ Bedroom piece removed'));
+        setTimeout(() => setOrderSaveToast(''), 2500);
       } catch (e) {
-        console.warn('Bedroom delete fallback:', e.message);
+        console.error('Bedroom delete error:', e);
+        alert(`${t('deleteFailed', 'Failed to delete bedroom piece:')} ${e.message || ''}`);
+        return;
       }
-      setBedroomRecords((prev) => prev.filter((b) => b.id !== id));
+      setBedroomRecords((prev) => prev.filter((b) => String(b.id) !== String(id)));
     }
   };
 
