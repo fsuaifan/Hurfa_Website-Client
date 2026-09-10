@@ -77,7 +77,7 @@
   .hurfa-navbar .navbar-brand {
     position: relative;
     height: 100%;
-    min-width: 75px;
+    min-width: 90px;
     display: flex;
     align-items: center;
   }
@@ -99,8 +99,8 @@
 
   .hurfa-navbar .navbar-brand {
     position: relative;
-    height: 46px;
-    min-width: 55px;
+    height: 48px;
+    min-width: 65px;
     display: flex;
     align-items: center;
   }
