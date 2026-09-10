@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { api } from '../services/api';
 import ProductModal from '../components/ProductModal';
 import { useLanguage } from '../context/LanguageContext';
@@ -42,7 +42,10 @@ function Products() {
   const [sortBy, setSortBy] = useState('default');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const categoryMenuRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -79,6 +82,33 @@ function Products() {
     };
   }, []);
 
+  // Close category dropdown on outside click or Escape key
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (categoryMenuRef.current && !categoryMenuRef.current.contains(event.target)) {
+        setIsCategoryMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape' && isCategoryMenuOpen) {
+        setIsCategoryMenuOpen(false);
+      }
+    }
+
+    if (isCategoryMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isCategoryMenuOpen]);
+
   const handleOpenProduct = (product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
@@ -87,6 +117,24 @@ function Products() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+
+  const getCategoryKey = (cat) => {
+    return typeof cat === 'string' ? cat : cat.name;
+  };
+
+  const getCategoryLabel = (cat) => {
+    if (typeof cat === 'string') {
+      return cat === 'All' ? t('all', 'All') : cat;
+    }
+    return cat.name === 'All'
+      ? t('all', 'All')
+      : (isArabic && cat.arabic_name ? cat.arabic_name : cat.name);
+  };
+
+  const activeCategoryObj = categories.find((c) => getCategoryKey(c) === activeCategory);
+  const activeCategoryLabel = activeCategoryObj
+    ? getCategoryLabel(activeCategoryObj)
+    : (activeCategory === 'All' ? t('all', 'All') : activeCategory);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -119,13 +167,11 @@ function Products() {
         <h1>{t('homeFurniture', 'Home Furniture')}</h1>
 
         <div className="products-filter-bar">
-          {/* Category Tabs */}
-          <div className="products-filter-tabs" role="tablist" aria-label="Filter by category">
+          {/* Desktop Category Tabs */}
+          <div className="products-filter-tabs products-filter-tabs-desktop" role="tablist" aria-label="Filter by category">
             {categories.map((cat) => {
-              const catKey = typeof cat === 'string' ? cat : cat.name;
-              const catLabel = typeof cat === 'string'
-                ? (cat === 'All' ? t('all', 'All') : cat)
-                : (cat.name === 'All' ? t('all', 'All') : (isArabic && cat.arabic_name ? cat.arabic_name : cat.name));
+              const catKey = getCategoryKey(cat);
+              const catLabel = getCategoryLabel(cat);
               const isActive = activeCategory === catKey || (activeCategory === 'All' && catKey === 'All');
 
               return (
@@ -141,6 +187,86 @@ function Products() {
                 </button>
               );
             })}
+          </div>
+
+          {/* Mobile Hamburger Category Selector */}
+          <div className="products-category-mobile-wrapper" ref={categoryMenuRef}>
+            <button
+              type="button"
+              className={`products-category-hamburger-btn ${isCategoryMenuOpen ? 'active' : ''}`}
+              onClick={() => setIsCategoryMenuOpen((prev) => !prev)}
+              aria-expanded={isCategoryMenuOpen}
+              aria-haspopup="listbox"
+              aria-label={t('filterByCategory', 'Filter by category')}
+            >
+              <div className="products-category-btn-left">
+                <span className="products-category-hamburger-icon" aria-hidden="true">
+                  <span className="bar" />
+                  <span className="bar" />
+                  <span className="bar" />
+                </span>
+                <span className="products-category-current-label">
+                  <span className="products-category-prefix">{t('category', 'Category')}:</span>
+                  <span className="products-category-name">{activeCategoryLabel}</span>
+                </span>
+              </div>
+              <svg
+                className={`products-category-chevron ${isCategoryMenuOpen ? 'open' : ''}`}
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+
+            {isCategoryMenuOpen && (
+              <div className="products-category-dropdown" role="listbox" aria-label="Select category">
+                {categories.map((cat) => {
+                  const catKey = getCategoryKey(cat);
+                  const catLabel = getCategoryLabel(cat);
+                  const isActive = activeCategory === catKey || (activeCategory === 'All' && catKey === 'All');
+
+                  return (
+                    <button
+                      type="button"
+                      key={catKey}
+                      className={`products-category-dropdown-item ${isActive ? 'selected' : ''}`}
+                      role="option"
+                      aria-selected={isActive}
+                      onClick={() => {
+                        setActiveCategory(catKey);
+                        setIsCategoryMenuOpen(false);
+                      }}
+                    >
+                      <span className="products-category-item-text">{catLabel}</span>
+                      {isActive && (
+                        <svg
+                          className="products-category-check-icon"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Sort Dropdown */}

@@ -46,6 +46,11 @@
   flex-wrap: wrap;
 }
 
+/* Mobile Category Dropdown hidden on desktop */
+.products-category-mobile-wrapper {
+  display: none;
+}
+
 .products-filter-tab {
   background: transparent;
   border: 1px solid transparent;
@@ -371,39 +376,201 @@
   }
 
   .products-filter-bar {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
 
-  .products-filter-tabs {
+  /* Hide horizontal desktop category tabs on mobile */
+  .products-filter-tabs-desktop {
+    display: none !important;
+  }
+
+  /* Mobile Category Hamburger Button & Dropdown */
+  .products-category-mobile-wrapper {
+    display: block;
+    position: relative;
+    width: 100%;
+    z-index: 40;
+  }
+
+  .products-category-hamburger-btn {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 6px;
-    gap: 8px;
-    scrollbar-width: none;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 11px 15px;
+    background-color: #ffffff;
+    border: 1px solid #d6d3d1;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: #1f1d1b;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
-  .products-filter-tabs::-webkit-scrollbar {
-    display: none;
+  .products-category-hamburger-btn:hover,
+  .products-category-hamburger-btn:focus-visible {
+    border-color: #1f1d1b;
+    background-color: #fafaf9;
+    outline: none;
   }
 
-  .products-filter-tab {
-    flex-shrink: 0;
+  .products-category-hamburger-btn.active {
+    border-color: #1f1d1b;
+    box-shadow: 0 0 0 2px rgba(31, 29, 27, 0.1);
+  }
+
+  .products-category-btn-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .products-category-hamburger-icon {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3.5px;
+    width: 18px;
+    flex-shrink: 0;
+  }
+
+  .products-category-hamburger-icon .bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #1f1d1b;
+    border-radius: 2px;
+  }
+
+  .products-category-current-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .products-category-prefix {
+    font-size: 0.8rem;
+    color: #78716c;
+    font-weight: 500;
+  }
+
+  .products-category-name {
+    font-size: 0.88rem;
+    color: #1f1d1b;
+    font-weight: 600;
+  }
+
+  .products-category-chevron {
+    flex-shrink: 0;
+    margin-inline-start: 8px;
+    color: #78716c;
+    transition: transform 0.2s ease;
+  }
+
+  .products-category-chevron.open {
+    transform: rotate(180deg);
+    color: #1f1d1b;
+  }
+
+  /* Mobile Dropdown List */
+  .products-category-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #e7e5e4;
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    max-height: 320px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 100;
+    animation: productsDropdownFade 0.18s ease-out;
+  }
+
+  @keyframes productsDropdownFade {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .products-category-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #44403c;
+    text-align: start;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .products-category-dropdown-item:hover,
+  .products-category-dropdown-item:focus-visible {
+    background-color: #f5f5f4;
+    color: #1f1d1b;
+    outline: none;
+  }
+
+  .products-category-dropdown-item.selected {
+    background-color: #1f1d1b;
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .products-category-dropdown-item.selected:hover,
+  .products-category-dropdown-item.selected:focus-visible {
+    background-color: #292524;
+    color: #ffffff;
+  }
+
+  .products-category-check-icon {
+    flex-shrink: 0;
+    margin-inline-start: 8px;
+    color: #ffffff;
   }
 
   .products-sort-wrapper,
   .products-sort-wrap {
     width: 100%;
+    display: flex;
     justify-content: flex-end;
   }
 
   .products-sort-select {
-    width: auto;
-    min-width: 160px;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
   }
 
   .products-grid {
