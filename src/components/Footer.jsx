@@ -18,8 +18,7 @@ function Footer() {
             <img
               src={LOGO_URL}
               alt="Hurfa"
-              height="44"
-              style={{ filter: "brightness(0) invert(1)" }}
+              className="footer-logo"
             />
           </Col>
 

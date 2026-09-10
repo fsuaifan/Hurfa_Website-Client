@@ -16,14 +16,32 @@ footer .container {
   padding-right: 20px;
 }
 
+.footer-logo {
+  height: 38px !important;
+  max-height: 38px !important;
+  width: auto !important;
+  max-width: 120px !important;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  display: inline-block;
+  vertical-align: middle;
+}
+
 @media (max-width: 768px) {
   .hurfa-footer {
     padding-top: 36px !important;
     padding-bottom: 24px !important;
+  }
+
+  .footer-logo {
+    height: 32px !important;
+    max-height: 32px !important;
+    max-width: 100px !important;
   }
 }
 
 html[lang="ar"] .hurfa-footer {
   text-align: right;
 }
+
 
