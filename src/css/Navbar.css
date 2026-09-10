@@ -93,14 +93,21 @@
 /* Mobile & Tablet sizing (<= 991px) */
 @media (max-width: 991px) {
   .hurfa-navbar {
-    padding-top: 0.35rem !important;
-    padding-bottom: 0.35rem !important;
+    padding-top: 0.45rem !important;
+    padding-bottom: 0.45rem !important;
+    min-height: 64px;
+  }
+
+  .hurfa-navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .hurfa-navbar .navbar-brand {
     position: relative;
-    height: 48px;
-    min-width: 65px;
+    height: 56px;
+    min-width: 85px;
     display: flex;
     align-items: center;
   }
@@ -110,6 +117,12 @@
     top: 50%;
     left: 0;
     transform: translateY(-50%);
+  }
+
+  html[lang="ar"] .hurfa-navbar .navbar-brand .nav-logo,
+  html[dir="rtl"] .hurfa-navbar .navbar-brand .nav-logo {
+    left: auto;
+    right: 0;
   }
 
   .hurfa-navbar.is-solid {
