@@ -295,8 +295,14 @@
 
     /* Responsive adjustments */
     @media (max-width: 991px) {
+      .kitchens-header {
+        padding: 40px 5% 24px;
+      }
+
       .kitchens-gallery-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        padding-bottom: 80px;
       }
 
       .model-detail-row {
@@ -312,7 +318,7 @@
     @media (max-width: 640px) {
       .kitchens-gallery-grid {
         grid-template-columns: 1fr;
-        padding-bottom: 80px;
+        padding-bottom: 60px;
       }
 
       .kitchen-tile {
@@ -321,4 +327,17 @@
 
       .model-main-display {
         aspect-ratio: 4 / 3;
+        max-height: 380px;
       }
+
+      .model-swatches-row {
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+
+      .model-swatch-btn {
+        width: 52px;
+        height: 52px;
+      }
+    }
+

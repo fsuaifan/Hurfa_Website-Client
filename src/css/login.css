@@ -361,22 +361,29 @@ html[lang="ar"] .login-link {
    Responsive
    ========================================================================== */
 @media (max-width: 520px) {
+  .login-page {
+    padding: 30px 12px 60px;
+  }
+
   .login-card {
-    padding: 32px 22px;
+    padding: 28px 18px;
     border-radius: 20px;
   }
 
   .login-role-tabs {
     flex-direction: column;
     border-radius: 16px;
+    gap: 4px;
   }
 
   .login-role-tab {
     width: 100%;
+    padding: 8px 12px;
   }
 
   .login-header h1 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 }
+
 

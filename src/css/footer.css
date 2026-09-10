@@ -1,16 +1,29 @@
 /* src/css/footer.css */
 
-/* Make footer span the full 100% width of the page */
 .hurfa-footer,
 footer {
   width: 100%;
   box-sizing: border-box;
+  background-color: #1a1918 !important;
 }
 
-/* Keep the inner content properly centered */
 .hurfa-footer .container,
 footer .container {
   max-width: 1320px;
   margin-left: auto;
   margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
+
+@media (max-width: 768px) {
+  .hurfa-footer {
+    padding-top: 36px !important;
+    padding-bottom: 24px !important;
+  }
+}
+
+html[lang="ar"] .hurfa-footer {
+  text-align: right;
+}
+

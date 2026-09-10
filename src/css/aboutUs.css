@@ -358,15 +358,35 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 991px) {
+@media (max-width: 1080px) {
   .about-cards-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
 
   .about-process-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 24px;
+  }
+
+  .about-process-step::after {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  .about-hero {
+    padding: 40px 5% 24px;
+  }
+
+  .about-cards-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 18px;
+  }
+
+  .about-process-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
   }
 
   .about-process-step::after {
@@ -374,6 +394,34 @@
   }
 
   .about-org-section {
-    padding: 50px 4% 60px;
+    padding: 40px 4% 50px;
+  }
+
+  .about-team-section {
+    padding: 60px 5% 80px;
+  }
+
+  .about-team-grid {
+    gap: 32px 20px;
+  }
+
+  .about-team-member {
+    width: 150px;
+  }
+
+  .about-team-avatar {
+    width: 100px;
+    height: 100px;
+    font-size: 1.5rem;
   }
 }
+
+html[lang="ar"] .about-process-step {
+  text-align: right;
+}
+
+html[lang="ar"] .about-process-step .dot {
+  left: auto;
+  right: 0;
+}
+
